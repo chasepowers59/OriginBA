@@ -17,64 +17,55 @@
     <query language="SQL"><![CDATA[
 SELECT TRIM(sa.acct_id) AS ACCT_ID, pn.entity_name AS CUSTOMER_NAME, TRIM(x.SA_ID) AS SA_ID, x.CUR_BAL, x.ARS_AMT1, x.ARS_AMT2, x.ARS_AMT3, x.ARS_AMT4, x.ARS_AMT5
 FROM (
-WITH base AS (
-  SELECT /*+ NO_EXPAND INLINE FULL(ft) */ ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
-         COALESCE(ft.cur_amt, 0) AS cur_amt, COALESCE(ft.tot_amt, 0) AS tot_amt,
-         CASE WHEN COALESCE(ft.cur_amt, 0) > 0 THEN ft.cur_amt ELSE 0 END AS debt_amt,
-         CASE WHEN COALESCE(ft.cur_amt, 0) < 0 THEN -ft.cur_amt ELSE 0 END AS credit_amt,
-         CASE WHEN $P{AGE_BY} = 'DUE' AND TRIM(ft.ft_type_flg) IN ('BS', 'BX')
-              THEN COALESCE((SELECT TRUNC(b.due_dt) FROM CISADM.CI_BSEG bs JOIN CISADM.CI_BILL b ON b.bill_id = bs.bill_id WHERE bs.bseg_id = ft.sibling_id), TRUNC(ft.ars_dt))
-              ELSE TRUNC(ft.ars_dt) END AS aging_dt
-  FROM CISADM.CI_FT ft
-  WHERE TRIM(ft.freeze_sw) = 'Y' AND TRIM(ft.not_in_ars_sw) = 'N' AND ft.ars_dt IS NOT NULL
-    AND TRUNC(ft.ars_dt) <= $P{AS_OF_DT}
-    AND ($P{AS_KNOWN_TODAY} = 'Y' OR ft.freeze_dttm < $P{AS_OF_DT} + INTERVAL '1' DAY)
-      AND ($P{CUST_CL_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa JOIN CISADM.CI_ACCT fa ON fa.acct_id = fsa.acct_id WHERE fsa.sa_id = ft.sa_id AND TRIM(fa.cust_cl_cd) = TRIM($P{CUST_CL_F})))
+WITH pos AS (
+  SELECT sa_id, cur_bal, tot_bal,
+         ars_amt1 - GREATEST(0, total_credit - total_debt) AS ars_amt1,
+         ars_amt2, ars_amt3, ars_amt4, ars_amt5
+  FROM (
+    SELECT sa_id, MAX(cur_bal) AS cur_bal, MAX(tot_bal) AS tot_bal, MAX(total_debt) AS total_debt, MAX(total_credit) AS total_credit,
+           SUM(CASE WHEN debt_amt > 0 AND age BETWEEN 0 AND 30 THEN unpaid ELSE 0 END) AS ars_amt1,
+           SUM(CASE WHEN debt_amt > 0 AND age BETWEEN 31 AND 60 THEN unpaid ELSE 0 END) AS ars_amt2,
+           SUM(CASE WHEN debt_amt > 0 AND age BETWEEN 61 AND 90 THEN unpaid ELSE 0 END) AS ars_amt3,
+           SUM(CASE WHEN debt_amt > 0 AND age BETWEEN 91 AND 120 THEN unpaid ELSE 0 END) AS ars_amt4,
+           SUM(CASE WHEN debt_amt > 0 AND age > 120 THEN unpaid ELSE 0 END) AS ars_amt5
+    FROM (
+      SELECT sa_id, debt_amt, cur_bal, tot_bal, total_debt, total_credit,
+             GREATEST(0, $P{AS_OF_DT} - aging_dt) AS age,
+             GREATEST(0, cum_debt - total_credit) - GREATEST(0, cum_debt - debt_amt - total_credit) AS unpaid
+      FROM (
+        SELECT sa_id, debt_amt, aging_dt,
+               SUM(cur_amt) OVER (PARTITION BY sa_id) AS cur_bal,
+               SUM(tot_amt) OVER (PARTITION BY sa_id) AS tot_bal,
+               SUM(debt_amt) OVER (PARTITION BY sa_id) AS total_debt,
+               SUM(credit_amt) OVER (PARTITION BY sa_id) AS total_credit,
+               SUM(debt_amt) OVER (PARTITION BY sa_id ORDER BY ars_dt, ft_id ROWS UNBOUNDED PRECEDING) AS cum_debt
+        FROM (
+          SELECT /*+ NO_EXPAND FULL(ft) */ ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
+                 COALESCE(ft.cur_amt, 0) AS cur_amt, COALESCE(ft.tot_amt, 0) AS tot_amt,
+                 CASE WHEN COALESCE(ft.cur_amt, 0) > 0 THEN ft.cur_amt ELSE 0 END AS debt_amt,
+                 CASE WHEN COALESCE(ft.cur_amt, 0) < 0 THEN -ft.cur_amt ELSE 0 END AS credit_amt,
+                 CASE WHEN $P{AGE_BY} = 'DUE' AND TRIM(ft.ft_type_flg) IN ('BS', 'BX')
+                      THEN COALESCE((SELECT TRUNC(b.due_dt) FROM CISADM.CI_BSEG bs JOIN CISADM.CI_BILL b ON b.bill_id = bs.bill_id WHERE bs.bseg_id = ft.sibling_id), TRUNC(ft.ars_dt))
+                      ELSE TRUNC(ft.ars_dt) END AS aging_dt
+          FROM CISADM.CI_FT ft
+          WHERE TRIM(ft.freeze_sw) = 'Y' AND TRIM(ft.not_in_ars_sw) = 'N' AND ft.ars_dt IS NOT NULL
+            AND TRUNC(ft.ars_dt) <= $P{AS_OF_DT}
+            AND ($P{AS_KNOWN_TODAY} = 'Y' OR ft.freeze_dttm < $P{AS_OF_DT} + INTERVAL '1' DAY)
+              AND ($P{CUST_CL_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa JOIN CISADM.CI_ACCT fa ON fa.acct_id = fsa.acct_id WHERE fsa.sa_id = ft.sa_id AND TRIM(fa.cust_cl_cd) = TRIM($P{CUST_CL_F})))
   AND ($P{CIS_DIVISION_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = ft.sa_id AND TRIM(fsa.cis_division) = TRIM($P{CIS_DIVISION_F})))
   AND ($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = ft.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))
-),
-sa_tot AS (
-  SELECT /*+ MATERIALIZE */ sa_id, SUM(cur_amt) AS cur_bal, SUM(tot_amt) AS tot_bal, SUM(debt_amt) AS total_debt, SUM(credit_amt) AS total_credit
-  FROM base
-  GROUP BY sa_id
-),
-debt_rows AS (
-  SELECT b.sa_id, b.aging_dt, b.debt_amt,
-         SUM(b.debt_amt) OVER (PARTITION BY b.sa_id ORDER BY b.ars_dt, b.ft_id ROWS UNBOUNDED PRECEDING) AS cum_debt
-  FROM base b
-  JOIN sa_tot t ON t.sa_id = b.sa_id AND t.cur_bal <> 0
-  WHERE b.debt_amt > 0
-),
-unpaid AS (
-  SELECT d.sa_id, d.aging_dt,
-         GREATEST(0, d.cum_debt - t.total_credit) - GREATEST(0, d.cum_debt - d.debt_amt - t.total_credit) AS unpaid_amt
-  FROM debt_rows d
-  JOIN sa_tot t ON t.sa_id = d.sa_id
-),
-aged AS (
-  SELECT sa_id,
-         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) BETWEEN 0 AND 30 THEN unpaid_amt ELSE 0 END) AS ars_amt1,
-         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) BETWEEN 31 AND 60 THEN unpaid_amt ELSE 0 END) AS ars_amt2,
-         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) BETWEEN 61 AND 90 THEN unpaid_amt ELSE 0 END) AS ars_amt3,
-         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) BETWEEN 91 AND 120 THEN unpaid_amt ELSE 0 END) AS ars_amt4,
-         SUM(CASE WHEN GREATEST(0, $P{AS_OF_DT} - aging_dt) > 120 THEN unpaid_amt ELSE 0 END) AS ars_amt5
-  FROM unpaid
-  GROUP BY sa_id
-),
-sa_pos AS (
-  SELECT t.sa_id, t.cur_bal, t.tot_bal,
-         COALESCE(a.ars_amt1, 0) - GREATEST(0, t.total_credit - t.total_debt) AS ars_amt1,
-         COALESCE(a.ars_amt2, 0) AS ars_amt2, COALESCE(a.ars_amt3, 0) AS ars_amt3,
-         COALESCE(a.ars_amt4, 0) AS ars_amt4, COALESCE(a.ars_amt5, 0) AS ars_amt5
-  FROM sa_tot t
-  LEFT JOIN aged a ON a.sa_id = t.sa_id
+        ) base
+      ) w
+    ) u
+    GROUP BY sa_id
+  ) t
+  WHERE cur_bal <> 0
 )
 SELECT /*+ RESULT_CACHE */ TRIM(sa.cis_division) AS SA_CIS_DIVISION, TRIM(sa.sa_type_cd) AS SA_TYPE_CD, p.sa_id AS SA_ID, p.cur_bal AS CUR_BAL,
        p.ars_amt1 AS ARS_AMT1, p.ars_amt2 AS ARS_AMT2, p.ars_amt3 AS ARS_AMT3, p.ars_amt4 AS ARS_AMT4, p.ars_amt5 AS ARS_AMT5,
        ROW_NUMBER() OVER (PARTITION BY TRIM(sa.cis_division), TRIM(sa.sa_type_cd) ORDER BY p.cur_bal DESC, p.sa_id) AS RN
-FROM sa_pos p
+FROM pos p
 JOIN CISADM.CI_SA sa ON sa.sa_id = p.sa_id
-WHERE p.cur_bal <> 0
 ) x
 JOIN CISADM.CI_SA sa ON sa.sa_id = x.SA_ID
 LEFT JOIN CISADM.CI_ACCT_PER ap ON ap.acct_id = sa.acct_id AND TRIM(ap.main_cust_sw) = 'Y'

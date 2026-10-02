@@ -273,14 +273,15 @@ class AsOf(unittest.TestCase):
     def test_the_snapshot_arithmetic_and_the_history_filter(self):
         for sql in (self.s.main_sql(), self.s.sub_sql()):
             for must in ("TRIM(ft.freeze_sw) = 'Y'", "TRIM(ft.not_in_ars_sw) = 'N'", "TRUNC(ft.ars_dt) <= $P{AS_OF_DT}",
-                         "ft.freeze_dttm < $P{AS_OF_DT} + INTERVAL '1' DAY", "ROWS UNBOUNDED PRECEDING", "GREATEST(0, t.total_credit - t.total_debt)",
+                         "ft.freeze_dttm < $P{AS_OF_DT} + INTERVAL '1' DAY", "ROWS UNBOUNDED PRECEDING", "GREATEST(0, total_credit - total_debt)",
                          "BETWEEN 91 AND 120", "> 120"):
                 self.assertIn(must, sql, must)
             self.assertIn("$P{AS_KNOWN_TODAY} = 'Y' OR", sql, "the switch that counts later cancellations back into history")
             self.assertIn("THEN COALESCE((SELECT TRUNC(b.due_dt) FROM CISADM.CI_BSEG bs JOIN CISADM.CI_BILL b", sql, "Age By DUE uses the bill's real due date, never a shifted constant")
             # College Station (35.8M FTs): no join serves a filter nobody set; the window covers only SAs with a balance
-            self.assertNotIn("JOIN CISADM.CI_ACCT ac", sql); self.assertIn("SELECT /*+ NO_EXPAND INLINE FULL(ft) */", sql)
-            self.assertIn("JOIN sa_tot t ON t.sa_id = b.sa_id AND t.cur_bal <> 0", sql)
+            self.assertNotIn("JOIN CISADM.CI_ACCT ac", sql); self.assertIn("SELECT /*+ NO_EXPAND FULL(ft) */", sql)
+            # one pass: no CTE is referenced twice, so no temporary table (the subreport's result cache depends on it)
+            self.assertNotIn("MATERIALIZE", sql); self.assertEqual(sql.count("FROM pos p"), 1)
         self.assertIn("x.SA_CIS_DIVISION = TRIM($P{SA_CIS_DIVISION})", self.s.sub_sql(), "SA types are division-qualified: the sub takes both keys")
 
 
