@@ -11,6 +11,7 @@ import logging
 from calendar import monthrange
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
+from statistics import median
 from typing import Any
 
 from api.data_version import data_version
@@ -22,6 +23,13 @@ from api.summary_cache import cached
 log = logging.getLogger("originba.api")
 
 HISTORY_MONTHS = 36
+# A trailing month holding under half of a typical month (the median of the twelve before it)
+# is not a month yet: the copy stopped receiving activity (CityCorp's June 2026 held 21% of
+# May's bills while the calendar called it complete). One or two such months are left out;
+# three in a row are a trend and stay.
+INCOMPLETE_FLOOR = 0.5
+INCOMPLETE_TAIL_MAX = 2
+TYPICAL_MIN_MONTHS = 6
 
 
 def complete_months(today: date, count: int) -> list[str]:
@@ -41,6 +49,22 @@ def series_from_rows(months: list[str], rows: list[list[Any]]) -> list[dict[str,
     by_month = {str(r[0])[:7]: float(r[-1] or 0) for r in rows if r and r[0] is not None}
     first = next((i for i, m in enumerate(months) if m in by_month), None)
     return [] if first is None else [{"month": m, "value": by_month.get(m, 0.0)} for m in months[first:]]
+
+
+def trim_incomplete_tail(series: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """The series without its incomplete trailing months, and those months with their share of a typical month."""
+    thin: list[dict[str, Any]] = []
+    for k in range(1, INCOMPLETE_TAIL_MAX + 2):
+        if len(series) - k < TYPICAL_MIN_MONTHS:
+            break
+        before = [p["value"] for p in series[max(0, len(series) - k - 12):len(series) - k]]
+        typical = median(before)
+        if typical <= 0 or series[-k]["value"] >= INCOMPLETE_FLOOR * typical:
+            break
+        thin.append({"month": series[-k]["month"], "pct": round(100 * series[-k]["value"] / typical)})
+    if not thin or len(thin) > INCOMPLETE_TAIL_MAX:
+        return series, []
+    return series[:-len(thin)], thin[::-1]
 
 
 def monthly_history(kpi: dict[str, Any], organization_id: str, months: int = HISTORY_MONTHS) -> list[dict[str, Any]]:
@@ -68,9 +92,9 @@ def _build(organization_id: str) -> tuple[dict[str, list], dict[str, dict], bool
     from api.executive_dashboard import EXECUTIVE_KPIS, available_kpis
     kpis, _ = available_kpis([k for k in EXECUTIVE_KPIS if not k.get("windowless")], organization_id)
 
-    def one(kpi: dict[str, Any]) -> list[dict[str, Any]] | None:
+    def one(kpi: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]] | None:
         try:
-            return monthly_history(kpi, organization_id)
+            return trim_incomplete_tail(monthly_history(kpi, organization_id))
         except Exception as exc:  # noqa: BLE001 -- one card failing leaves the others
             from api.executive_dashboard import is_missing_relation_error
             # an organization whose warehouse is not built yet says so on every card: expected
@@ -80,9 +104,10 @@ def _build(organization_id: str) -> tuple[dict[str, list], dict[str, dict], bool
 
     with ThreadPoolExecutor(max_workers=max(1, min(8, len(kpis)))) as pool:
         histories = list(pool.map(one, kpis))
-    history = {k["id"]: h for k, h in zip(kpis, histories) if h}
+    history = {k["id"]: h[0] for k, h in zip(kpis, histories) if h and h[0]}
+    incomplete = {k["id"]: h[1] for k, h in zip(kpis, histories) if h and h[0]}
     meta = {k["id"]: {"label": k["label"], "format": k.get("format", "number"), "workstream": k.get("workstream"),
-                      "snapshot_id": k.get("snapshot_id")}
+                      "snapshot_id": k.get("snapshot_id"), "incomplete_months": incomplete[k["id"]]}
             for k in kpis if k["id"] in history}
     return history, meta, None in histories
 

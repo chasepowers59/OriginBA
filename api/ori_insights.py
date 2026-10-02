@@ -208,7 +208,9 @@ def forecasts(history: dict[str, list[dict[str, Any]]], meta: dict[str, dict[str
             "headline": f"{label}: about {_approx(total, fmt)} over {span}",
             "detail": f"Likely between {_approx(low, fmt)} and {_approx(high, fmt)}. {how}; replayed on past "
                       f"months, its three-month total was off by {typical:.0f}% in a typical case "
-                      f"({len(totals)} checks).",
+                      f"({len(totals)} checks)." + "".join(
+                          f" {_month_label(m['month'])} is left out: it holds {m['pct']}% of a typical month and looks incomplete."
+                          for m in meta[kpi_id].get("incomplete_months") or []),
             "question": f"What is driving the {_lower_first(label)} forecast for {span}?",
         })
     return out
