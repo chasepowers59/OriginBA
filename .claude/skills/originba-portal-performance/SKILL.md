@@ -28,6 +28,12 @@ from and falls back to the slow, correct path when unsure.
   summary ("ori findings") and the cards' 36-month history ("ori trends", `api/ori_series.py`:
   one monthly query per windowed card, ~6-10 s cold on Ellensburg, 35 ms warm). Off under tests and with
   `PORTAL_WARM_CACHE=false`. Its last run per org is in Settings > System health.
+- **`data_as_of` anchor** (`config/portal_organizations.json`, `api/reporting_dates.py`): a frozen TEST
+  copy declares the last day ALL of its activity was normal (measure bills, payments AND transactions
+  by day; CityCorp's first anchor, read from bills alone, sat six weeks past the real end). Relative
+  windows end there, Ori's history ends there, and Data Quality takes the build-to-anchor gap off every
+  "Days ..." column (`api/dq_routes.aging_gap_days`), since the canvases age to the BUILD date. Remove
+  the key when the copy is refreshed.
 - **Date-window contract** `tests/fixtures/date_presets.json`: the browser (`datePresets.ts`) and
   the server (`api/date_presets.py`) must compute the same opening window, or the warmed report is
   never the one asked for. Both suites read this file; add a case there, never in one suite only.

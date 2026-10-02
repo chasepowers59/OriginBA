@@ -14,6 +14,8 @@ per-tenant warehouse pool (Postgres) or Oracle session pool every canvas query u
 from __future__ import annotations
 
 import copy
+from datetime import date
+import re
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -29,6 +31,7 @@ from api.demo_db import execute_query as oracle_query
 from api.executive_dashboard import (DATABASE_UNREACHABLE_NOTE, is_missing_relation_error, is_not_connected_error,
                                      is_transient_error)
 from api.freshness import built_at, refresh_marker
+from api.reporting_dates import data_as_of
 from api.org_db import require_org_for_data
 from api.snapshot_catalog import org_backend
 from api.summary_cache import cached
@@ -145,8 +148,42 @@ def summarise_counts(rules: list[dict[str, Any]]) -> dict[str, int]:
     }
 
 
+_DAYS_COLUMN = re.compile(r'"Days [^"]+"')
+_FROM = re.compile(r"^\s*FROM\b", re.IGNORECASE | re.MULTILINE)
+
+
+def aging_gap_days(org: str, engine: str) -> int:
+    """Days between the warehouse build and the organization's data_as_of anchor, 0 when either
+    is undeclared or unknown. Every "Days ..." column is computed at build time, so on a frozen
+    TEST copy it overstates the age by exactly this gap (CityCorp 2026-10-02: 2,559 "stuck
+    bills" were the dead tail's bill cycles, aged 101 days to a build four months after the
+    anchor)."""
+    anchor = data_as_of(org)
+    if not anchor:
+        return 0
+    built = built_at(refresh_marker(org, engine), engine)
+    if not built:
+        return 0
+    return max(0, (date.fromisoformat(built[:10]) - date.fromisoformat(anchor)).days)
+
+
+def _anchor_aging(sql: str, gap: int) -> str:
+    """The rule's SQL with every "Days ..." column aged to the anchor: shown so in the select
+    list, compared and ordered so everywhere else. A rule with no such column is unchanged."""
+    if gap <= 0 or not _DAYS_COLUMN.search(sql):
+        return sql
+    m = _FROM.search(sql)
+    head, tail = (sql[:m.start()], sql[m.start():]) if m else (sql, "")
+    head = _DAYS_COLUMN.sub(lambda c: f"{c.group(0)} - {gap} AS {c.group(0)}", head)
+    tail = _DAYS_COLUMN.sub(lambda c: f"({c.group(0)} - {gap})", tail)
+    return head + tail
+
+
 def _run_rules(org: str, engine: str, path: Path) -> list[dict[str, Any]]:
     rules = yaml.safe_load(path.read_text())
+    gap = aging_gap_days(org, engine)
+    if gap:
+        rules = [{**r, "sql": _anchor_aging(r["sql"], gap)} for r in rules]
     if engine == "oracle":
         def run_oracle(sql: str):
             return oracle_query(sql, organization_id=org, max_rows=ROW_CAP + 1,
@@ -251,6 +288,8 @@ def dq_findings(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
         "configured": True,
         "refresh_marker": marker,
         "built_at": built_at(marker, engine),
+        # a frozen copy's "Days ..." columns are aged to its anchor, not to the build
+        "aged_to": data_as_of(org) if aging_gap_days(org, engine) else None,
         **summarise_counts(out),
         "acknowledged": sum(len(e.get("acked_rows") or []) for e in out),
         "rules": out,

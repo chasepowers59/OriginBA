@@ -19,4 +19,7 @@ test("each finding row has a Mark done button", async ({ page, context }, info) 
   const header = page.getByText(/Rules run against this organization/);
   await expect(header).toContainText(/data refreshed [A-Z][a-z]{2} \d{1,2}, \d{4}/);
   await expect(header).not.toContainText(/\d{14}/);
+  // both e2e organizations are frozen TEST copies with a data_as_of anchor: every "Days ..."
+  // column is aged to it, and the page says so; a live organization would say nothing here
+  await expect(header).toContainText(/ages counted to [A-Z][a-z]{2} \d{1,2}, \d{4}, this organization's data-as-of date/);
 });
