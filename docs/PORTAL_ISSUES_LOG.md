@@ -167,6 +167,15 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 ## Decisions
 
+- 2026-10-02 (frozen TEST copies, Chase: "you choose what is best for the app"): **a `data_as_of` anchor
+  governs windows, Ori's history and Data Quality's aging; reports do not re-age.** On a copy that
+  stopped receiving activity, every "Days ..." column is computed to the BUILD date by dbt
+  (`as_of_date: runtime`), so a report such as "Which bill cycles have the longest-open bills?" shows
+  the dead tail aged to the build while Data Quality (which takes the build-to-anchor gap off) shows it
+  aged to the anchor. The principled fix, building the copy with `as_of_date` pinned to its anchor, was
+  weighed and declined: the weekly parity against the client's own CMS_SA_SNAPSHOT (refreshed to
+  SYSDATE) and the nightly point-in-time probe against CIS would both go red by construction. A
+  refreshed copy removes the anchor and the difference with it.
 - 2026-09-29 (Chase: "go with your recommendations"):
   - **UI-2 colour meaning:** one hue per series (`--chart-1`); the leading bar is emphasised by strength of that hue, not by another colour; red (`--over`) only for negative values and explicit thresholds; the cross-filter selection keeps `--chart-selected`. Replaces the primary-to-red value ramp.
   - **UI-4 one glossary, one grouping:** user-facing words are **data set** (never canvas, reporting table, domain, snapshot), **report** (a ready-to-run question), **view** (a saved view), **dashboard**, **workstream** (the business area); organization, never tenant; unit of measure, never UOM. The Library groups by workstream only (the pack chips go); the builder's nav item is **Build**; data set pages sit under Library.
