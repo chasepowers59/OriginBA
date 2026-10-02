@@ -23,7 +23,7 @@ FROM (
           WHERE q.bseg_id = b.bseg_id AND TRIM(q.sqi_cd) IS NULL
             AND INSTR(', ' || $P{UNITS} || ',', ', ' || TRIM(q.uom_cd) || ',') > 0
             AND $X{IN, TRIM(q.uom_cd), UOM_CODES_F}) AS usage_qty,
-         (SELECT SUM(c.calc_amt) FROM CISADM.CI_BSEG_CALC c WHERE c.bseg_id = b.bseg_id) AS billed_amt
+         (SELECT /*+ NO_EXPAND */ SUM(c.calc_amt) FROM CISADM.CI_BSEG_CALC c WHERE c.bseg_id = b.bseg_id) AS billed_amt
   FROM CISADM.CI_SA s
   JOIN CISADM.CI_SA_TYPE t ON t.sa_type_cd = s.sa_type_cd AND t.cis_division = s.cis_division
   JOIN CISADM.CI_BSEG b ON b.sa_id = s.sa_id

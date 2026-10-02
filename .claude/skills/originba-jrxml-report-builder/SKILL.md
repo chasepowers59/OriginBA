@@ -158,6 +158,11 @@ Rules that are not obvious from the schema:
   the CTEs: `SELECT * FROM (WITH ... SELECT ...) q`. The pack emitter does it and its test holds
   every emitted query to `SELECT`. To find a server-only failure, fill the JRXML locally with
   JasperReports 7.0.7 and ojdbc11 from the letterprint classpath, then bisect on the server.
+- **Optional filters need `/*+ NO_EXPAND */` on their query block** (measured at College Station
+  2026-10-02): with JDBC binds Oracle OR-expands `$P{X} IS NULL OR <pred>` into one UNION-ALL
+  branch per filter, each re-scanning the driving table (4x the cost, 600 s timeouts at 3.5M
+  bills). A literal-value run never shows it, so prove a report's plan with binds
+  (`EXPLAIN PLAN FOR ... :X ...`), not only with values.
 - **Heavy logic belongs in Oracle.** A JRXML query is a thin `SELECT` over a view or refreshed
   table; REP8 went from a giant inline query to `SELECT ... FROM JRS2C2M.REP8_AGED_BALANCE`
   (refreshed by `REFRESH_NEWARK_REP8_AGED_BALANCE`, `sql/clients/newark/rep8_aged_balance/`).

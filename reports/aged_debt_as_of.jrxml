@@ -17,7 +17,7 @@
     <query language="SQL"><![CDATA[
 SELECT * FROM (
 WITH base AS (
-  SELECT ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
+  SELECT /*+ NO_EXPAND */ ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
          COALESCE(ft.cur_amt, 0) AS cur_amt, COALESCE(ft.tot_amt, 0) AS tot_amt,
          CASE WHEN COALESCE(ft.cur_amt, 0) > 0 THEN ft.cur_amt ELSE 0 END AS debt_amt,
          CASE WHEN COALESCE(ft.cur_amt, 0) < 0 THEN -ft.cur_amt ELSE 0 END AS credit_amt,

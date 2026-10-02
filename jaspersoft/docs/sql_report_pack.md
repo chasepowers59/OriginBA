@@ -101,6 +101,37 @@ contact your system administrator" before the query runs; a real SQL error says 
 SQL statement"). The emitter wraps CTE queries as `SELECT * FROM (...) q`; a test holds every
 emitted query to `SELECT`.
 
+## College Station test org (promoted 2026-10-02)
+
+Promoted from Origin_DEV with `jrs_promote.py` (import clean, all 31 package files equal on
+re-export, every unit and pick-list bound to `CollegeStation_DS`). Validated by running each unit
+as a PDF on the server and comparing its Total row with the unit's own SQL run directly on
+College Station's TEST database with the same parameters (`validate_pack.py` in the session
+scratchpad; June 2026 is the last complete month there, bills stop 2026-09-11):
+
+| Unit | Window | PDF total = direct SQL |
+| --- | --- | --- |
+| Payments by Tender Type | Jun 2026 | 52,068 tenders, $17,606,957.50; 183 cancelled, $89,451.22 |
+| Adjustments by Type | Jun 2026 | 57,646 adjustments, net ($137,107.71) |
+| Adjustment / AP requests | Jun 2026 | 609 requests, $86,768.05 |
+| Top Usage Customers (Water, top 10) | 2025 | 348 bills, 254,967 MGW, 5.47% share; #1 = 49,891 MGW, the same as the client's `BSEG_SQ_USAGE_RPT_CURR` |
+
+What College Station's volume (3.47M bills, 16.5M segments, 35.8M FTs) adds, measured the same day:
+
+- **The first run of a window is disk-bound.** Billing by Cycle for one month is 50,568 bills and
+  248,577 segments; the plan is right (CI_BILL scan, then indexed probes into segments and charge
+  headers), but cold it took over ten minutes and warm it takes 3 s; GL by Distribution Code 18 s
+  warm. The promotion tool's execution pass, cold and at the 600 s ceiling, timed out on both.
+- **The optimizer's bill estimate is 357, not 50,568**: `TRIM(bill_stat_flg) = 'C'` hides the
+  column from statistics. Harmless here (the plan is still the right one).
+- **With binds, every optional filter was OR-expanded.** The server sends `$P{}` as bind
+  variables, and Oracle turned each `$P{X} IS NULL OR EXISTS (...)` into a UNION-ALL branch that
+  re-scanned the driving table: Billing by Cycle cost 140K with binds against 35K with literals,
+  four full scans of CI_BILL instead of one. The literal-value runs that proved the numbers never
+  showed it. Every query block that receives optional filters now carries `/*+ NO_EXPAND */`
+  (the generator injects it; a test holds it); with binds the plans are back to one branch
+  (Billing 35,083; GL 1,553; Aged Debt 4,561). Postgres reads the hint as a comment.
+
 ## Semantics, so the totals reconcile
 
 - **Billed amount** is calc headers of frozen segments, the same figure as

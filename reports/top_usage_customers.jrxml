@@ -17,7 +17,7 @@
     <query language="SQL"><![CDATA[
 SELECT * FROM (
 WITH seg AS (
-  SELECT b.bseg_id, b.end_dt, s.sa_id, s.acct_id, s.char_prem_id
+  SELECT /*+ NO_EXPAND */ b.bseg_id, b.end_dt, s.sa_id, s.acct_id, s.char_prem_id
   FROM CISADM.CI_BSEG b
   JOIN CISADM.CI_BILL bl ON bl.bill_id = b.bill_id
   JOIN CISADM.CI_SA s ON s.sa_id = b.sa_id

@@ -15,7 +15,7 @@
     <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
     <query language="SQL"><![CDATA[
-SELECT TRIM(r.ap_req_id) AS AP_REQ_ID, TRIM(r.adj_id) AS ADJ_ID,
+SELECT /*+ NO_EXPAND */ TRIM(r.ap_req_id) AS AP_REQ_ID, TRIM(r.adj_id) AS ADJ_ID,
        COALESCE(tl.descr, TRIM(a.adj_type_cd)) AS ADJ_TYPE_DESCR, TRIM(sa.acct_id) AS ACCT_ID,
        r.entity_name AS PAYEE, a.adj_amt AS ADJ_AMT, r.paid_amt AS PAID_AMT,
        a.cre_dt AS CRE_DT, r.scheduled_pay_dt AS SCHEDULED_PAY_DT

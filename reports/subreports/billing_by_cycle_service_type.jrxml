@@ -15,7 +15,7 @@
     <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
     <query language="SQL"><![CDATA[
-SELECT TRIM(t.svc_type_cd) AS SVC_TYPE_CD, COALESCE(sl.descr, TRIM(t.svc_type_cd)) AS SVC_TYPE_DESCR,
+SELECT /*+ NO_EXPAND */ TRIM(t.svc_type_cd) AS SVC_TYPE_CD, COALESCE(sl.descr, TRIM(t.svc_type_cd)) AS SVC_TYPE_DESCR,
        COUNT(DISTINCT s.sa_id) AS SERVICE_AGREEMENTS,
        COUNT(DISTINCT s.bseg_id) AS SEGMENTS,
        COUNT(DISTINCT CASE WHEN TRIM(s.est_sw) = 'Y' THEN s.bseg_id END) AS ESTIMATED_SEGMENTS,

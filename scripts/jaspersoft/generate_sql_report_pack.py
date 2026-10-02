@@ -126,18 +126,29 @@ class Spec:
 def _with_filters(sql: str, preds: list[str]) -> str:
     """Append the optional predicates to the query's (first) WHERE clause -- before GROUP BY /
     ORDER BY. Queries here have one WHERE at their driving level; the TOP-N subquery is the
-    exception and is handled by placing the marker comment where the filters belong."""
+    exception and is handled by placing the marker comment where the filters belong.
+
+    The block that receives them gets NO_EXPAND: with binds Oracle OR-expands each
+    "$P{X} IS NULL OR ..." into a UNION-ALL branch that re-scans the driving table (Billing by
+    Cycle at College Station: cost 140K vs 35K, over 600 s cold; measured 2026-10-02). Postgres
+    reads the hint as a comment."""
     preds = [p for p in preds if p]   # a filter applied inside the query's own logic adds no predicate
     if not preds:
         return sql
     extra = "".join(f"\n  AND {p}" for p in preds)
     if "/*FILTERS*/" in sql:
-        return sql.replace("/*FILTERS*/", extra.lstrip("\n"))
-    for kw in ("\nGROUP BY", "\nORDER BY"):
-        i = sql.find(kw)
-        if i >= 0:
-            return sql[:i] + extra + sql[i:]
-    return sql + extra
+        at = sql.find("/*FILTERS*/")
+        sql = sql.replace("/*FILTERS*/", extra.lstrip("\n"))
+    else:
+        at = next((i for i in (sql.find(kw) for kw in ("\nGROUP BY", "\nORDER BY")) if i >= 0), len(sql))
+        sql = sql[:at] + extra + sql[at:]
+    return _hint_block(sql, at)
+
+
+def _hint_block(sql: str, at: int) -> str:
+    """NO_EXPAND on the SELECT that owns position `at` (the nearest SELECT before it)."""
+    i = sql.rfind("SELECT", 0, at)
+    return sql[:i] + "SELECT /*+ NO_EXPAND */" + sql[i + len("SELECT"):]
 
 
 # ------------------------------------------------------------------ JRXML 7 emitter

@@ -63,6 +63,19 @@ class Sql(unittest.TestCase):
             for lit, why in s.constants.items():
                 self.assertTrue(why and ("lifecycle" in why or "lookup field name" in why or "PYMNT_SEL_STAT_FLG" in why), f"{s.name}: literal {lit!r} needs a base-product reason")
 
+    def test_optional_filters_never_or_expand(self):
+        # With binds Oracle OR-expands "$P{X} IS NULL OR EXISTS (...)" into a UNION-ALL branch per
+        # filter, each re-scanning the driving table: Billing by Cycle cost 140K vs 35K at College
+        # Station (EXPLAIN with binds, 2026-10-02) and timed out at 600 s. NO_EXPAND in the block
+        # that holds the filters keeps the one plan the literal-value run gets.
+        for s in g.SPECS:
+            for name, sql in ((s.name, s.main_sql()), (s.sub.name, s.sub_sql())):
+                if "IS NULL OR" not in sql and "$X{IN" not in sql:
+                    continue
+                i = max(sql.find("IS NULL OR"), sql.find("$X{IN"))
+                block = sql[:sql.find("IS NULL OR") if "IS NULL OR" in sql else i]
+                self.assertIn("/*+ NO_EXPAND */", block, f"{name}: the block with the optional filters needs NO_EXPAND")
+
     def test_every_emitted_query_starts_with_select(self):
         # JRS 10 refuses a report query that starts with WITH: a generic "An error has occurred"
         # before the query runs (measured on Origin_DEV 2026-10-01; the same CTE as an inline view ran)

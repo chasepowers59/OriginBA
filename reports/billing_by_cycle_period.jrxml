@@ -15,7 +15,7 @@
     <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
     <query language="SQL"><![CDATA[
-SELECT COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)') AS BILL_CYC_CD,
+SELECT /*+ NO_EXPAND */ COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)') AS BILL_CYC_CD,
        COALESCE(cl.descr, CASE WHEN NULLIF(TRIM(b.bill_cyc_cd), '') IS NULL THEN 'Off-cycle / no bill cycle' ELSE TRIM(b.bill_cyc_cd) END) AS BILL_CYC_DESCR,
        COUNT(DISTINCT b.bill_id)  AS BILLS,
        COUNT(DISTINCT b.acct_id)  AS ACCOUNTS,
