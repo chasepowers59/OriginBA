@@ -15,7 +15,7 @@ import { asOrg } from "./org";
  */
 
 const PAGES = [
-  "/", "/reports", "/dashboards", "/build", "/database", "/data-quality", "/settings",
+  "/", "/reports", "/dashboards", "/build", "/database", "/data-quality", "/forecasts", "/settings",
   "/workstream/billing", "/workstream/finance",
   "/explore/rpt_bill_segment", "/explore/rpt_payment", "/explore/rpt_rate_configuration",
 ];
