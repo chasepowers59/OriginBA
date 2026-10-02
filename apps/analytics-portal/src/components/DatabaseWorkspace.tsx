@@ -15,6 +15,7 @@ import {
   type DatabaseQueryTemplate,
   type WorkspaceEngine,
 } from "@/lib/databaseQueryTemplates";
+import { browseQuery } from "@/lib/databaseBrowse";
 import { exportRowsCsv, formatBoolean, formatCellValue, formatCurrency, formatNumber, isIdentifierColumn } from "@/lib/format";
 import { prettifyFieldName } from "@/lib/businessLabels";
 import { cisadmTableGuide } from "@/lib/cisadmTableGuide";
@@ -100,6 +101,7 @@ export function DatabaseWorkspace({
   // Postgres is the default guess; the first /database/tables response corrects this
   // for an Oracle tenant.
   const [engine, setEngine] = useState<WorkspaceEngine>("postgres");
+  const [engineKnown, setEngineKnown] = useState(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
   const queryTemplates = useMemo(() => templatesForEngine(engine), [engine]);
@@ -141,6 +143,7 @@ export function DatabaseWorkspace({
     } catch {
       setTables([]);
     } finally {
+      setEngineKnown(true);   // learned, or the default stands: either way the seed may run
       setTablesLoading(false);
     }
   }, [dbConfigured]);
@@ -272,28 +275,22 @@ export function DatabaseWorkspace({
   };
 
   const insertTable = (tableName: string) => {
-    // CISADM browse snippets. ci_pay_tndr carries protected columns, so its snippet
-    // lists safe columns explicitly — the fence rejects SELECT * there.
-    const isTender = tableName.toLowerCase() === "ci_pay_tndr";
-    const cols = isTender ? "pay_event_id, tender_type_cd, tender_amt, tender_ctl_id" : "*";
-    const snippet =
-      engine === "postgres"
-        ? `SELECT ${cols}\nFROM cisadm.${tableName}\nLIMIT ${pageSize}`
-        : `SELECT ${cols}\nFROM ${tableName}\nFETCH FIRST ${pageSize} ROWS ONLY`;
-    setSql(snippet);
+    setSql(browseQuery(tableName, engine, pageSize));
     setActiveTemplate(null);
     editorRef.current?.focus();
   };
 
-  // Deep-link entry from a Canvas Overview: /database?table=<name> seeds a browse query.
+  // Deep-link entry from a data set page: /database?table=<name> seeds a browse query, once the
+  // engine is known. Seeding on mount gave an Oracle organization the Postgres form and ORA-00907
+  // on Run (CityCorp, 2026-10-02).
   const seededTable = useRef(false);
   useEffect(() => {
-    if (initialTable && !seededTable.current) {
+    if (initialTable && engineKnown && !seededTable.current) {
       seededTable.current = true;
       insertTable(initialTable);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialTable]);
+  }, [initialTable, engineKnown]);
 
   const statusText = useMemo(() => {
     if (loading) return "Executing…";
