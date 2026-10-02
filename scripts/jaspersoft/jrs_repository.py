@@ -22,7 +22,7 @@ the login is scoped to, named back; on prod also --i-mean-prod; --dry-run prints
     --org Origin_DEV mkdir  /SmartCity/Report/New_Folder --label "New Folder" --confirm Origin_DEV
     --org Origin_DEV perms  /SmartCity/Report/Standard_Offering
     --org Origin_DEV perms-set /SmartCity/Report/X role:/ROLE_BILLING:18 role:/ROLE_ADMINISTRATOR:1 --confirm Origin_DEV
-    --org Origin_DEV jobs [--report /SmartCity/Report/X/r] | job ID | job-run ID | job-delete ID
+    --org Origin_DEV jobs [--report /SmartCity/Report/X/r] | job ID | job-delete ID
     --org Origin_DEV users [--role ROLE_BILLING] | roles
     --org Origin_DEV export /SmartCity/Report/Standard_Offering/Finance --out backups/finance.zip
     --org Origin_DEV run /SmartCity/Report/Standard_Offering/Finance/gl_by_distribution_code_period --format pdf --param FROM_DT=2026-08-01 --param TO_DT=2026-08-31
@@ -96,7 +96,7 @@ def _call(path: str, *, method: str = "GET", body: bytes | None = None, ctype: s
 
 # ---- every write goes through here: the org must be named back, prod must be meant, and the
 # call is printed before it is made so a --dry-run shows exactly what would hit the server.
-WRITES = {"copy", "move", "delete", "mkdir", "perms-set", "job-delete", "job-run", "import", "put-file"}
+WRITES = {"copy", "move", "delete", "mkdir", "perms-set", "job-delete", "import", "put-file"}
 
 
 def guard_write(cmd: str, a) -> None:
@@ -204,11 +204,10 @@ def jobs(report_uri: str | None) -> int:
 
 
 def job(cmd: str, job_id: str, a) -> int:
+    # No run-now: JasperReports Server 10.0 has no POST /rest_v2/jobs/{id}/run (404); a job runs on its trigger or from the UI.
     if cmd == "job":
         code, text = _call(f"/rest_v2/jobs/{job_id}", accept="application/job+json"); return _show(code, text)
-    if cmd == "job-delete":
-        return _show(*_write("DELETE", f"/rest_v2/jobs/{job_id}", a))
-    return _show(*_write("POST", f"/rest_v2/jobs/{job_id}/run", a))
+    return _show(*_write("DELETE", f"/rest_v2/jobs/{job_id}", a))
 
 
 def users(role: str | None) -> int:
@@ -357,7 +356,7 @@ def main() -> int:
     pr = sub.add_parser("perms", help="who can do what on a resource"); pr.add_argument("uri")
     ps = sub.add_parser("perms-set", help="REPLACE a resource's permissions: role:/ROLE_X:18 user:/name:30 ... (the recipient carries a colon; 0 = no access, 1 administer, 2 read, 32 execute only)"); ps.add_argument("uri"); ps.add_argument("grants", nargs="+")
     j = sub.add_parser("jobs", help="scheduled report jobs, optionally for one report"); j.add_argument("--report")
-    for c in ("job", "job-delete", "job-run"):
+    for c in ("job", "job-delete"):
         x = sub.add_parser(c); x.add_argument("id")
     u = sub.add_parser("users"); u.add_argument("--role")
     sub.add_parser("roles")
@@ -382,7 +381,7 @@ def main() -> int:
     if a.cmd == "perms": return perms(a.uri)
     if a.cmd == "perms-set": return perms_set(a.uri, a.grants, a)
     if a.cmd == "jobs": return jobs(a.report)
-    if a.cmd in ("job", "job-delete", "job-run"): return job(a.cmd, a.id, a)
+    if a.cmd in ("job", "job-delete"): return job(a.cmd, a.id, a)
     if a.cmd == "users": return users(a.role)
     if a.cmd == "roles": return roles()
     if a.cmd == "export": return export(a.uris, a.out)
