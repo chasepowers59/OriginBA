@@ -27,6 +27,13 @@ test("home has one question box: the vetted-metric form waits folded under Ori",
   await expect(form).toBeHidden();
   await page.getByText("Run a vetted metric with your own filters").click();
   await expect(form).toBeVisible();
+  // the folded form lists the metrics it answers; choosing one runs it, no model call
+  const picker = page.getByRole("combobox", { name: "Choose a metric" });
+  await expect(picker).toBeVisible({ timeout: 30_000 });
+  const answered = page.waitForResponse((r) => r.url().includes("/analytics-nlq") && r.request().method() === "POST", { timeout: 120_000 });
+  await picker.selectOption({ label: "Total customer accounts" });
+  expect((await answered).ok()).toBe(true);
+  await expect(form).toHaveValue(/.+/);
 });
 
 test("every other page offers Ask Ori beside it", async ({ page }) => {
