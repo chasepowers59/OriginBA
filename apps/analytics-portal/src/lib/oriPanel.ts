@@ -16,7 +16,7 @@ export type ForecastRow = { month: string; actual?: number; projected?: number; 
 
 /**
  * One row per month: the actual months, then the projected ones. The last actual month also
- * starts the projection, with a range of no width, so the dashed line and the band grow out of
+ * starts the forecast, with a range of no width, so the dashed line and the band grow out of
  * the last real point rather than floating beside it.
  */
 export function forecastRows({ history, forecast }: Pick<OriForecast, "history" | "forecast">): ForecastRow[] {

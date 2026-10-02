@@ -1,5 +1,5 @@
 """Ori's home surfaces (api/ori_insights.py): findings and Ori's read (fast, from the home summary),
-unusual months and projections (the monthly history, api/ori_series.py)."""
+unusual months and forecasts (the monthly history, api/ori_series.py)."""
 from __future__ import annotations
 
 from typing import Any

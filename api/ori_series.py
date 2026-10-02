@@ -1,4 +1,4 @@
-"""Monthly history of the home cards, for Ori's unusual months and projections.
+"""Monthly history of the home cards, for Ori's unusual months and forecasts.
 
 Each windowed home card's OWN number (its value query, filters and default lens) by calendar
 month, complete months only, ending at the organization's reporting date or the day before its

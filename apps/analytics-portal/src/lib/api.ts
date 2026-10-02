@@ -632,7 +632,7 @@ export type OriAnomaly = {
   headline: string; detail: string; question: string; snapshot_id?: string | null;
 };
 
-/** Where a home card is heading: the actual months, then a projection with its likely range. */
+/** Where a home card is heading: the actual months, then a forecast with its likely range. */
 export type OriForecast = {
   kpi_id: string; label: string; format: "currency" | "number";
   history: { month: string; value: number }[];
@@ -655,7 +655,7 @@ export function fetchOriFindings(signal?: AbortSignal, workstream?: string): Pro
   return fetchJson(`/portal/ori/findings${query}`, { signal });
 }
 
-/** Unusual months and projections for the home cards; slow on a cold cache, so callers abort it. */
+/** Unusual months and forecasts for the home cards; slow on a cold cache, so callers abort it. */
 export function fetchOriTrends(signal?: AbortSignal): Promise<OriTrends> {
   return fetchJson("/portal/ori/trends", { signal });
 }

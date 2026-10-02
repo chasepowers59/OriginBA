@@ -5,7 +5,7 @@
  */
 import type { Turn } from "./assistant";
 
-/** One of Ori's own items (a projection, an unusual month): the server restates its figures. */
+/** One of Ori's own items (a forecast, an unusual month): the server restates its figures. */
 export type OriItem = { kind: "forecast" | "anomaly"; kpi_id: string };
 
 export type PageContext = { canvas_id: string; label: string; period?: string; filters?: string[]; ori_item?: OriItem };

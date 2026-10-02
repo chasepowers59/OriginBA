@@ -90,7 +90,7 @@ def warm_once(org_id: str) -> list[str]:
     jobs = [("home", lambda: cached_home_summary(org_id, 30, False, "prior_period", [], ["*"], {}, ())),
             # the home summary in compare mode: what Ori's findings read (api/ori_routes.py)
             ("ori findings", lambda: cached_home_summary(org_id, 30, True, "prior_period", [], ["*"], {}, ())),
-            # the cards' monthly history: Ori's unusual months and projections (api/ori_series.py)
+            # the cards' monthly history: Ori's unusual months and forecasts (api/ori_series.py)
             ("ori trends", lambda: cached_history(org_id)),
             # the data-quality rules: ~40 s at Ellensburg, served until the next rebuild
             ("data quality", lambda: warm_data_quality(org_id))]

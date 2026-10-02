@@ -27,7 +27,7 @@ export function OriInsights({ workstream }: { workstream?: string } = {}) {
     const { signal } = controller;
     // An aborted request is not an empty answer: Strict Mode aborts the first mount's requests.
     fetchOriFindings(signal, workstream).then(setRead, () => signal.aborted || setRead(NO_READ));
-    // projections read the home cards' monthly history, so a workstream page has none
+    // forecasts read the home cards' monthly history, so a workstream page has none
     if (workstream) setTrends(NO_TRENDS);
     else fetchOriTrends(signal).then(setTrends, () => signal.aborted || setTrends(NO_TRENDS));
     return () => controller.abort();

@@ -1,4 +1,4 @@
-"""What Ori says unprompted about the home cards: findings, unusual months, projections, a read.
+"""What Ori says unprompted about the home cards: findings, unusual months, forecasts, a read.
 
 FINDINGS and ORI'S READ come from the SAME summary the home page shows (the vetted KPI
 runner, compare mode), so they can never disagree with a card. A finding needs a windowed
@@ -6,10 +6,10 @@ card (a balance or a population has no prior period), both values present, a non
 prior, a move of at least 15%, and enough behind it to matter: a count of at least 20 or
 money of at least 1,000 in either period. At most three, largest first.
 
-UNUSUAL MONTHS and PROJECTIONS read each card's monthly history (api/ori_series.py). A month
+UNUSUAL MONTHS and FORECASTS read each card's monthly history (api/ori_series.py). A month
 is unusual only when it falls outside all of the 12 before it AND sits 3.5 robust deviations
 and 15% from their median (a seasonal peak inside last year's range is not news). A
-projection of the next three months is either the same months last year scaled by the last
+forecast of the next three months is either the same months last year scaled by the last
 three months against a year earlier, or the average of the last 12 months: whichever missed
 the three-month total less when replayed on the organization's own past months, published
 only when that miss was at most 15% in a typical case and at most 25% in four cases of five,
