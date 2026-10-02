@@ -40,6 +40,16 @@ from and falls back to the slow, correct path when unsure.
   Catalog presets may be names (`"last_12_months"`): a name picks the chip of that label.
 
 ## Measured (say where a number came from)
+- Both proof-of-concept organizations, 2026-10-02, through the running API after a restart and
+  warm (`scratchpad timing_pass.py`, one request each): Home 30 days 0.04 s warm (4.0 s the first
+  time at Ellensburg); the 90-day and 6-month chips 1.4-1.8 s cold, 0.04 s again, with or without
+  Compare, so the warmer need not pre-build them; every workstream summary 0.03 s warm at CityCorp
+  and 0.65-1.0 s at Ellensburg (cashiering 5.9 s once); Ori findings/trends and Data Quality 0.03-2.2 s
+  warm; a 12-month monthly count on each of the eight largest data sets 0.4-1.2 s (rpt_bill_segment_read
+  3.0 s at Ellensburg, the one without an aggregate). The 365-day Compare summary is 32-47 s cold and
+  is no UI chip; `check_kpi_consistency_live.py` is its only caller. Ori, one live question per
+  organization: 10-17 s, four model turns, ~22-25K cached input tokens read and ~11K written per
+  organization's first question.
 
 - Ellensburg, 2026-09-29 after the full refresh, every ready-to-run report on the eight
   largest data sets over a 12-month window, cold: 24 of 26 answer in 0.05-1.7 s. The two
