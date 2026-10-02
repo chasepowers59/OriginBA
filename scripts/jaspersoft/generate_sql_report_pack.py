@@ -382,8 +382,10 @@ WINDOW = "{col} >= $P{{FROM_DT}} AND {col} < $P{{TO_DT}} + INTERVAL '1' DAY"
 # EXISTS, the due date a scalar subquery Oracle evaluates only in the DUE branch), is INLINE so each
 # pass is a scan rather than a TEMP copy, and the FIFO window runs only over SAs with a balance (an
 # SA at zero is excluded from every output anyway).
+# FULL(ft): with TRIM() on the flags and TRUNC() on the date the optimizer estimated 178 of 30M rows
+# and read the whole table through an index one row at a time (College Station plan, 2026-10-02).
 AGED = '''WITH base AS (
-  SELECT /*+ INLINE */ ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
+  SELECT /*+ INLINE FULL(ft) */ ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
          COALESCE(ft.cur_amt, 0) AS cur_amt, COALESCE(ft.tot_amt, 0) AS tot_amt,
          CASE WHEN COALESCE(ft.cur_amt, 0) > 0 THEN ft.cur_amt ELSE 0 END AS debt_amt,
          CASE WHEN COALESCE(ft.cur_amt, 0) < 0 THEN -ft.cur_amt ELSE 0 END AS credit_amt,

@@ -279,7 +279,7 @@ class AsOf(unittest.TestCase):
             self.assertIn("$P{AS_KNOWN_TODAY} = 'Y' OR", sql, "the switch that counts later cancellations back into history")
             self.assertIn("THEN COALESCE((SELECT TRUNC(b.due_dt) FROM CISADM.CI_BSEG bs JOIN CISADM.CI_BILL b", sql, "Age By DUE uses the bill's real due date, never a shifted constant")
             # College Station (35.8M FTs): no join serves a filter nobody set; the window covers only SAs with a balance
-            self.assertNotIn("JOIN CISADM.CI_ACCT ac", sql); self.assertIn("SELECT /*+ NO_EXPAND INLINE */", sql)
+            self.assertNotIn("JOIN CISADM.CI_ACCT ac", sql); self.assertIn("SELECT /*+ NO_EXPAND INLINE FULL(ft) */", sql)
             self.assertIn("JOIN sa_tot t ON t.sa_id = b.sa_id AND t.cur_bal <> 0", sql)
         self.assertIn("x.SA_CIS_DIVISION = TRIM($P{SA_CIS_DIVISION})", self.s.sub_sql(), "SA types are division-qualified: the sub takes both keys")
 
