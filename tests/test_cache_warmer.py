@@ -73,6 +73,18 @@ class WarmerTests(unittest.TestCase):
         self.version[0] = "v2"
         self.assertEqual(cw.warm_once("demo25"), ["home", "ori findings", "ori trends", "data quality", "billing", "finance"])
 
+    def test_a_new_day_warms_again_on_the_same_stamp(self):
+        # Every cache key carries the day (a window never outlives its date), so at midnight UTC every
+        # entry misses. CityCorp's nightly skipped on 2026-10-02 (VPN down), the stamp never moved, and
+        # the first visitor paid a cold data-quality run while another page timed out beside it.
+        from datetime import date
+        with mock.patch.object(cw, "_today", return_value=date(2026, 10, 1)):
+            self.assertEqual(len(cw.warm_once("demo25")), 6)
+            self.assertEqual(cw.warm_once("demo25"), [])
+        with mock.patch.object(cw, "_today", return_value=date(2026, 10, 2)):
+            self.assertEqual(len(cw.warm_once("demo25")), 6)
+            self.assertEqual(cw.warm_once("demo25"), [])
+
     def test_an_unknown_stamp_does_nothing(self):
         self.version[0] = None
         self.assertEqual(cw.warm_once("demo25"), [])
