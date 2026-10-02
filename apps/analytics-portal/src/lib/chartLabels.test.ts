@@ -23,3 +23,16 @@ describe("categoryLabel", () => {
     expect(categoryLabel(2026)).toBe("2026");
   });
 });
+
+import { tickText } from "./chartLabels";
+
+describe("tickText: a time-axis tick is kept short, except the one that must say more", () => {
+  it("cuts a long tick to fifteen characters and an ellipsis", () => {
+    expect(tickText("Electric Commercial (Demand)")).toBe("Electric Commer…");
+    expect(tickText("Jun 2026")).toBe("Jun 2026");
+  });
+
+  it("a cut-short bucket's tick is shown whole: it is what the chart is saying", () => {
+    expect(tickText("Jun 2026 (to Jun 2, 2026)", { whole: true })).toBe("Jun 2026 (to Jun 2, 2026)");
+  });
+});
