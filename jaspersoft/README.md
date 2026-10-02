@@ -9,7 +9,7 @@ page is the index.
 | --- | --- | --- |
 | Generated domains (dbt canvases, `<CANVAS>_BI` views) | `~/originba_dbt/jaspersoft/domains/<target>/` | `jaspersoft-domain-generation` (dbt repo) |
 | Hand-built domains (CISADM joins, active-8 snapshots) | `domains/exports/manual_imports/` (7 active-8 XML, report packages); `domains/manual_imports/newark_*` (client deliverables); `domains/working/` (temporary) | `.claude/skills/originba-jaspersoft-domain-modeling` |
-| Standardized SQL reports (one generated pack; Origin_DEV + College_Station test, `Standard_Offering/Standardized_Reports`) | `scripts/jaspersoft/generate_sql_report_pack.py`, `jaspersoft/docs/sql_report_pack.md` (semantics, College Station timings, the index DDL), deploy `scripts/jaspersoft/jrs_deploy_report_units.py`, promote `scripts/jaspersoft/jrs_promote.py` | `.claude/skills/originba-jrxml-report-builder` (Pattern D) |
+| Standardized SQL reports (one generated pack; Origin_DEV + College_Station test, JRS folder Standard_Offering/Standardized_Reports) | `scripts/jaspersoft/generate_sql_report_pack.py`, `jaspersoft/docs/sql_report_pack.md` (semantics, College Station timings, the index DDL), deploy `scripts/jaspersoft/jrs_deploy_report_units.py`, promote `scripts/jaspersoft/jrs_promote.py` | `.claude/skills/originba-jrxml-report-builder` (Pattern D) |
 | JRXML reports + input controls | `reports/`, `server/input_controls/` (paired `<report>_input_controls{,_rest}.json`), `deploy/build_report_unit*.sh` | `.claude/skills/originba-jrxml-report-builder`; style: `origin-doc-style` (dbt repo) |
 | Client promotion and tenant imports | `deploy/jaspersoft_client_promotion/`, `scripts/jaspersoft/{prepare_client_imports,build_client_tenant_report_import,verify_prepared_import,run_client_import_pipeline}.py` | `.claude/skills/jaspersoft-client-tenant-import`, `originba-client-promotion` |
 | Environment promotion (Origin_DEV -> STAGE etc.) | `deploy/jaspersoft_environment_promotion/`, `scripts/jaspersoft/promotion_environments.py` | -- |
@@ -18,7 +18,6 @@ page is the index.
 | Dashboards | `jaspersoft/dashboards/{native,snapshot}_dashboard_pack_v1/`, `scripts/jaspersoft/package_native_dashboard.py` | -- |
 | Snapshot operations (the active-8) | `sql/performance/snapshots/` and its `docs/` | `originba-snapshot-rollout-qa` |
 | Delivery standards, runbooks, export anatomy, troubleshooting | `jaspersoft/docs/` (moved from `docs/` 2026-09-08; `docs/MOVED.md` lists them) | -- |
-| **Odessa import/export (analytics + cross-repo)** | `jaspersoft/docs/odessa_jaspersoft_import_export_guide.md` (also covers `~/originba_dbt`, `~/originba-letterprint`) | `jaspersoft-client-tenant-import` |
 | Per-report and QA signoff | `jaspersoft/docs/ar_aging_asof_report_import.md`, `scripts/doc/build_standard_offering_validation_doc.py` | `originba-validation-signoff` |
 
 **Resolutions written here so they stop being re-derived (2026-09-08)**
