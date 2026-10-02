@@ -31,7 +31,7 @@ test("home has one question box: the vetted-metric form waits folded under Ori",
   const picker = page.getByRole("combobox", { name: "Choose a metric" });
   await expect(picker).toBeVisible({ timeout: 30_000 });
   const answered = page.waitForResponse((r) => r.url().includes("/analytics-nlq") && r.request().method() === "POST", { timeout: 120_000 });
-  await picker.selectOption({ label: "Total customer accounts" });
+  await picker.selectOption({ label: "Billing accounts (at least one active service agreement)" });
   expect((await answered).ok()).toBe(true);
   await expect(form).toHaveValue(/.+/);
 });
