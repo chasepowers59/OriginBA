@@ -780,16 +780,19 @@ ORDER BY SUM(p.cur_bal) DESC""",
         sub=Sub(
             name="aged_debt_as_of_top", key_param="SA_TYPE_CD", key_field="SA_TYPE_CD", extra_keys={"SA_CIS_DIVISION": "SA_CIS_DIVISION"},
             intro='"Largest balances of SA type " + $P{SA_TYPE_CD}',
-            sql="SELECT TRIM(sa.acct_id) AS ACCT_ID, pn.entity_name AS CUSTOMER_NAME, TRIM(x.SA_ID) AS SA_ID, x.CUR_BAL, x.ARS_AMT1, x.ARS_AMT2, x.ARS_AMT3, x.ARS_AMT4, x.ARS_AMT5\nFROM (\n" + AGED.format(restrict="") + """SELECT /*+ RESULT_CACHE */ TRIM(sa.cis_division) AS SA_CIS_DIVISION, TRIM(sa.sa_type_cd) AS SA_TYPE_CD, p.sa_id AS SA_ID, p.cur_bal AS CUR_BAL,
+            # the cached block keeps only the top N per type (TOP_N is the same for every row), so the
+            # result stays within Oracle's per-result cache limit; one row per SA with a balance did not
+            sql="SELECT TRIM(sa.acct_id) AS ACCT_ID, pn.entity_name AS CUSTOMER_NAME, TRIM(x.SA_ID) AS SA_ID, x.CUR_BAL, x.ARS_AMT1, x.ARS_AMT2, x.ARS_AMT3, x.ARS_AMT4, x.ARS_AMT5\nFROM (\n  SELECT /*+ RESULT_CACHE */ r.* FROM (\n" + AGED.format(restrict="") + """SELECT TRIM(sa.cis_division) AS SA_CIS_DIVISION, TRIM(sa.sa_type_cd) AS SA_TYPE_CD, p.sa_id AS SA_ID, p.cur_bal AS CUR_BAL,
        p.ars_amt1 AS ARS_AMT1, p.ars_amt2 AS ARS_AMT2, p.ars_amt3 AS ARS_AMT3, p.ars_amt4 AS ARS_AMT4, p.ars_amt5 AS ARS_AMT5,
        ROW_NUMBER() OVER (PARTITION BY TRIM(sa.cis_division), TRIM(sa.sa_type_cd) ORDER BY p.cur_bal DESC, p.sa_id) AS RN
 FROM pos p
 JOIN CISADM.CI_SA sa ON sa.sa_id = p.sa_id
+  ) r WHERE r.RN <= $P{TOP_N}
 ) x
 JOIN CISADM.CI_SA sa ON sa.sa_id = x.SA_ID
 LEFT JOIN CISADM.CI_ACCT_PER ap ON ap.acct_id = sa.acct_id AND TRIM(ap.main_cust_sw) = 'Y'
 LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_flg) = 'PRIM'
-WHERE x.SA_CIS_DIVISION = TRIM($P{SA_CIS_DIVISION}) AND x.SA_TYPE_CD = TRIM($P{SA_TYPE_CD}) AND x.RN <= $P{TOP_N}
+WHERE x.SA_CIS_DIVISION = TRIM($P{SA_CIS_DIVISION}) AND x.SA_TYPE_CD = TRIM($P{SA_TYPE_CD})
 ORDER BY x.RN""",
             columns=[Col("ACCT_ID", "Account", width=72), Col("CUSTOMER_NAME", "Customer", width=136), Col("SA_ID", "SA", width=60),
                      Col("CUR_BAL", "Balance", "java.math.BigDecimal", 90, "Right", MONEY, True),
