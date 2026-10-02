@@ -558,7 +558,10 @@ will be Ori too, so they never need renaming.
   aborted on unmount, and shows nothing on error. The panel is absent only when the brief,
   findings, unusual months and forecasts are all empty (`lib/oriPanel.oriPanelShows`). The
   rules (`api/ori_insights.py`, `api/ori_series.py`, pinned by `tests/test_ori_trends.py`):
-  complete months only; an unusual month is outside all 12 before it AND 3.5 robust deviations
+  complete months only, and a trailing month holding under half of a typical month (median of
+  the 12 before it) is left out as incomplete, one or two of them, named in the forecast's
+  detail (CityCorp's June 2026: 21% of May, a TEST copy that stopped receiving activity; three
+  thin months in a row are a trend and stay); an unusual month is outside all 12 before it AND 3.5 robust deviations
   AND 15% from their median; a forecast is the better-replaying of "same months last year x
   recent growth" and "12-month average", published only when its THREE-MONTH TOTAL missed at
   most 15% typically and 25% in four cases of five on the org's own past. An estimate reads
