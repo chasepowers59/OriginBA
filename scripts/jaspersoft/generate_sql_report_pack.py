@@ -137,18 +137,34 @@ def _with_filters(sql: str, preds: list[str]) -> str:
         return sql
     extra = "".join(f"\n  AND {p}" for p in preds)
     if "/*FILTERS*/" in sql:
-        at = sql.find("/*FILTERS*/")
-        sql = sql.replace("/*FILTERS*/", extra.lstrip("\n"))
+        inserted = extra.lstrip("\n")
+        sql = sql.replace("/*FILTERS*/", inserted)   # a template may carry the marker in two blocks
+        ats = [i for i in range(len(sql)) if sql.startswith(inserted, i)]
     else:
         at = next((i for i in (sql.find(kw) for kw in ("\nGROUP BY", "\nORDER BY")) if i >= 0), len(sql))
         sql = sql[:at] + extra + sql[at:]
-    return _hint_block(sql, at)
+        ats = [at]
+    for at in reversed(ats):
+        sql = _hint_block(sql, at)
+    return sql
 
 
 def _hint_block(sql: str, at: int) -> str:
-    """NO_EXPAND on the SELECT that owns position `at` (the nearest SELECT before it)."""
-    i = sql.rfind("SELECT", 0, at)
-    return sql[:i] + "SELECT /*+ NO_EXPAND */" + sql[i + len("SELECT"):]
+    """NO_EXPAND on the SELECT that owns position `at` (the nearest SELECT before it), merged
+    into a hint comment the template already put there (Oracle reads only the first)."""
+    depth, i = 0, at   # walk back past any subquery (a scalar lookup, an EXISTS) to the block's own SELECT
+    while i > 0:
+        i -= 1
+        if sql[i] == ")":
+            depth += 1
+        elif sql[i] == "(":
+            depth -= 1
+        elif depth <= 0 and sql.startswith("SELECT", i) and (i == 0 or not sql[i - 1].isalnum()):
+            break
+    rest = sql[i + len("SELECT"):]
+    if rest.startswith(" /*+ "):
+        return sql[:i] + "SELECT /*+ NO_EXPAND " + rest[len(" /*+ "):]
+    return sql[:i] + "SELECT /*+ NO_EXPAND */" + rest
 
 
 # ------------------------------------------------------------------ JRXML 7 emitter
@@ -359,32 +375,38 @@ WINDOW = "{col} >= $P{{FROM_DT}} AND {col} < $P{{TO_DT}} + INTERVAL '1' DAY"
 # the CMS_SA_SNAPSHOT arithmetic (sql/performance/snapshots/debt_mgmt/cms_sa_snapshot) for ANY day: eligible frozen
 # arrears FTs with ars_dt on or before the day AND, unless As Known Today, frozen by that day; credits retire the
 # oldest debt first; excess credit nets bucket 1; buckets sum to the balance.
+# At College Station (35.8M FTs) the first shape joined every FT to its SA, account, segment and
+# bill before anything else -- the SA/account joins served only the optional filters and the
+# segment/bill joins only Age By = DUE -- then copied all 35M rows to TEMP for two passes; it ran
+# 15 minutes and lost its connection (2026-10-02). Now: base reads CI_FT alone (filters are guarded
+# EXISTS, the due date a scalar subquery Oracle evaluates only in the DUE branch), is INLINE so each
+# pass is a scan rather than a TEMP copy, and the FIFO window runs only over SAs with a balance (an
+# SA at zero is excluded from every output anyway).
 AGED = '''WITH base AS (
-  SELECT ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
+  SELECT /*+ INLINE */ ft.sa_id, ft.ft_id, TRUNC(ft.ars_dt) AS ars_dt,
          COALESCE(ft.cur_amt, 0) AS cur_amt, COALESCE(ft.tot_amt, 0) AS tot_amt,
          CASE WHEN COALESCE(ft.cur_amt, 0) > 0 THEN ft.cur_amt ELSE 0 END AS debt_amt,
          CASE WHEN COALESCE(ft.cur_amt, 0) < 0 THEN -ft.cur_amt ELSE 0 END AS credit_amt,
-         CASE WHEN $P{{AGE_BY}} = 'DUE' AND TRIM(ft.ft_type_flg) IN ('BS', 'BX') THEN COALESCE(TRUNC(b.due_dt), TRUNC(ft.ars_dt)) ELSE TRUNC(ft.ars_dt) END AS aging_dt
+         CASE WHEN $P{{AGE_BY}} = 'DUE' AND TRIM(ft.ft_type_flg) IN ('BS', 'BX')
+              THEN COALESCE((SELECT TRUNC(b.due_dt) FROM CISADM.CI_BSEG bs JOIN CISADM.CI_BILL b ON b.bill_id = bs.bill_id WHERE bs.bseg_id = ft.sibling_id), TRUNC(ft.ars_dt))
+              ELSE TRUNC(ft.ars_dt) END AS aging_dt
   FROM CISADM.CI_FT ft
-  JOIN CISADM.CI_SA sa ON sa.sa_id = ft.sa_id
-  JOIN CISADM.CI_ACCT ac ON ac.acct_id = sa.acct_id
-  LEFT JOIN CISADM.CI_BSEG bs ON TRIM(ft.ft_type_flg) IN ('BS', 'BX') AND bs.bseg_id = ft.sibling_id
-  LEFT JOIN CISADM.CI_BILL b ON b.bill_id = bs.bill_id
   WHERE TRIM(ft.freeze_sw) = 'Y' AND TRIM(ft.not_in_ars_sw) = 'N' AND ft.ars_dt IS NOT NULL
     AND TRUNC(ft.ars_dt) <= $P{{AS_OF_DT}}
     AND ($P{{AS_KNOWN_TODAY}} = 'Y' OR ft.freeze_dttm < $P{{AS_OF_DT}} + INTERVAL '1' DAY){restrict}
     /*FILTERS*/
 ),
 sa_tot AS (
-  SELECT sa_id, SUM(cur_amt) AS cur_bal, SUM(tot_amt) AS tot_bal, SUM(debt_amt) AS total_debt, SUM(credit_amt) AS total_credit
+  SELECT /*+ MATERIALIZE */ sa_id, SUM(cur_amt) AS cur_bal, SUM(tot_amt) AS tot_bal, SUM(debt_amt) AS total_debt, SUM(credit_amt) AS total_credit
   FROM base
   GROUP BY sa_id
 ),
 debt_rows AS (
-  SELECT sa_id, aging_dt, debt_amt,
-         SUM(debt_amt) OVER (PARTITION BY sa_id ORDER BY ars_dt, ft_id ROWS UNBOUNDED PRECEDING) AS cum_debt
-  FROM base
-  WHERE debt_amt > 0
+  SELECT b.sa_id, b.aging_dt, b.debt_amt,
+         SUM(b.debt_amt) OVER (PARTITION BY b.sa_id ORDER BY b.ars_dt, b.ft_id ROWS UNBOUNDED PRECEDING) AS cum_debt
+  FROM base b
+  JOIN sa_tot t ON t.sa_id = b.sa_id AND t.cur_bal <> 0
+  WHERE b.debt_amt > 0
 ),
 unpaid AS (
   SELECT d.sa_id, d.aging_dt,
@@ -442,20 +464,24 @@ ORDER BY BILLED_AMT DESC""",
             name="billing_by_cycle_service_type", key_param="BILL_CYC_CD", key_field="BILL_CYC_CD",
             intro='"By service type in cycle " + $P{BILL_CYC_CD}',
             sql=f"""
-SELECT TRIM(t.svc_type_cd) AS SVC_TYPE_CD, COALESCE(sl.descr, TRIM(t.svc_type_cd)) AS SVC_TYPE_DESCR,
-       COUNT(DISTINCT s.sa_id) AS SERVICE_AGREEMENTS,
-       COUNT(DISTINCT s.bseg_id) AS SEGMENTS,
-       COUNT(DISTINCT CASE WHEN TRIM(s.est_sw) = 'Y' THEN s.bseg_id END) AS ESTIMATED_SEGMENTS,
-       COALESCE(SUM(h.calc_amt), 0) AS BILLED_AMT
-FROM CISADM.CI_BILL b
-JOIN CISADM.CI_BSEG s ON s.bill_id = b.bill_id AND TRIM(s.bseg_stat_flg) = '50'
-JOIN CISADM.CI_SA sa ON sa.sa_id = s.sa_id
-JOIN CISADM.CI_SA_TYPE t ON t.sa_type_cd = sa.sa_type_cd AND t.cis_division = sa.cis_division
-LEFT JOIN CISADM.CI_SVC_TYPE_L sl ON sl.svc_type_cd = t.svc_type_cd AND sl.language_cd = 'ENG'
-LEFT JOIN CISADM.CI_BSEG_CALC h ON h.bseg_id = s.bseg_id
-WHERE TRIM(b.bill_stat_flg) = 'C' AND {WINDOW.format(col='b.bill_dt')}
-  AND COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)') = $P{{BILL_CYC_CD}}
-GROUP BY TRIM(t.svc_type_cd), COALESCE(sl.descr, TRIM(t.svc_type_cd))
+SELECT SVC_TYPE_CD, SVC_TYPE_DESCR, SERVICE_AGREEMENTS, SEGMENTS, ESTIMATED_SEGMENTS, BILLED_AMT FROM (
+  SELECT /*+ RESULT_CACHE */ COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)') AS BILL_CYC_CD,
+         TRIM(t.svc_type_cd) AS SVC_TYPE_CD, COALESCE(sl.descr, TRIM(t.svc_type_cd)) AS SVC_TYPE_DESCR,
+         COUNT(DISTINCT s.sa_id) AS SERVICE_AGREEMENTS,
+         COUNT(DISTINCT s.bseg_id) AS SEGMENTS,
+         COUNT(DISTINCT CASE WHEN TRIM(s.est_sw) = 'Y' THEN s.bseg_id END) AS ESTIMATED_SEGMENTS,
+         COALESCE(SUM(h.calc_amt), 0) AS BILLED_AMT
+  FROM CISADM.CI_BILL b
+  JOIN CISADM.CI_BSEG s ON s.bill_id = b.bill_id AND TRIM(s.bseg_stat_flg) = '50'
+  JOIN CISADM.CI_SA sa ON sa.sa_id = s.sa_id
+  JOIN CISADM.CI_SA_TYPE t ON t.sa_type_cd = sa.sa_type_cd AND t.cis_division = sa.cis_division
+  LEFT JOIN CISADM.CI_SVC_TYPE_L sl ON sl.svc_type_cd = t.svc_type_cd AND sl.language_cd = 'ENG'
+  LEFT JOIN CISADM.CI_BSEG_CALC h ON h.bseg_id = s.bseg_id
+  WHERE TRIM(b.bill_stat_flg) = 'C' AND {WINDOW.format(col='b.bill_dt')}
+    /*FILTERS*/
+  GROUP BY COALESCE(NULLIF(TRIM(b.bill_cyc_cd), ''), '(none)'), TRIM(t.svc_type_cd), COALESCE(sl.descr, TRIM(t.svc_type_cd))
+) x
+WHERE x.BILL_CYC_CD = $P{{BILL_CYC_CD}}
 ORDER BY BILLED_AMT DESC""",
             header=True,
             columns=[Col("SVC_TYPE_CD", "Type", width=46), Col("SVC_TYPE_DESCR", "Service Type", width=252),
@@ -561,19 +587,19 @@ ORDER BY ABS(COALESCE(SUM(a.adj_amt), 0)) DESC""",
             name="adjustments_by_type_top", key_param="ADJ_TYPE_CD", key_field="ADJ_TYPE_CD",
             intro='"Largest adjustments of type " + $P{ADJ_TYPE_CD}',
             sql=f"""
-SELECT ADJ_ID, CRE_DT, SA_ID, ACCT_ID, CUSTOMER_NAME, ADJ_AMT FROM (
-  SELECT TRIM(a.adj_id) AS ADJ_ID, a.cre_dt AS CRE_DT, TRIM(a.sa_id) AS SA_ID, TRIM(sa.acct_id) AS ACCT_ID,
-         pn.entity_name AS CUSTOMER_NAME, a.adj_amt AS ADJ_AMT
+SELECT x.ADJ_ID, x.CRE_DT, x.SA_ID, TRIM(sa.acct_id) AS ACCT_ID, pn.entity_name AS CUSTOMER_NAME, x.ADJ_AMT
+FROM (
+  SELECT /*+ RESULT_CACHE */ TRIM(a.adj_type_cd) AS ADJ_TYPE_CD, TRIM(a.adj_id) AS ADJ_ID, a.cre_dt AS CRE_DT, a.sa_id AS SA_ID, a.adj_amt AS ADJ_AMT,
+         ROW_NUMBER() OVER (PARTITION BY TRIM(a.adj_type_cd) ORDER BY ABS(a.adj_amt) DESC, a.adj_id) AS RN
   FROM CISADM.CI_ADJ a
-  JOIN CISADM.CI_SA sa ON sa.sa_id = a.sa_id
-  LEFT JOIN CISADM.CI_ACCT_PER ap ON ap.acct_id = sa.acct_id AND TRIM(ap.main_cust_sw) = 'Y'
-  LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_flg) = 'PRIM'
   WHERE TRIM(a.adj_status_flg) = '50' AND {WINDOW.format(col='a.cre_dt')}
-    AND TRIM(a.adj_type_cd) = TRIM($P{{ADJ_TYPE_CD}})
     /*FILTERS*/
-  ORDER BY ABS(a.adj_amt) DESC, a.adj_id
 ) x
-FETCH FIRST $P{{TOP_N}} ROWS ONLY""",
+JOIN CISADM.CI_SA sa ON sa.sa_id = x.SA_ID
+LEFT JOIN CISADM.CI_ACCT_PER ap ON ap.acct_id = sa.acct_id AND TRIM(ap.main_cust_sw) = 'Y'
+LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_flg) = 'PRIM'
+WHERE x.ADJ_TYPE_CD = TRIM($P{{ADJ_TYPE_CD}}) AND x.RN <= $P{{TOP_N}}
+ORDER BY x.RN""",
             header=True,
             columns=[Col("ADJ_ID", "Adjustment", width=90), Col("CRE_DT", "Created", "java.sql.Timestamp", 80, "Center", "yyyy-MM-dd"),
                      Col("SA_ID", "SA", width=90), Col("ACCT_ID", "Account", width=90), Col("CUSTOMER_NAME", "Main Customer", width=308),
@@ -585,7 +611,7 @@ FETCH FIRST $P{{TOP_N}} ROWS ONLY""",
                    lov_sql="SELECT TRIM(adj_type_cd) AS CODE, TRIM(adj_type_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_ADJ_TYPE_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ADJ a WHERE a.adj_type_cd = l.adj_type_cd AND a.cre_dt >= CURRENT_DATE - INTERVAL '3' YEAR) ORDER BY 1"),
             Filter("ACCT_ID_F", "Account ID",
                    "($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = a.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))",
-                   "($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))"),
+                   "($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = a.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))"),
             Filter("SA_ID_F", "Service agreement ID",
                    "($P{SA_ID_F} IS NULL OR TRIM(a.sa_id) = TRIM($P{SA_ID_F}))",
                    "($P{SA_ID_F} IS NULL OR TRIM(a.sa_id) = TRIM($P{SA_ID_F}))"),
@@ -619,15 +645,19 @@ ORDER BY ABS(COALESCE(SUM(g.amount), 0)) DESC""",
             extra_keys={"GL_ACCT": "GL_ACCT"},
             intro='"By accounting month for distribution code " + $P{DST_ID} + ", GL account " + $P{GL_ACCT}',
             sql=f"""
-SELECT TO_CHAR(f.accounting_dt, 'YYYY-MM') AS ACCT_MONTH, COUNT(*) AS GL_LINES,
-       COALESCE(SUM(CASE WHEN g.amount > 0 THEN g.amount ELSE 0 END), 0) AS DEBIT_AMT,
-       COALESCE(SUM(CASE WHEN g.amount < 0 THEN -g.amount ELSE 0 END), 0) AS CREDIT_AMT,
-       COALESCE(SUM(g.amount), 0) AS NET_AMT
-FROM CISADM.CI_FT_GL g
-JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id
-WHERE TRIM(f.freeze_sw) = 'Y' AND {WINDOW.format(col='f.accounting_dt')} AND TRIM(g.dst_id) = TRIM($P{{DST_ID}})
-  AND COALESCE(TRIM(g.gl_acct), '(no GL account)') = $P{{GL_ACCT}}
-GROUP BY TO_CHAR(f.accounting_dt, 'YYYY-MM')
+SELECT ACCT_MONTH, GL_LINES, DEBIT_AMT, CREDIT_AMT, NET_AMT FROM (
+  SELECT /*+ RESULT_CACHE */ TRIM(g.dst_id) AS DST_ID, COALESCE(TRIM(g.gl_acct), '(no GL account)') AS GL_ACCT,
+         TO_CHAR(f.accounting_dt, 'YYYY-MM') AS ACCT_MONTH, COUNT(*) AS GL_LINES,
+         COALESCE(SUM(CASE WHEN g.amount > 0 THEN g.amount ELSE 0 END), 0) AS DEBIT_AMT,
+         COALESCE(SUM(CASE WHEN g.amount < 0 THEN -g.amount ELSE 0 END), 0) AS CREDIT_AMT,
+         COALESCE(SUM(g.amount), 0) AS NET_AMT
+  FROM CISADM.CI_FT_GL g
+  JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id
+  WHERE TRIM(f.freeze_sw) = 'Y' AND {WINDOW.format(col='f.accounting_dt')}
+    /*FILTERS*/
+  GROUP BY TRIM(g.dst_id), COALESCE(TRIM(g.gl_acct), '(no GL account)'), TO_CHAR(f.accounting_dt, 'YYYY-MM')
+) x
+WHERE x.DST_ID = TRIM($P{{DST_ID}}) AND x.GL_ACCT = $P{{GL_ACCT}}
 ORDER BY ACCT_MONTH""",
             columns=[Col("ACCT_MONTH", "Month", width=328), Col("GL_LINES", "Lines", "java.lang.Long", 70, "Right", INT, True),
                      Col(None, "", width=70),
@@ -752,15 +782,18 @@ ORDER BY SUM(p.cur_bal) DESC""",
         sub=Sub(
             name="aged_debt_as_of_top", key_param="SA_TYPE_CD", key_field="SA_TYPE_CD", extra_keys={"SA_CIS_DIVISION": "SA_CIS_DIVISION"},
             intro='"Largest balances of SA type " + $P{SA_TYPE_CD}',
-            sql=AGED.format(restrict="\n    AND TRIM(sa.cis_division) = TRIM($P{SA_CIS_DIVISION}) AND TRIM(sa.sa_type_cd) = TRIM($P{SA_TYPE_CD})") + """SELECT TRIM(sa.acct_id) AS ACCT_ID, pn.entity_name AS CUSTOMER_NAME, TRIM(p.sa_id) AS SA_ID, p.cur_bal AS CUR_BAL,
-       p.ars_amt1 AS ARS_AMT1, p.ars_amt2 AS ARS_AMT2, p.ars_amt3 AS ARS_AMT3, p.ars_amt4 AS ARS_AMT4, p.ars_amt5 AS ARS_AMT5
+            sql="SELECT TRIM(sa.acct_id) AS ACCT_ID, pn.entity_name AS CUSTOMER_NAME, TRIM(x.SA_ID) AS SA_ID, x.CUR_BAL, x.ARS_AMT1, x.ARS_AMT2, x.ARS_AMT3, x.ARS_AMT4, x.ARS_AMT5\nFROM (\n" + AGED.format(restrict="") + """SELECT /*+ RESULT_CACHE */ TRIM(sa.cis_division) AS SA_CIS_DIVISION, TRIM(sa.sa_type_cd) AS SA_TYPE_CD, p.sa_id AS SA_ID, p.cur_bal AS CUR_BAL,
+       p.ars_amt1 AS ARS_AMT1, p.ars_amt2 AS ARS_AMT2, p.ars_amt3 AS ARS_AMT3, p.ars_amt4 AS ARS_AMT4, p.ars_amt5 AS ARS_AMT5,
+       ROW_NUMBER() OVER (PARTITION BY TRIM(sa.cis_division), TRIM(sa.sa_type_cd) ORDER BY p.cur_bal DESC, p.sa_id) AS RN
 FROM sa_pos p
 JOIN CISADM.CI_SA sa ON sa.sa_id = p.sa_id
+WHERE p.cur_bal <> 0
+) x
+JOIN CISADM.CI_SA sa ON sa.sa_id = x.SA_ID
 LEFT JOIN CISADM.CI_ACCT_PER ap ON ap.acct_id = sa.acct_id AND TRIM(ap.main_cust_sw) = 'Y'
 LEFT JOIN CISADM.CI_PER_NAME pn ON pn.per_id = ap.per_id AND TRIM(pn.name_type_flg) = 'PRIM'
-WHERE p.cur_bal <> 0
-ORDER BY p.cur_bal DESC
-FETCH FIRST $P{TOP_N} ROWS ONLY""",
+WHERE x.SA_CIS_DIVISION = TRIM($P{SA_CIS_DIVISION}) AND x.SA_TYPE_CD = TRIM($P{SA_TYPE_CD}) AND x.RN <= $P{TOP_N}
+ORDER BY x.RN""",
             columns=[Col("ACCT_ID", "Account", width=72), Col("CUSTOMER_NAME", "Customer", width=136), Col("SA_ID", "SA", width=60),
                      Col("CUR_BAL", "Balance", "java.math.BigDecimal", 90, "Right", MONEY, True),
                      Col("ARS_AMT1", "0-30", "java.math.BigDecimal", 84, "Right", MONEY, True), Col("ARS_AMT2", "31-60", "java.math.BigDecimal", 84, "Right", MONEY, True),
@@ -768,13 +801,13 @@ FETCH FIRST $P{TOP_N} ROWS ONLY""",
                      Col("ARS_AMT5", "120+", "java.math.BigDecimal", 84, "Right", MONEY, True)]),
         filters=[
             Filter("CUST_CL_F", "Customer class",
-                   "($P{CUST_CL_F} IS NULL OR TRIM(ac.cust_cl_cd) = TRIM($P{CUST_CL_F}))", "($P{CUST_CL_F} IS NULL OR TRIM(ac.cust_cl_cd) = TRIM($P{CUST_CL_F}))",
+                   "($P{CUST_CL_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa JOIN CISADM.CI_ACCT fa ON fa.acct_id = fsa.acct_id WHERE fsa.sa_id = ft.sa_id AND TRIM(fa.cust_cl_cd) = TRIM($P{CUST_CL_F})))", "($P{CUST_CL_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa JOIN CISADM.CI_ACCT fa ON fa.acct_id = fsa.acct_id WHERE fsa.sa_id = ft.sa_id AND TRIM(fa.cust_cl_cd) = TRIM($P{CUST_CL_F})))",
                    lov_sql="SELECT TRIM(cust_cl_cd) AS CODE, TRIM(cust_cl_cd) || ' - ' || descr AS DESCR FROM CISADM.CI_CUST_CL_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_ACCT a JOIN CISADM.CI_SA sa ON sa.acct_id = a.acct_id WHERE a.cust_cl_cd = l.cust_cl_cd AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"),
             Filter("CIS_DIVISION_F", "CIS division",
-                   "($P{CIS_DIVISION_F} IS NULL OR TRIM(sa.cis_division) = TRIM($P{CIS_DIVISION_F}))", "($P{CIS_DIVISION_F} IS NULL OR TRIM(sa.cis_division) = TRIM($P{CIS_DIVISION_F}))",
+                   "($P{CIS_DIVISION_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = ft.sa_id AND TRIM(fsa.cis_division) = TRIM($P{CIS_DIVISION_F})))", "($P{CIS_DIVISION_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = ft.sa_id AND TRIM(fsa.cis_division) = TRIM($P{CIS_DIVISION_F})))",
                    lov_sql="SELECT TRIM(cis_division) AS CODE, TRIM(cis_division) || ' - ' || descr AS DESCR FROM CISADM.CI_CIS_DIVISION_L l WHERE l.language_cd = 'ENG' AND EXISTS (SELECT 1 FROM CISADM.CI_SA sa WHERE sa.cis_division = l.cis_division AND (sa.end_dt IS NULL OR sa.end_dt >= CURRENT_DATE - INTERVAL '3' YEAR)) ORDER BY 1"),
             Filter("ACCT_ID_F", "Account ID",
-                   "($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))", "($P{ACCT_ID_F} IS NULL OR TRIM(sa.acct_id) = TRIM($P{ACCT_ID_F}))"),
+                   "($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = ft.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))", "($P{ACCT_ID_F} IS NULL OR EXISTS (SELECT 1 FROM CISADM.CI_SA fsa WHERE fsa.sa_id = ft.sa_id AND TRIM(fsa.acct_id) = TRIM($P{ACCT_ID_F})))"),
         ]),
 
     # College Station, 2026-10-01: "the top 10 users of water, the top 20 of electric, for the year".

@@ -74,7 +74,24 @@ class Sql(unittest.TestCase):
                     continue
                 i = max(sql.find("IS NULL OR"), sql.find("$X{IN"))
                 block = sql[:sql.find("IS NULL OR") if "IS NULL OR" in sql else i]
-                self.assertIn("/*+ NO_EXPAND */", block, f"{name}: the block with the optional filters needs NO_EXPAND")
+                self.assertIn("/*+ NO_EXPAND", block, f"{name}: the block with the optional filters needs NO_EXPAND")
+
+    def test_per_row_subreports_compute_the_window_once(self):
+        # A subreport runs once per main row; at College Station (16 cycles, 162 GL rows, 79 SA
+        # types) each run re-scanned the window. These compute the whole window once in an inner
+        # block Oracle keeps in its result cache (measured 2026-10-02: 29 s, then 2 s per cycle) and
+        # pick the row's key outside it, so the key never reaches the cached block.
+        for s in g.SPECS:
+            if s.sub.name not in CACHED_SUBS:
+                continue
+            sql = s.sub_sql()
+            inner_end = sql.rfind("\n) x")
+            self.assertIn("/*+ NO_EXPAND", sql[:inner_end], s.sub.name)        # the block with the optional filters
+            self.assertIn("RESULT_CACHE */", sql[:inner_end], s.sub.name)      # the cached block (the same one, or the CTE query's final SELECT)
+            self.assertGreater(inner_end, 0, s.sub.name)
+            for key in s.sub.keys():
+                self.assertNotIn(f"$P{{{key}}}", sql[:inner_end], f"{s.sub.name}: key {key} inside the cached block")
+                self.assertIn(f"$P{{{key}}}", sql[inner_end:], f"{s.sub.name}: key {key} missing outside it")
 
     def test_every_emitted_query_starts_with_select(self):
         # JRS 10 refuses a report query that starts with WITH: a generic "An error has occurred"
@@ -178,6 +195,8 @@ if __name__ == "__main__":
     unittest.main()
 
 
+CACHED_SUBS = {"billing_by_cycle_service_type", "adjustments_by_type_top", "gl_by_distribution_code_month", "aged_debt_as_of_top"}
+
 # Lists that show configuration rather than activity, each with its reason.
 CONFIGURATION_LISTS = {
     # the units configured for the chosen service (CI_UOM, 2-14 rows); "billed in 3 years" would scan
@@ -258,8 +277,11 @@ class AsOf(unittest.TestCase):
                          "BETWEEN 91 AND 120", "> 120"):
                 self.assertIn(must, sql, must)
             self.assertIn("$P{AS_KNOWN_TODAY} = 'Y' OR", sql, "the switch that counts later cancellations back into history")
-            self.assertIn("COALESCE(TRUNC(b.due_dt), TRUNC(ft.ars_dt))", sql, "Age By DUE uses the bill's real due date, never a shifted constant")
-        self.assertIn("TRIM($P{SA_CIS_DIVISION})", self.s.sub_sql(), "SA types are division-qualified: the sub takes both keys")
+            self.assertIn("THEN COALESCE((SELECT TRUNC(b.due_dt) FROM CISADM.CI_BSEG bs JOIN CISADM.CI_BILL b", sql, "Age By DUE uses the bill's real due date, never a shifted constant")
+            # College Station (35.8M FTs): no join serves a filter nobody set; the window covers only SAs with a balance
+            self.assertNotIn("JOIN CISADM.CI_ACCT ac", sql); self.assertIn("SELECT /*+ NO_EXPAND INLINE */", sql)
+            self.assertIn("JOIN sa_tot t ON t.sa_id = b.sa_id AND t.cur_bal <> 0", sql)
+        self.assertIn("x.SA_CIS_DIVISION = TRIM($P{SA_CIS_DIVISION})", self.s.sub_sql(), "SA types are division-qualified: the sub takes both keys")
 
 
 class TopUsage(unittest.TestCase):

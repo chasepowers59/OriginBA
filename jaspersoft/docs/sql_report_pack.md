@@ -132,6 +132,19 @@ What College Station's volume (3.47M bills, 16.5M segments, 35.8M FTs) adds, mea
   (the generator injects it; a test holds it); with binds the plans are back to one branch
   (Billing 35,083; GL 1,553; Aged Debt 4,561). Postgres reads the hint as a comment.
 
+- **Billing by Cycle re-reads CI_BILL once per cycle** (its service-type subreport runs per cycle
+  row: 16 at College Station), and CISADM has no index on `BILL_DT`, so each pass is a full scan
+  of 3.47M bills: about 3 s warm, far more cold. **Recommended to the client DBA**: a CM_ index on
+  `CISADM.CI_BILL (BILL_DT)` (or `(BILL_CYC_CD, BILL_DT)`), which turns every pass into a range
+  scan of the month's ~50K bills. Nothing in the report needs to change for it.
+- **Aged Debt As Of Date was rewritten for this volume** (35.8M FTs): the first shape joined every
+  FT to its SA, account, segment and bill up front and copied all 35M rows to TEMP for two passes
+  (15 minutes, then the VPN dropped the connection). The base now reads CI_FT alone, the optional
+  filters are guarded `EXISTS`, the DUE date is a scalar subquery Oracle evaluates only when Age By
+  is DUE, the base is `INLINE` (two scans beat a TEMP copy), the per-SA totals are `MATERIALIZE`d
+  once, and the FIFO window runs only over SAs with a balance. Same numbers at Ellensburg
+  (36,599 SAs, $2,583,801.04, every bucket).
+
 ## Semantics, so the totals reconcile
 
 - **Billed amount** is calc headers of frozen segments, the same figure as
