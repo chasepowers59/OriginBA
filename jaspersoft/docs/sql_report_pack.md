@@ -140,13 +140,17 @@ What College Station's volume (3.47M bills, 16.5M segments, 35.8M FTs) adds, mea
   client DBA (our account holds no `CREATE ANY INDEX` there):
 
       CREATE INDEX CISADM.CM_CI_BILL_BILL_DT ON CISADM.CI_BILL (BILL_DT) ONLINE;
-- **Aged Debt As Of Date was rewritten for this volume** (35.8M FTs): the first shape joined every
+- **Aged Debt As Of Date was rewritten for this volume** (35.8M FTs). The first shape joined every
   FT to its SA, account, segment and bill up front and copied all 35M rows to TEMP for two passes
-  (15 minutes, then the VPN dropped the connection). The base now reads CI_FT alone, the optional
-  filters are guarded `EXISTS`, the DUE date is a scalar subquery Oracle evaluates only when Age By
-  is DUE, the base is `INLINE` (two scans beat a TEMP copy), the per-SA totals are `MATERIALIZE`d
-  once, and the FIFO window runs only over SAs with a balance. Same numbers at Ellensburg
-  (36,599 SAs, $2,583,801.04, every bucket).
+  (15 minutes, then the VPN dropped the connection); with `TRIM()` on the flags and `TRUNC()` on the
+  date the optimizer also estimated 178 rows of 30M and read the table through an index one row at a
+  time. Now: the base reads CI_FT alone with `FULL(ft)`, the optional filters are guarded `EXISTS`,
+  the DUE date is a scalar subquery Oracle evaluates only when Age By is DUE, and the per-SA totals
+  and the FIFO running sum are window functions over the same rows: one scan, one sort, no
+  temporary table. **College Station: 173 s** (direct run, June 2026). Same numbers at Ellensburg
+  (36,599 SAs, $2,583,801.04, every bucket) and the same rows at College Station as the slow shape.
+  No temporary table matters twice: Oracle will not result-cache a query that uses one, and the
+  top-N subreport (one run per SA type: 79 at Ellensburg) relies on that cache.
 
 ## Semantics, so the totals reconcile
 
