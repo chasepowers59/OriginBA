@@ -1,4 +1,4 @@
-"""Monthly history of the home cards, for Ori's unusual months and projections.
+"""Monthly history of the home cards, for Ori's unusual months and forecasts.
 
 Each windowed home card's OWN number (its value query, filters and default lens) by calendar
 month, complete months only, ending at the organization's reporting date or the day before its
@@ -81,7 +81,8 @@ def _build(organization_id: str) -> tuple[dict[str, list], dict[str, dict], bool
     with ThreadPoolExecutor(max_workers=max(1, min(8, len(kpis)))) as pool:
         histories = list(pool.map(one, kpis))
     history = {k["id"]: h for k, h in zip(kpis, histories) if h}
-    meta = {k["id"]: {"label": k["label"], "format": k.get("format", "number"), "workstream": k.get("workstream")}
+    meta = {k["id"]: {"label": k["label"], "format": k.get("format", "number"), "workstream": k.get("workstream"),
+                      "snapshot_id": k.get("snapshot_id")}
             for k in kpis if k["id"] in history}
     return history, meta, None in histories
 

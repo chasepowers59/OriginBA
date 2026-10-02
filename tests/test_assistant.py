@@ -485,6 +485,48 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class OriItemContext(unittest.TestCase):
+    """A question from one of Ori's own items (a projection, an unusual month) carries that item:
+    the server rebuilds its figures from the cached history and says them before the question.
+    The client sends only the item's identity, never its text."""
+
+    HISTORY = {"pay": [{"month": "2026-05", "value": 1.0}]}
+    META = {"pay": {"label": "Payments", "format": "currency", "snapshot_id": "rpt_payment"}}
+
+    def _asked(self, context):
+        from api import assistant
+        with mock.patch("api.assistant._canvases", return_value={"rpt_payment": {"label": "Payment"}}), \
+             mock.patch("api.ori_series.cached_history", return_value=(self.HISTORY, self.META)), \
+             mock.patch("api.ori_insights.grounding", return_value="ORI SAID: about $9M over Jul to Sep 2026") as g:
+            return assistant._with_page_context("citycorp", "What is driving it?", context), g
+
+    def test_the_item_s_figures_come_before_the_question(self):
+        asked, g = self._asked({"canvas_id": "rpt_payment", "ori_item": {"kind": "forecast", "kpi_id": "pay"}})
+        g.assert_called_once_with("forecast", "pay", self.HISTORY, self.META)
+        self.assertIn("ORI SAID: about $9M over Jul to Sep 2026", asked)
+        self.assertTrue(asked.endswith("What is driving it?"))
+
+    def test_an_item_whose_card_is_not_the_named_data_set_says_nothing(self):
+        asked, g = self._asked({"canvas_id": "rpt_payment", "ori_item": {"kind": "forecast", "kpi_id": "other"}})
+        g.assert_not_called()
+        self.assertNotIn("ORI SAID", asked)
+
+    def test_an_unreadable_data_set_says_nothing(self):
+        from api import assistant
+        with mock.patch("api.assistant._canvases", return_value={}), \
+             mock.patch("api.ori_insights.grounding") as g:
+            asked = assistant._with_page_context("citycorp", "Why?", {"canvas_id": "rpt_payment",
+                                                                     "ori_item": {"kind": "forecast", "kpi_id": "pay"}})
+        g.assert_not_called()
+        self.assertEqual(asked, "Why?")
+
+    def test_the_prompt_knows_ori_publishes_forecasts(self):
+        from api.assistant import system_prompt
+        with mock.patch("api.assistant.org_backend", return_value=("postgres", "dbt")):
+            text = system_prompt("dev", "Dev", "postgres")[0]["text"]
+        self.assertIn("forecasts", text)
+
+
 class TheStub(unittest.TestCase):
     """ASSISTANT_MODEL=stub exercises the whole path with no key -- and only outside production."""
 

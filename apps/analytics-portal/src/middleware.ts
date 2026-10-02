@@ -16,6 +16,7 @@ const APP_ROUTES = new Set([
   "letters",
   "database",
   "data-quality",
+  "forecasts",
   "settings",
   "explore",
   "workstream",

@@ -12,6 +12,7 @@ import {
   formatPercent,
   formatDateTime,
 } from "@/lib/format";
+import { exportAbout, exportNote } from "@/lib/exportAbout";
 import { EmptyStateIcon } from "@/components/EmptyStateIcon";
 import {
   kpiLabelsForMeasure,
@@ -24,7 +25,7 @@ import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
 import { downloadPdf } from "@/lib/api";
-import { isMeasureColumn, summarizeResult, totalRow } from "@/lib/resultSummary";
+import { leaderParts, isMeasureColumn, summarizeResult, totalRow } from "@/lib/resultSummary";
 import { POPOVER_PANEL, menuFocusIndex, usePopover } from "@/lib/popover";
 import { aggIsAdditive } from "@/lib/chartLayout";
 
@@ -108,6 +109,8 @@ export function ResultsPanel({
             measureField,
             measureAgg,
             labels: columnLabels,
+            truncated: result.truncated,
+            grandTotal: result.totals?.[measureKey] == null ? null : Number(result.totals[measureKey]),
           })
         : null,
     [result, measureKey, dimensionKey, measureField, measureAgg, columnLabels],
@@ -201,17 +204,30 @@ export function ResultsPanel({
       return out;
     });
     downloadWorkbook(
-      [{ name: reportTitle ?? snapshotLabel ?? snapshotId, columns: friendlyHeaders, rows: labeledRows }],
+      [{ name: reportTitle ?? snapshotLabel ?? snapshotId, columns: friendlyHeaders, rows: labeledRows },
+       // what the rows are: report, filters, and whether the list is cut (lib/exportAbout)
+       { name: "About this export", columns: ["Field", "Value"], rows: exportAbout(exportContext()) }],
       `${snapshotId}_analysis.xlsx`,
     );
   };
+
+  const exportContext = () => ({
+    title: reportTitle ?? snapshotLabel ?? snapshotId,
+    dataSet: snapshotLabel ?? snapshotId,
+    period: periodLabel ?? null,
+    disclosure,
+    rowCount: result.row_count,
+    total: summary?.total == null ? null : formatMeasure(summary.total),
+    truncated: result.truncated,
+    exportedAt: formatDateTime(new Date()),
+  });
 
   const handlePdf = async () => {
     setPdfState("Preparing…");
     try {
       await downloadPdf({
         title: reportTitle ?? snapshotLabel ?? snapshotId,
-        note: [periodLabel, dateRange ? `${formatDate(dateRange[0])} to ${formatDate(dateRange[1])}` : null].filter(Boolean).join(" · "),
+        note: exportNote(exportContext()),
         columns: result.columns,
         labels: Object.fromEntries(result.columns.map((c) => [c, columnLabels[c] ?? prettifyFieldName(c)])),
         rows: result.rows,
@@ -255,7 +271,8 @@ export function ResultsPanel({
           </h3>
           <p className="text-sm text-fg-muted">
             {periodLabel ? `${periodLabel} · ` : ""}
-            {formatNumber(result.row_count)} {result.row_count === 1 ? "row" : "rows"}
+            {result.truncated ? "top " : ""}{formatNumber(result.row_count)} {result.row_count === 1 ? "row" : "rows"}
+            {result.truncated ? " (more groups than are listed; totals and shares count them all)" : ""}
             {loading ? " · updating…" : ""}
           </p>
           {disclosure?.length ? (
@@ -297,16 +314,18 @@ export function ResultsPanel({
         </p>
       ) : null}
 
-      {insight ? (
-        <div className="rounded-xl border border-edge tint-panel px-4 py-3 text-sm text-heading">
-          <span className="font-medium text-heading">{insight.label}</span> leads this view at{" "}
-          <span className="font-semibold text-primary">{formatPercent(insight.share)}</span> of the
-          total ({formatMeasure(insight.value)}).
-        </div>
-      ) : null}
+      {insight && summary?.total != null ? (() => {
+        const lead = leaderParts(insight, summary.total, formatMeasure, formatPercent);
+        return (
+          <div className="rounded-xl border border-edge tint-panel px-4 py-3 text-sm text-heading">
+            <span className="font-medium text-heading">{lead.label}</span> leads this view with {lead.value},{" "}
+            <span className="font-semibold text-primary">{lead.share}</span> of the {lead.total} total.
+          </div>
+        );
+      })() : null}
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <KpiCard label={kpi.groups} value={formatCompact(result.row_count)} />
+        <KpiCard label={kpi.groups} value={`${formatCompact(result.row_count)}${result.truncated ? "+" : ""}`} />
         <KpiCard
           label={kpi.total}
           value={formatCompact(summary?.total, { currency: isCurrency })}

@@ -264,9 +264,25 @@ def run_kpi_query(
     )
     row_cap = int(query_spec.get("limit") or 500)
     if backend == "postgres":
-        from api.warehouse_db import execute_query as run_warehouse
-        return run_warehouse(sql, binds, organization_id=organization_id, max_rows=row_cap)
-    return execute_query(sql, binds, organization_id=organization_id, max_rows=row_cap)
+        from api.warehouse_db import execute_query as run
+    else:
+        run = execute_query
+    # The explorer's routing, unchanged: a pre-aggregate answers only when its answer is the
+    # canvas's (api/aggregate_routing.py). CityCorp's GL card took 85.6 s on rpt_gl, past the
+    # 60 s timeout, with AGG_GL_DAILY holding the answer in 22,459 rows (2026-10-01). A
+    # magnitude ranking is not something the router expresses, so it reads the canvas.
+    if query_spec.get("rank") != "magnitude":
+        from api.aggregate_routing import routed_query
+        routed = routed_query(organization_id, snapshot, dimensions=query_spec.get("dimensions") or [],
+                              measures=query_spec.get("measures") or [{"field": "*", "agg": "count"}],
+                              filters=filters, time_dimensions=time_dimensions or [], limit=row_cap,
+                              dialect=dialect, schema=schema)
+        if routed:
+            try:
+                return run(routed[0], routed[1], organization_id=organization_id, max_rows=row_cap)
+            except Exception:  # noqa: BLE001 -- an aggregate older than the catalog: the canvas answers
+                pass
+    return run(sql, binds, organization_id=organization_id, max_rows=row_cap)
 
 
 def scalar_measure_value(columns: list[str], rows: list[list[Any]]) -> float | None:
@@ -384,6 +400,19 @@ def execute_kpi_definition(
             "empty_window": empty_window_note(
                 value=value, windowless=windowless, snapshot_id=snapshot_id,
                 date_field=date_field, organization_id=organization_id),
+            # the question that produced the number, so the card can open it (the builder
+            # shows the same figure): its filters, the lens, any cross-filter, the window
+            "explore_question": {
+                "snapshot_id": snapshot_id,
+                "dimensions": [],
+                "measures": kpi["value"].get("measures") or [{"field": "*", "agg": "count"}],
+                "filters": [*(kpi["value"].get("filters") or []), *extra_filters,
+                            *([{"field": date_field, "op": "between", "value": [cur_start, cur_end]}]
+                              if date_field else [])],
+                "chart_type": "bar",
+                # a stock figure (a balance, a population) has no window: none may be added
+                "all_dates": windowless,
+            },
             "error": None,
         }
     except (QueryValidationError, ValueError) as exc:

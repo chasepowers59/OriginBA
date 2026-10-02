@@ -5,9 +5,9 @@ import { VisualBuilder } from "@/components/builder/VisualBuilder";
 export default async function BuildPage({
   searchParams,
 }: {
-  searchParams: Promise<{ canvas?: string; report?: string; view?: string }>;
+  searchParams: Promise<{ canvas?: string; report?: string; view?: string; question?: string }>;
 }) {
-  const { canvas, report, view } = await searchParams;
+  const { canvas, report, view, question } = await searchParams;
   let index;
   try {
     index = await fetchSnapshots();
@@ -32,7 +32,7 @@ export default async function BuildPage({
             visualization — or start from a governed business question.
           </p>
         </div>
-        <VisualBuilder initialCanvas={canvas} initialReport={report} initialView={view} />
+        <VisualBuilder initialCanvas={canvas} initialReport={report} initialView={view} initialQuestion={question} />
       </section>
     </AppShell>
   );

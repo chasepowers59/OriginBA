@@ -49,3 +49,13 @@ describe("comparePeriods", () => {
     expect(comparePeriods(now, before, "Cycle", "m0").movers.map((g) => g.key)).toEqual(["C2", "C1", "C4"]);
   });
 });
+
+describe("comparing periods over cut breakdowns (2026-10-01)", () => {
+  it("totals each period from the API's unbroken answer when it gives one", () => {
+    const cur = [{ g: "a", m0: 12 }], pri = [{ g: "a", m0: 10 }];
+    const out = comparePeriods(cur, pri, "g", "m0", 3, { current: 3591, prior: 3000 });
+    expect(out.total.current).toBe(3591);
+    expect(out.total.prior).toBe(3000);
+    expect(out.total.change).toBe(591);
+  });
+});

@@ -26,7 +26,10 @@ export function kpiHeadline(
   rows: Record<string, unknown>[],
   measureKey: string,
   agg: string,
+  /** the API's unbroken total when it cut the breakdown (QueryResult.totals) */
+  grandTotal?: number | null,
 ): number | null {
+  if (grandTotal != null && Number.isFinite(grandTotal)) return grandTotal;
   if (!rows.length || !measureKey) return null;
   if (rows.length === 1) {
     const v = Number(rows[0][measureKey]);

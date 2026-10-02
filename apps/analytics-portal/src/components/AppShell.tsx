@@ -10,8 +10,6 @@ import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { roleLabel } from "@/lib/auth";
 import OrgSwitcher from "@/components/OrgSwitcher";
-import { getActiveOrganization } from "@/lib/auth";
-import { viewingAnotherClient } from "@/lib/orgContext";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { isRestricted, visibleNav } from "@/lib/rowRules";
@@ -28,6 +26,7 @@ const NAV = [
   { href: "/build", label: "Build", id: "build" as const },
   { href: "/dashboards", label: "Dashboards", id: "custom" as const },
   { href: "/reports", label: "Library", id: "reports" as const },
+  { href: "/forecasts", label: "Forecasts", id: "forecasts" as const },
   { href: "/letters", label: "Letters", id: "letters" as const, permission: "letters:read" },
   { href: "/database", label: "SQL", id: "database" as const },
   { href: "/data-quality", label: "Data Quality", id: "dq" as const },
@@ -46,18 +45,13 @@ export function AppShell({
   snapshots: SnapshotSummary[];
   workstreams: WorkstreamGroup[];
   activeId?: string;
-  activeNav?: "home" | "reports" | "build" | "dashboard" | "custom" | "letters" | "database" | "dq" | "settings";
+  activeNav?: "home" | "reports" | "build" | "dashboard" | "custom" | "letters" | "database" | "dq" | "settings" | "forecasts";
   dbConfigured: boolean;
 }) {
   const brand = useBrand();
   const portal = usePortalConfig();
   const { user, logout, can } = useAuth();
   // the active-organization cookie exists only in the browser: read after hydration
-  const [otherClient, setOtherClient] = useState(false);
-  useEffect(() => {
-    setOtherClient(user?.role === "admin" && viewingAnotherClient(getActiveOrganization(), user.organization_id));
-  }, [user]);
-
   // Every page says when the reporting data stopped refreshing (19 days unnoticed, 2026-09-29)
   const [freshness, setFreshness] = useState<Freshness | null>(null);
   useEffect(() => {
@@ -89,7 +83,7 @@ export function AppShell({
   useEffect(closeMenus, [pathname]);
 
   return (
-    <div className="mesh-bg min-h-screen">
+    <div className="mesh-bg flex min-h-screen flex-col">
       {/* Three-zone app bar: brand + org context | nav | compact controls. The meta
           that used to crowd the bar (workstream counts, role, org, sign out) lives in
           the user menu, so the bar itself stays one clean row at every width. */}
@@ -110,13 +104,8 @@ export function AppShell({
             {portal.organization_name ? (
               <span
                 data-testid="org-chip"
-                className={`inline-flex min-w-0 max-w-[42vw] items-center gap-1.5 truncate rounded-full border px-2.5 py-1 text-xs font-medium sm:hidden ${
- otherClient ? "border-warn bg-warn-bg text-warn" : "border-edge-subtle bg-chip text-fg"
- }`}
+                className="inline-flex min-w-0 max-w-[42vw] items-center truncate rounded-full border border-edge-subtle bg-chip px-2.5 py-1 text-xs font-medium text-fg sm:hidden"
               >
-                {otherClient ? (
-                  <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-warn" />
-                ) : null}
                 <span className="truncate">{portal.organization_name}</span>
               </span>
             ) : null}
@@ -233,7 +222,7 @@ export function AppShell({
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1700px] px-6 py-8 2xl:px-10">
+      <div className="mx-auto w-full max-w-[1700px] flex-1 px-6 py-8 2xl:px-10">
         {staleNotice ? (
           <p role="status" data-testid="stale-data"
              className="mb-6 rounded-xl border border-warn bg-warn-bg px-4 py-3 text-sm text-warn">

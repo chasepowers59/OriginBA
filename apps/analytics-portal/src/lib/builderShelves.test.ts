@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fieldGlyph, shelfDimensions, startingQuestions } from "./builderShelves";
+import { fieldGlyph, shelfDimensions, startingQuestions, sortableId, parseSortableId, dropShelf, reorderShelf, valueKey } from "./builderShelves";
 
 /**
  * Dragging a date onto the Columns shelf used to WIPE every other column: the
@@ -79,5 +79,35 @@ describe("the builder's starting questions", () => {
   });
   it("is empty when there are no questions", () => {
     expect(startingQuestions([])).toEqual([]);
+  });
+});
+
+describe("reordering what sits on a shelf (Chase, 2026-10-01: fields on a shelf could not be moved)", () => {
+  it("a chip's drag id names its shelf and its key, and reads back", () => {
+    const id = sortableId("columns", "Service Type");
+    expect(parseSortableId(id)).toEqual({ shelf: "columns", key: "Service Type" });
+    expect(parseSortableId("palette:Service Type")).toBeNull();
+    expect(parseSortableId("columns")).toBeNull();
+  });
+
+  it("a drop on a shelf or on any chip in it lands on that shelf", () => {
+    // dropping a new field ONTO a chip used to hand "columns::X" to addField, which ignored it
+    expect(dropShelf("values")).toBe("values");
+    expect(dropShelf(sortableId("values", "Billed Amount|sum"))).toBe("values");
+  });
+
+  it("moves an item to where it was dropped, or to the end when dropped on the shelf", () => {
+    const items = ["A", "B", "C", "D"];
+    const key = (s: string) => s;
+    expect(reorderShelf(items, key, "D", "A")).toEqual(["D", "A", "B", "C"]);
+    expect(reorderShelf(items, key, "A", "C")).toEqual(["B", "C", "A", "D"]);
+    expect(reorderShelf(items, key, "B", null)).toEqual(["A", "C", "D", "B"]);
+    expect(reorderShelf(items, key, "B", "B")).toBe(items);
+    expect(reorderShelf(items, key, "Z", "A")).toBe(items);
+  });
+
+  it("one measure twice, by two aggregations, is two separate items", () => {
+    // keyed by field alone, changing or removing one changed or removed both
+    expect(valueKey({ field: "Billed Amount", agg: "sum" })).not.toBe(valueKey({ field: "Billed Amount", agg: "max" }));
   });
 });

@@ -52,7 +52,7 @@ share these token names and values — changing a V2.1 value is a cross-app deci
 
 - `builder/BuilderChart` (+ `ui/chart.tsx` primitives) is THE chart renderer.
   `MiniSparkChart` is the only other (KPI sparklines), plus `OriForecastChart` for Ori's
-  projections alone (actual months solid, projection dashed from the last of them, the
+  forecasts alone (actual months solid, forecast dashed from the last of them, the
   likely range a band; one hue, `--chart-1`, on the `ui/chart` primitives). Never add
   another; never reintroduce raw Recharts with hex colours (the deleted ChartView
   anti-pattern).
@@ -102,7 +102,8 @@ Home (exec KPIs) · Build `/build` (THE builder; deep links `?canvas=&report=`) 
 Dashboards `/dashboards` (@dnd-kit pinboard) · Library `/reports` (reports grouped by
 workstream, the one grouping, beside the workstream rail) · Letters `/letters` (collections letters: the PDF beside the data behind it, and runs approved by a second person and released as one print file; nav
 behind `letters:read`, hidden from row-restricted people) · SQL `/database` (CISADM
-workspace; `?table=` seeds a query) · Data Quality · Settings. A new top-level route
+workspace; `?table=` seeds a query) · Data Quality · Forecasts `/forecasts` (every Home card's three-month
+forecast with its chart, method and accuracy bar; hidden from row-restricted people) · Settings. A new top-level route
 must also join `APP_ROUTES` in `middleware.ts`, or signed-in people are sent home from it. `/explore/[snapshotId]` is the data set overview, under Library (Reports + Data model only —
 builder/SQL tabs redirect out). Never add a second builder/SQL/chart surface.
 
@@ -548,14 +549,17 @@ will be Ori too, so they never need renaming.
   moves of 15% or more with a volume floor (count 20, money 1,000), windowed cards only, at most
   three, plus a one-paragraph `brief`; "Ask Ori why" hands the question to Ori via `requestAsk`.
 - **Ori's trends** (2026-09-29): the same panel reads `GET /portal/ori/trends` for unusual
-  months (listed after the findings, one list) and projections ("Where it's heading", one row
-  and one `OriForecastChart` each, "Ask Ori about this", footnote "A projection from past months,
-  not a promise."). Up to ~30 s cold, so it loads on its own, shows `ORI.thinking` meanwhile, is
+  months (listed after the findings, one list) and FORECASTS (Chase 2026-10-01: say "forecast",
+  never "projection", and keep Home light): Home shows one line per forecast under "Forecasts"
+  with "See all forecasts →"; the `/forecasts` page (`ForecastsBoard`) carries the charts
+  (`OriForecastChart`, 220px), the method and accuracy bar in plain words, "Ask Ori about this"
+  (the ask names the item, `oriAsk`, and the server restates its figures), footnote "A forecast
+  from past months, not a promise." Up to ~30 s cold, so it loads on its own, shows `ORI.thinking` meanwhile, is
   aborted on unmount, and shows nothing on error. The panel is absent only when the brief,
-  findings, unusual months and projections are all empty (`lib/oriPanel.oriPanelShows`). The
+  findings, unusual months and forecasts are all empty (`lib/oriPanel.oriPanelShows`). The
   rules (`api/ori_insights.py`, `api/ori_series.py`, pinned by `tests/test_ori_trends.py`):
   complete months only; an unusual month is outside all 12 before it AND 3.5 robust deviations
-  AND 15% from their median; a projection is the better-replaying of "same months last year x
+  AND 15% from their median; a forecast is the better-replaying of "same months last year x
   recent growth" and "12-month average", published only when its THREE-MONTH TOTAL missed at
   most 15% typically and 25% in four cases of five on the org's own past. An estimate reads
   compact (`_approx`, as `formatCompact`: "$11.2M"); a measured value keeps every digit. Ori's
@@ -563,7 +567,7 @@ will be Ori too, so they never need renaming.
   compare"). Ellensburg 2026-09-29: payments and bills projected, billing and field activities
   honestly refused. Every workstream page mounts `<OriInsights workstream={id} />`: the read and
   findings from THAT page's cards (`/portal/ori/findings?workstream=`, grant checked), no
-  projections. Headlines are "label: down 18% vs prior 30d" and "label for May 2026: unusually
+  forecasts. Headlines are "label: down 18% vs prior 30d" and "label for May 2026: unusually
   low", questions "Why did ... go down" / "What made ... so low" (plural labels read right). New
   Ori insight types should follow this shape: rules in a pure, tested backend module; words
   from `ORI`; one follow-up question to Ori.

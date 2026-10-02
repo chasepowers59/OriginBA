@@ -87,12 +87,15 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
                    "filters": [{"field": "Is Cancelled", "op": "eq", "value": True}], "limit": 6}},
     ],
     "debt": [
-        {"id": "accounts_receivable", "label": "Accounts receivable", "subtitle": "Total SA balances",
+        # balances OWED, like past due beside it: credit balances (deposits held, overpayments)
+        # netted CityCorp's to $611,911 under a $1,253,802 past-due card (2026-10-01)
+        {"id": "accounts_receivable", "label": "Accounts receivable", "subtitle": "Balances owed (credits excluded)",
          "snapshot_id": "rpt_sa_aged_balance", "format": "currency", "workstream": "debt",
          "explore_report_id": None, "windowless": True,
-         "value": {"dimensions": [], "measures": [{"field": "Total Balance", "agg": "sum"}], "filters": []},
+         "value": {"dimensions": [], "measures": [{"field": "Total Balance", "agg": "sum"}],
+                   "filters": [{"field": "Total Balance", "op": "gte", "value": 0.01}]},
          "trend": {"dimensions": ["Oldest Debt Band"], "measures": [{"field": "Total Balance", "agg": "sum"}],
-                   "filters": [], "limit": 6}},
+                   "filters": [{"field": "Total Balance", "op": "gte", "value": 0.01}], "limit": 6}},
         {"id": "past_due", "label": "Past-due balance", "subtitle": "Service agreements past due",
          "snapshot_id": "rpt_sa_aged_balance", "format": "currency", "workstream": "debt",
          "explore_report_id": None, "windowless": True,
@@ -100,11 +103,14 @@ WORKSTREAM_KPIS: dict[str, list[dict[str, Any]]] = {
                    "filters": [{"field": "Is Past Due", "op": "eq", "value": True}]},
          "trend": {"dimensions": ["Oldest Debt Band"], "measures": [{"field": "Total Balance", "agg": "sum"}],
                    "filters": [{"field": "Is Past Due", "op": "eq", "value": True}], "limit": 6}},
-        {"id": "collection_processes", "label": "Collection processes", "subtitle": "Started in window",
+        # rpt_debt_process is one row per process x SA x event: count PROCESSES (CityCorp 454,919
+        # rows were 49,425 processes, 2026-10-01); collection, severance and write-off alike
+        {"id": "collection_processes", "label": "Debt processes",
+         "subtitle": "Collection, severance and write-off, started in window",
          "snapshot_id": "rpt_debt_process", "format": "number", "workstream": "debt",
          "explore_report_id": None, "date_field": "Process Created",
-         "value": {"dimensions": [], "measures": [{"field": "*", "agg": "count"}], "filters": []},
-         "trend": {"dimensions": ["Process Type"], "measures": [{"field": "*", "agg": "count"}],
+         "value": {"dimensions": [], "measures": [{"field": "Process ID", "agg": "count_distinct"}], "filters": []},
+         "trend": {"dimensions": ["Process Type"], "measures": [{"field": "Process ID", "agg": "count_distinct"}],
                    "filters": [], "limit": 6}},
         {"id": "active_pay_plans", "label": "Active pay plans", "subtitle": "Currently in force",
          "snapshot_id": "rpt_pay_plan", "format": "number", "workstream": "debt",

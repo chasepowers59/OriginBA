@@ -425,8 +425,9 @@ METRICS: list[NlqMetric] = [
         snapshot_id="rpt_sa_aged_balance",
         format="currency",
         example="What is our accounts receivable?",
+        # balances owed, as on the cards (api/workstream_dashboard.py)
         build=lambda _p: {"kind": "scalar", "windowless": True,
-                          "query": _sum("Total Balance")},
+                          "query": _sum("Total Balance", [{"field": "Total Balance", "op": "gte", "value": 0.01}])},
     ),
     NlqMetric(
         id="past_due",
@@ -458,8 +459,10 @@ METRICS: list[NlqMetric] = [
         patterns=[r"collection\s+process", r"collections?\s+started", r"dunning"],
         snapshot_id="rpt_debt_process",
         example="Collection processes last 90 days",
+        # processes, not their process x SA x event rows (CityCorp 49,425 vs 454,919)
         build=lambda _p: {"kind": "scalar", "date_field": "Process Created",
-                          "query": _count(dims=["Process Type"])},
+                          "query": {"dimensions": ["Process Type"],
+                                    "measures": [{"field": "Process ID", "agg": "count_distinct"}], "filters": []}},
     ),
     NlqMetric(
         id="active_pay_plans",

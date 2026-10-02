@@ -207,6 +207,8 @@ export type BuilderQuestion = {
   measures: BuilderMeasure[];
   filters: FilterDef[];
   chart_type: string;
+  /** a stock figure (a KPI card's balance or population): no window may be added */
+  all_dates?: boolean;
 };
 
 export type BuilderQuestionsResponse = {
@@ -243,6 +245,10 @@ export type QueryResponse = {
   columns: string[];
   rows: Record<string, unknown>[];
   row_count: number;
+  /** The breakdown was cut to its top groups (the API's row cap)... */
+  truncated?: boolean;
+  /** ...and this is the same question answered unbroken: the true total per measure column. */
+  totals?: Record<string, unknown> | null;
   sql: string;
   /** Set ONLY when the server chose the window itself, because the request carried no
    *  filters. An unfiltered aggregate scans the whole canvas — the row cap cannot stop
@@ -339,6 +345,8 @@ export type ExecutiveKpi = {
   format: "currency" | "number";
   workstream: string;
   explore_report_id?: string | null;
+  /** the question behind the number (api/kpi_runner.py), opened by the card's link */
+  explore_question?: import("./kpiLinks").CardQuestion | null;
   value: number | null;
   prior_value?: number | null;
   change_pct?: number | null;

@@ -39,6 +39,23 @@ def modules_for_organization(organization_id: str | None) -> dict[str, bool]:
     return {m: features.get(m) is not False for m in MODULES}
 
 
+def hidden_canvases(organization_id: str | None) -> set[str]:
+    return {c for c, m in CANVAS_MODULES.items() if not module_enabled(organization_id, m)}
+
+
+def hidden_reports(organization_id: str | None, catalog: dict) -> set[tuple[str, str]]:
+    """(data set, report) pairs this client is not offered: every report on a canvas it never
+    used, and every report in a folder of a module it does not use. The Library, the data-set
+    list and the builder's question gallery all read this, so they agree."""
+    off_folders = {f for f, m in FOLDER_MODULES.items() if not module_enabled(organization_id, m)}
+    off_canvases = hidden_canvases(organization_id)
+    out = {(sid, r.get("id")) for sid, snap in (catalog.get("snapshots") or {}).items() if sid in off_canvases
+           for r in snap.get("premade_reports") or []}
+    out |= {(ref.get("snapshot_id"), ref.get("report_id")) for folder in catalog.get("report_library") or []
+            if folder.get("id") in off_folders for ref in folder.get("reports") or []}
+    return out
+
+
 def hide_unused_reports(library: dict, organization_id: str | None) -> dict:
     """Drop the folders and canvases of modules this client does not use, from folders and packs."""
     off = {f for f, m in FOLDER_MODULES.items() if not module_enabled(organization_id, m)}

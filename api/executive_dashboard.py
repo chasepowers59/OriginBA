@@ -138,6 +138,8 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         "workstream": "finance",
         "explore_report_id": None,
         "windowless": True,
+        # the base is every balance; the LENSES below choose (Owing by default). A base filter
+        # here would make "In credit" always $0 and "Net" equal "Owing" (2026-10-01)
         "value": {"dimensions": [],
                   "measures": [{"field": "Total Balance", "agg": "sum"}], "filters": []},
         "trend": {"dimensions": ["Oldest Debt Band"],
@@ -154,15 +156,16 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         # question, and that the choice "belongs to the Ad Hoc user, which is why
         # 'Is In Arrears' and 'Has Credit Balance' exist as flags instead". The card
         # simply never made the choice; these lenses are it, using that same flag.
-        # The flag reads Current Balance while the measure sums Total Balance, so the
-        # subtitles name the flag rather than implying a clean sign split.
+        # Split by the SIGN of the Total Balance the card sums: the Has Credit Balance flag
+        # reads Current Balance, so "Owing" by the flag was $731,460 at CityCorp beside the
+        # debt card's $1,254,198 receivables (2026-10-01). Owing + In credit = Net, exactly.
         "lenses": [
             {"id": "owing", "label": "Owing",
-             "subtitle": "Service agreements not in credit",
-             "filters": [{"field": "Has Credit Balance", "op": "eq", "value": False}]},
+             "subtitle": "Balances owed to the utility",
+             "filters": [{"field": "Total Balance", "op": "gte", "value": 0.01}]},
             {"id": "credit", "label": "In credit",
              "subtitle": "Credit balances — what the utility owes",
-             "filters": [{"field": "Has Credit Balance", "op": "eq", "value": True}]},
+             "filters": [{"field": "Total Balance", "op": "lte", "value": -0.01}]},
             {"id": "net", "label": "Net", "subtitle": "Every balance, credits netted off",
              "filters": []},
         ],
@@ -187,7 +190,7 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
     {
         "id": "bills_completed",
         "label": "Bills",
-        "subtitle": "Bills completed in the period",
+        "subtitle": "Bills created in the period",
         "snapshot_id": "rpt_bill",
         "format": "number",
         "workstream": "billing",
@@ -208,11 +211,11 @@ EXECUTIVE_KPIS: list[dict[str, Any]] = [
         # 'C'/'P', so no code is written down at all -- the model already owns that
         # mapping and is tested on it. Demo 25.4: 1,963 complete, 15 pending.
         "lenses": [
-            {"id": "complete", "label": "Complete", "subtitle": "Completed bills",
+            {"id": "complete", "label": "Complete", "subtitle": "Created in the period, now complete",
              "filters": [{"field": "Is Completed", "op": "eq", "value": True}]},
-            {"id": "pending", "label": "Pending", "subtitle": "Bills not yet completed",
+            {"id": "pending", "label": "Pending", "subtitle": "Created in the period, not yet complete",
              "filters": [{"field": "Is Completed", "op": "eq", "value": False}]},
-            {"id": "all", "label": "All", "subtitle": "Every bill, any status", "filters": []},
+            {"id": "all", "label": "All", "subtitle": "Created in the period, any status", "filters": []},
         ],
     },
     {

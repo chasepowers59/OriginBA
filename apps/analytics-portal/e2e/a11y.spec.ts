@@ -10,7 +10,7 @@ import path from "node:path";
  *
  *   npx playwright test e2e/a11y.spec.ts --project=desktop
  */
-const PAGES = ["/", "/reports", "/dashboards", "/dashboards/new", "/build", "/database", "/data-quality", "/settings",
+const PAGES = ["/", "/reports", "/dashboards", "/dashboards/new", "/build", "/database", "/data-quality", "/settings", "/forecasts",
   "/workstream/billing", "/explore/rpt_bill_segment"];
 
 for (const route of PAGES) {

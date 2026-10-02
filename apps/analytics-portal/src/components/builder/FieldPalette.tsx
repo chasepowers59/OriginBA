@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FieldDef, SnapshotMetadata, SnapshotSummary } from "@/lib/types";
 import { workstreamDisplayName } from "@/lib/businessLabels";
 import { FieldPill } from "./FieldPill";
@@ -25,6 +25,8 @@ export function FieldPalette({
   onAddField?: (field: import("@/lib/types").FieldDef) => void;
 }) {
   const [q, setQ] = useState("");
+  const [folded, setFolded] = useState(false);
+  useEffect(() => setFolded(false), [activeId]);   // a data set chosen elsewhere opens
   const needle = q.trim().toLowerCase();
 
   const trusted = useMemo(
@@ -94,24 +96,27 @@ export function FieldPalette({
             <div className="space-y-0.5">
               {snaps.map((s) => {
                 const active = s.id === activeId;
+                // the selected data set and its open field list are two things: its own arrow
+                // folds the list without unselecting it (it used to re-select, so never closed)
+                const open = active && !folded;
                 return (
                   <div key={s.id}>
                     <button
                       type="button"
-                      onClick={() => onSelect(s.id)}
-                      aria-expanded={active}
+                      onClick={() => (active ? setFolded((f) => !f) : (setFolded(false), onSelect(s.id)))}
+                      aria-expanded={open}
                       className={`flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-xs font-medium transition ${
  active
  ? "bg-chip text-heading ring-1 ring-edge-subtle"
  : "text-fg-muted hover:bg-chip hover:text-heading"
  }`}
                     >
-                      <span aria-hidden className={`text-[9px] transition ${active ? "rotate-90" : ""}`}>
+                      <span aria-hidden className={`text-[9px] transition ${open ? "rotate-90" : ""}`}>
                         ▶
                       </span>
                       {s.label}
                     </button>
-                    {active ? (
+                    {open ? (
                       <div className="ml-3 mt-1.5 space-y-3 border-l border-edge-subtle pl-2">
                         {!meta ? (
                           <p className="py-1 text-[11px]" style={{ color: "var(--foreground-subtle)" }}>

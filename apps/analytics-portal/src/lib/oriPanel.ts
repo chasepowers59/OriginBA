@@ -1,12 +1,14 @@
 import type { OriAnomaly, OriFinding, OriForecast, OriRead, OriTrends } from "@/lib/api";
+import type { AskRequest, OriItem } from "@/lib/assistantContext";
 
-export type Investigation = { key: string; headline: string; detail: string; question: string };
+export type Investigation = { key: string; headline: string; detail: string; ask: AskRequest };
 
 /** The moves against the prior period first, then the unusual months: one list, one follow-up each. */
 export function investigations(findings: OriFinding[], anomalies: OriAnomaly[]): Investigation[] {
   return [
-    ...findings.map((f) => ({ ...f, key: `move:${f.kpi_id}` })),
-    ...anomalies.map((a) => ({ ...a, key: `month:${a.kpi_id}:${a.month}` })),
+    // a move's question carries its own figures; an unusual month is restated by the server
+    ...findings.map((f) => ({ ...f, key: `move:${f.kpi_id}`, ask: { question: f.question, context: null } })),
+    ...anomalies.map((a) => ({ ...a, key: `month:${a.kpi_id}:${a.month}`, ask: oriAsk(a, "anomaly") })),
   ];
 }
 
@@ -14,7 +16,7 @@ export type ForecastRow = { month: string; actual?: number; projected?: number; 
 
 /**
  * One row per month: the actual months, then the projected ones. The last actual month also
- * starts the projection, with a range of no width, so the dashed line and the band grow out of
+ * starts the forecast, with a range of no width, so the dashed line and the band grow out of
  * the last real point rather than floating beside it.
  */
 export function forecastRows({ history, forecast }: Pick<OriForecast, "history" | "forecast">): ForecastRow[] {
@@ -39,3 +41,16 @@ export const FORECAST_FRAME = {
   margin: { top: 6, right: 12, bottom: 4, left: 0 },
   valuePadding: { top: 0, bottom: 8 },
 } as const;
+
+/** Asking about one of Ori's items names it, so the server can restate what Ori showed. */
+export function oriAsk(
+  item: { kpi_id: string; question: string; snapshot_id?: string | null; headline: string },
+  kind: OriItem["kind"],
+): AskRequest {
+  return {
+    question: item.question,
+    context: item.snapshot_id
+      ? { canvas_id: item.snapshot_id, label: item.headline, ori_item: { kind, kpi_id: item.kpi_id } }
+      : null,
+  };
+}

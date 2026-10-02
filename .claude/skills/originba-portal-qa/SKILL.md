@@ -60,6 +60,24 @@ zeros or a single group, unless `KNOWN` records why that is true of the client (
 source column empty at every client, an axis constant on every row, a backlog without an
 open-only filter. Chase the finding to CISADM before recording it as a fact.
 
+Numbers that must agree, on each org's REAL warehouse (API running, VPN up; Chase 2026-10-01:
+Ellensburg and CityCorp are the proof-of-concept pair, check both):
+`python3 scripts/check_report_invariants_live.py --org citycorp` asks every offered report the
+fixture invariants live (breakdown = total, month trend = total, a clicked bar = its value, shares
+0-100; a cut breakdown must report the unbroken total), and
+`python3 scripts/check_kpi_consistency_live.py --org citycorp` checks every Home/workstream card
+against the explorer's answer to the card's own question over the card's period. First runs
+(2026-10-01) found: breakdowns cut at 500 rows totalled over the 500 shown (~10 reports per org),
+a "Collection processes" card counting process x SA x event rows (9x), receivables netting credit
+balances below the past-due card, and KPI cards never using the pre-aggregates (GL card timed out).
+A green check is not the end: READ the numbers it agreed on (past due > receivables was
+consistent and wrong).
+
+Operated, not just loaded: `e2e/explorer-interactions.spec.ts` (every period, compare, cross-filter
+and its removal, sort, the Excel export's About sheet) and `e2e/builder-interactions.spec.ts`
+(every visual type, a date's grain, a field dragged to Filters), plus `e2e/builder-drag.spec.ts`
+and `e2e/dashboard-drag.spec.ts`. Run each with `E2E_ORG=citycorp` and with Ellensburg.
+
 Client separation through the running application: `python3 scripts/check_tenant_isolation.py`
 starts its own API with sign-in ON (a throwaway SQLite user database, a throwaway saved-view
 store on the 5433 container, random passwords never printed), creates the root admin, an

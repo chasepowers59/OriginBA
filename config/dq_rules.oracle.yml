@@ -8,9 +8,9 @@
   severity: action
   title: AMI device never registered at head-end
   action: >
-    The head-end has never seen this installed meter — it measures nothing over the network.
-    In CIS: Main Menu > Device > search the Device ID; verify commissioning and the head-end
-    registration; re-commission or replace.
+    This installed meter has never registered at the head-end and no actual reading has arrived
+    since it was installed. In CIS: Main Menu > Device > search the Device ID; verify commissioning
+    and the head-end registration; re-commission or replace.
   sql: |
     SELECT
       "Device ID",
@@ -18,10 +18,18 @@
       "Device Type",
       "Premise Address",
       "Install Date/Time"
-    FROM ORIGINBA_REPORTING.RPT_DEVICE_ASSET
+    FROM ORIGINBA_REPORTING.RPT_DEVICE_ASSET d
     WHERE
       "Never Registered At Head-End" = 1
       AND "Is Attached To Service Point" = 1
+      AND NOT EXISTS(
+        SELECT
+          1
+        FROM ORIGINBA_REPORTING.RPT_PREMISE_SP p
+        WHERE
+          p."MDM Service Point ID" = d."MDM Service Point ID"
+          AND p."Last Actual Measurement Date/Time" >= d."Install Date/Time"
+      )
       AND (
         SELECT
           COUNT(CASE WHEN NOT "Never Registered At Head-End" = 1 THEN 1 END)
@@ -270,18 +278,26 @@
   sql: |
     SELECT
       bs."SA Type",
-      COUNT(DISTINCT bs."Bill Segment ID") AS "Usage Bill Segments",
-      COUNT(cl."Unit of Measure Code") AS "Charge Lines With a Unit",
-      COUNT(*) AS "Charge Lines"
+      COUNT(*) AS "Usage Bill Segments",
+      SUM(cl.with_unit) AS "Charge Lines With a Unit",
+      SUM(cl.lines) AS "Charge Lines"
     FROM ORIGINBA_REPORTING.RPT_BILL_SEGMENT bs
-    JOIN ORIGINBA_REPORTING.RPT_BILLED_CHARGE cl
-      ON cl."Bill Segment ID" = bs."Bill Segment ID"
+    JOIN (
+      SELECT
+        "Bill Segment ID" AS bseg_id,
+        COUNT("Unit of Measure Code") AS with_unit,
+        COUNT(*) AS lines
+      FROM ORIGINBA_REPORTING.RPT_BILLED_CHARGE
+      GROUP BY
+        "Bill Segment ID"
+    ) cl
+      ON cl.bseg_id = bs."Bill Segment ID"
     WHERE
       bs."Billed Usage" IS NOT NULL
     GROUP BY
       bs."SA Type"
     HAVING
-      COUNT(cl."Unit of Measure Code") = 0
+      SUM(cl.with_unit) = 0
 - id: config_tax_in_calc_lines
   object: Rate configuration
   severity: info

@@ -266,6 +266,9 @@ def snapshots_index(ctx: AuthContext = Depends(get_auth_context)) -> dict[str, A
     catalog = load_catalog(organization_id=org_id)
     workstreams = filter_workstreams_for_auth(list_workstreams(org_id), ctx)
     snapshots = filter_snapshots_for_auth(list_snapshots(organization_id=org_id), ctx)
+    from api.client_capabilities import hidden_canvases
+    unused = hidden_canvases(org_id)   # a data set the client never used opens empty
+    snapshots = [s for s in snapshots if s["id"] not in unused]
     if ctx.row_rules:
         snapshots = [s for s in snapshots if readable(ctx.row_rules, get_snapshot(s["id"], org_id))]
     return {
@@ -301,6 +304,8 @@ def snapshot_questions(ctx: AuthContext = Depends(get_auth_context)) -> dict[str
     labels = catalog.get("workstream_labels", {})
     order_index = {ws: i for i, ws in enumerate(order)}
 
+    from api.client_capabilities import hidden_reports
+    unused = hidden_reports(org_id, catalog)   # the same reports the Library hides
     questions: list[dict[str, Any]] = []
     for snapshot_id, meta in catalog.get("snapshots", {}).items():
         if not meta.get("portal_enabled", True):
@@ -309,6 +314,8 @@ def snapshot_questions(ctx: AuthContext = Depends(get_auth_context)) -> dict[str
         if not ctx.can_access_workstream(workstream) or not readable(ctx.row_rules, meta):
             continue
         for report in meta.get("premade_reports", []) or []:
+            if (snapshot_id, report.get("id")) in unused:
+                continue
             questions.append({
                 "id": f"{snapshot_id}:{report.get('id')}",
                 "report_id": report.get("id"),
@@ -443,11 +450,19 @@ def snapshot_metadata(
     org_id = require_org_for_data(ctx)
     snapshot = _require_snapshot_access(ctx, snapshot_id)
     default_filter = _default_date_filter(snapshot, org_id)
+    # the table where THIS org's warehouse holds it (the shared catalog writes the Postgres
+    # shape): ORIGINBA_REPORTING.RPT_X in an in-database client's own Oracle
+    data_model = dict(snapshot.get("data_model") or {})
+    if snapshot.get("table_name"):
+        backend, _dialect, schema = snapshot_backend(snapshot, org_id)
+        table = snapshot["table_name"].upper() if backend == "oracle" else snapshot["table_name"]
+        data_model["snapshot_table"] = f"{schema}.{table}"
     return {
         "id": snapshot_id,
         "client": org_id,
         "organization_id": org_id,
         **snapshot,
+        "data_model": data_model,
         "suggested_default_filter": default_filter.model_dump() if default_filter else None,
         # The browser computes its date presets; a frozen copy's presets end here.
         "data_as_of": data_as_of(org_id),
@@ -835,6 +850,17 @@ def snapshot_query(
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
         for row in rows
     ]
+    # A breakdown cut to its top groups must not be totalled by the reader: CityCorp's
+    # on/off churn (2026-10-01) showed 1,971 for a period that held 3,591. Say it was cut,
+    # and answer the same question unbroken so the total and every share are the real ones.
+    truncated = bool(body.dimensions or body.time_dimensions) \
+        and len(rows) >= min(body.limit, snapshot.get("max_rows", 500))
+    totals = None
+    if truncated:
+        whole = body.model_copy(update={"dimensions": [], "time_dimensions": [], "limit": 1})
+        _, total_columns, total_rows, _ = cached_query(org_id, snapshot, whole, filters)
+        if total_rows:
+            totals = {c: _serialize_value(v) for c, v in zip(total_columns, total_rows[0])}
     from api.access_audit import record_access_event
     record_access_event(
         actor_email=ctx.email, actor_id=ctx.id, action="report_run",
@@ -855,6 +881,8 @@ def snapshot_query(
             [t.model_dump() for t in body.time_dimensions]),
         "rows": serialized_rows,
         "row_count": len(serialized_rows),
+        "truncated": truncated,
+        "totals": totals,
         "sql": sql,
         # None when the caller set their own filters: only a window WE chose is ours to
         # announce, and labelling the caller's own range as a default would misreport it.

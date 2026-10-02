@@ -5,7 +5,15 @@
  */
 import type { Turn } from "./assistant";
 
-export type PageContext = { canvas_id: string; label: string; period?: string; filters?: string[] };
+/** One of Ori's own items (a forecast, an unusual month): the server restates its figures. */
+export type OriItem = { kind: "forecast" | "anomaly"; kpi_id: string };
+
+export type PageContext = { canvas_id: string; label: string; period?: string; filters?: string[]; ori_item?: OriItem };
+
+/** What the panel sends about the page: everything but the display label. */
+export function askPayload(c: PageContext | null) {
+  return c ? { canvas_id: c.canvas_id, period: c.period, filters: c.filters, ori_item: c.ori_item } : null;
+}
 
 let current: PageContext | null = null;
 const listeners = new Set<() => void>();

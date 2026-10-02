@@ -2,7 +2,8 @@
 so the first reader each morning is not the one who waits.
 
 Every minute, for each organization with a warehouse: when its build stamp
-(api/data_version.py) is new, build what those pages ask for by default -- 30 days, no
+(api/data_version.py) is new, or the day has changed (every cache key carries the day, so
+midnight UTC empties the cache even when the warehouse did not rebuild), build what those pages ask for by default -- 30 days, no
 comparison, no filters -- for a reader with every workstream and no row rules, through the
 routes' own cache functions; and on each canvas of a million rows or more, the report the
 explorer runs when the page opens (its first ready-to-run report over the canvas's default
@@ -26,8 +27,12 @@ log = logging.getLogger("originba.api")
 INTERVAL_SECONDS = 60
 MAX_ATTEMPTS = 3   # passes per build stamp before a failing warm waits for the next rebuild
 WARM_MIN_ROWS = 1_000_000
-_warmed: dict[str, str] = {}
+_warmed: dict[str, tuple[str, str]] = {}      # org -> (build stamp, day) last warmed
 _attempts: dict[str, tuple[str, int]] = {}
+
+
+def _today() -> date:
+    return date.today()
 _last: dict[str, dict[str, Any]] = {}
 _started = threading.Event()
 
@@ -73,17 +78,19 @@ def warm_once(org_id: str) -> list[str]:
     from api.snapshot_explorer import cached_home_summary, cached_workstream_summary
 
     version = data_version(org_id)
-    if not version or _warmed.get(org_id) == version:
+    # every cache key carries the day (api/summary_cache.py), so a new day is as cold as a new build
+    identity = (version, _today().isoformat()) if version else None
+    if not identity or _warmed.get(org_id) == identity:
         return []
     seen, tries = _attempts.get(org_id, ("", 0))
-    tries = tries + 1 if seen == version else 1
+    tries = tries + 1 if seen == identity else 1
     if tries > MAX_ATTEMPTS:
         return []
-    _attempts[org_id] = (version, tries)
+    _attempts[org_id] = (identity, tries)
     jobs = [("home", lambda: cached_home_summary(org_id, 30, False, "prior_period", [], ["*"], {}, ())),
             # the home summary in compare mode: what Ori's findings read (api/ori_routes.py)
             ("ori findings", lambda: cached_home_summary(org_id, 30, True, "prior_period", [], ["*"], {}, ())),
-            # the cards' monthly history: Ori's unusual months and projections (api/ori_series.py)
+            # the cards' monthly history: Ori's unusual months and forecasts (api/ori_series.py)
             ("ori trends", lambda: cached_history(org_id)),
             # the data-quality rules: ~40 s at Ellensburg, served until the next rebuild
             ("data quality", lambda: warm_data_quality(org_id))]
@@ -104,7 +111,7 @@ def warm_once(org_id: str) -> list[str]:
     _last[org_id] = {"at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "version": version,
                      "built": built, "failed": failed, "attempt": tries}
     if not failed:   # a pass with a failure is tried again on the next pass
-        _warmed[org_id] = version
+        _warmed[org_id] = identity
     return built
 
 

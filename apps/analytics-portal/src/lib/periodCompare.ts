@@ -32,6 +32,8 @@ export function comparePeriods(
   dimension: string,
   measure: string,
   top = 3,
+  /** each period's unbroken total when the API cut its breakdown (QueryResult.totals) */
+  totals: { current?: number | null; prior?: number | null } = {},
 ): { total: Omit<GroupChange, "key">; groups: GroupChange[]; movers: GroupChange[] } {
   const sums = new Map<string, { current: number; prior: number }>();
   const add = (rows: Record<string, unknown>[], side: "current" | "prior") => {
@@ -45,8 +47,8 @@ export function comparePeriods(
   add(current, "current");
   add(prior, "prior");
   const groups = [...sums].map(([key, v]) => ({ key, ...v, change: v.current - v.prior, pct: pct(v.current - v.prior, v.prior) }));
-  const cur = groups.reduce((s, g) => s + g.current, 0);
-  const pri = groups.reduce((s, g) => s + g.prior, 0);
+  const cur = totals.current ?? groups.reduce((s, g) => s + g.current, 0);
+  const pri = totals.prior ?? groups.reduce((s, g) => s + g.prior, 0);
   const movers = [...groups].filter((g) => g.change !== 0)
     .sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, top);
   return { total: { current: cur, prior: pri, change: cur - pri, pct: pct(cur - pri, pri) }, groups, movers };

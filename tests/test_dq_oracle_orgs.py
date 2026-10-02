@@ -75,7 +75,7 @@ class OracleOrgHarness(unittest.TestCase):
             p.start()
             self.addCleanup(p.stop)
 
-    def _oracle(self, sql, binds=None, *, organization_id, max_rows):
+    def _oracle(self, sql, binds=None, *, organization_id, max_rows, timeout_ms=None):
         self.assertEqual(organization_id, "ellensburg")
         self.executed.append(sql)
         for rule_id in self.failing:
@@ -131,7 +131,7 @@ class OracleOrgFindingsTests(OracleOrgHarness):
         # page down; found by the concurrency test below via a broken barrier.
         fetch = self._oracle
 
-        def silent_failure(sql, binds=None, *, organization_id, max_rows):
+        def silent_failure(sql, binds=None, *, organization_id, max_rows, timeout_ms=None):
             if "Usage After Vacancy" in sql:
                 raise RuntimeError()
             return fetch(sql, binds, organization_id=organization_id, max_rows=max_rows)
@@ -153,7 +153,7 @@ class OracleOrgFindingsTests(OracleOrgHarness):
         lock, in_flight, peak = threading.Lock(), [0], [0]
         fetch = self._oracle
 
-        def concurrent(sql, binds=None, *, organization_id, max_rows):
+        def concurrent(sql, binds=None, *, organization_id, max_rows, timeout_ms=None):
             with lock:
                 in_flight[0] += 1
                 peak[0] = max(peak[0], in_flight[0])
@@ -324,7 +324,7 @@ class OracleOrgCachingTests(OracleOrgHarness):
         first = ORACLE_RULES[0]["id"]
         original = self._oracle
 
-        def flaky(sql, binds=None, *, organization_id, max_rows):
+        def flaky(sql, binds=None, *, organization_id, max_rows, timeout_ms=None):
             if first in self.cut and ORACLE_RULES[0]["sql"].strip() in sql:
                 raise RuntimeError("DPY-4011: the database or network closed the connection")
             return original(sql, binds, organization_id=organization_id, max_rows=max_rows)
@@ -343,7 +343,7 @@ class OracleOrgCachingTests(OracleOrgHarness):
         first = ORACLE_RULES[0]["sql"].strip()
         original, calls = self._oracle, {"n": 0}
 
-        def slow_once(sql, binds=None, *, organization_id, max_rows):
+        def slow_once(sql, binds=None, *, organization_id, max_rows, timeout_ms=None):
             if first in sql:
                 calls["n"] += 1
                 if calls["n"] == 1:
@@ -354,6 +354,21 @@ class OracleOrgCachingTests(OracleOrgHarness):
             again = dq_routes.dq_findings(ctx=_ctx())
         self.assertFalse(any(r.get("error") for r in again["rules"]))
 
+    def test_rules_run_under_a_longer_ceiling_than_interactive_queries(self):
+        # 2026-10-01: at CityCorp (6.2M charge lines) two rules full-scan RPT_BILLED_CHARGE side by
+        # side; one crossed the 60 s interactive ceiling on every run, so no result was ever kept and
+        # every visit re-ran the whole suite for a minute. A rule run is a once-per-build job.
+        seen = []
+        original = self._oracle
+
+        def record(sql, binds=None, *, organization_id, max_rows, timeout_ms=None):
+            seen.append(timeout_ms)
+            return original(sql, binds, organization_id=organization_id, max_rows=max_rows)
+        with mock.patch.object(dq_routes, "oracle_query", side_effect=record):
+            dq_routes.dq_findings(ctx=_ctx())
+        self.assertTrue(seen)
+        self.assertTrue(all(t is not None and t >= 180_000 for t in seen), seen)
+
     def test_an_outage_is_not_kept(self):
         self.failing = {r["id"] for r in ORACLE_RULES}
         dq_routes.dq_findings(ctx=_ctx())
@@ -362,6 +377,32 @@ class OracleOrgCachingTests(OracleOrgHarness):
         out = dq_routes.dq_findings(ctx=_ctx())
         self.assertGreater(len(self.executed), ran)
         self.assertTrue(out["configured"])
+
+
+class CallCeilingTest(unittest.TestCase):
+    """execute_query applies the ceiling its caller asks for, else the interactive default."""
+
+    def _run(self, **kw):
+        from contextlib import contextmanager
+        from api import demo_db
+        conn = mock.MagicMock()
+        conn.cursor.return_value.__enter__.return_value.description = [("A",)]
+        conn.cursor.return_value.__enter__.return_value.fetchmany.return_value = [(1,)]
+
+        @contextmanager
+        def fake(org):
+            yield conn
+        with mock.patch.object(demo_db, "demo_connection", fake):
+            demo_db.execute_query("select 1 from dual", organization_id="citycorp", **kw)
+        return conn.call_timeout, demo_db._CALL_TIMEOUT_MS
+
+    def test_default_is_the_interactive_ceiling(self):
+        applied, default = self._run()
+        self.assertEqual(applied, default)
+
+    def test_a_caller_can_ask_for_longer(self):
+        applied, _ = self._run(timeout_ms=300_000)
+        self.assertEqual(applied, 300_000)
 
 
 if __name__ == "__main__":

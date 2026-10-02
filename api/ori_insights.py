@@ -1,4 +1,4 @@
-"""What Ori says unprompted about the home cards: findings, unusual months, projections, a read.
+"""What Ori says unprompted about the home cards: findings, unusual months, forecasts, a read.
 
 FINDINGS and ORI'S READ come from the SAME summary the home page shows (the vetted KPI
 runner, compare mode), so they can never disagree with a card. A finding needs a windowed
@@ -6,10 +6,10 @@ card (a balance or a population has no prior period), both values present, a non
 prior, a move of at least 15%, and enough behind it to matter: a count of at least 20 or
 money of at least 1,000 in either period. At most three, largest first.
 
-UNUSUAL MONTHS and PROJECTIONS read each card's monthly history (api/ori_series.py). A month
+UNUSUAL MONTHS and FORECASTS read each card's monthly history (api/ori_series.py). A month
 is unusual only when it falls outside all of the 12 before it AND sits 3.5 robust deviations
 and 15% from their median (a seasonal peak inside last year's range is not news). A
-projection of the next three months is either the same months last year scaled by the last
+forecast of the next three months is either the same months last year scaled by the last
 three months against a year earlier, or the average of the last 12 months: whichever missed
 the three-month total less when replayed on the organization's own past months, published
 only when that miss was at most 15% in a typical case and at most 25% in four cases of five,
@@ -127,7 +127,7 @@ def anomalies(history: dict[str, list[dict[str, Any]]], meta: dict[str, dict[str
             continue
         high, month = x > hi, _month_label(latest["month"])
         out.append({
-            "kpi_id": kpi_id,
+            "kpi_id": kpi_id, "snapshot_id": meta[kpi_id].get("snapshot_id"),
             "month": latest["month"],
             "direction": "high" if high else "low",
             "z": z,
@@ -201,7 +201,7 @@ def forecasts(history: dict[str, list[dict[str, Any]]], meta: dict[str, dict[str
         low, high = max(0.0, total * (1 - _p80(totals))), total * (1 + _p80(totals))
         fmt, label, span = meta[kpi_id]["format"], meta[kpi_id]["label"], _span_label(ahead[0], ahead[-1])
         out.append({
-            "kpi_id": kpi_id, "label": label, "format": fmt,
+            "kpi_id": kpi_id, "label": label, "format": fmt, "snapshot_id": meta[kpi_id].get("snapshot_id"),
             "history": points[-BASELINE_MONTHS:], "forecast": rows,
             "total": total, "total_low": low, "total_high": high,
             "typical_error_pct": typical, "checks": len(totals),
@@ -209,7 +209,7 @@ def forecasts(history: dict[str, list[dict[str, Any]]], meta: dict[str, dict[str
             "detail": f"Likely between {_approx(low, fmt)} and {_approx(high, fmt)}. {how}; replayed on past "
                       f"months, its three-month total was off by {typical:.0f}% in a typical case "
                       f"({len(totals)} checks).",
-            "question": f"What is driving the {_lower_first(label)} projection for {span}?",
+            "question": f"What is driving the {_lower_first(label)} forecast for {span}?",
         })
     return out
 
@@ -245,3 +245,31 @@ def brief(summary: dict[str, Any]) -> str | None:
     clauses = [c for c in clauses if c]
     lead = f"In the {_lower_first(period.get('label') or 'period')}, {clauses[0]}."
     return " ".join([lead] + [f"{c[0].upper()}{c[1:]}." for c in clauses[1:]])
+
+
+def grounding(kind: str, kpi_id: str, history: dict[str, list[dict[str, Any]]],
+              meta: dict[str, dict[str, Any]]) -> str | None:
+    """What Ori showed for one item, restated for the assistant from the same history. Without
+    it a question about a forecast reached a model told never to state a figure no data set
+    holds, and it answered that no forecast exists (2026-10-01)."""
+    if kpi_id not in history or kpi_id not in meta:
+        return None
+    one = {kpi_id: history[kpi_id]}
+    if kind == "forecast":
+        found = forecasts(one, meta)
+        if not found:
+            return None
+        f, fmt = found[0], meta[kpi_id]["format"]
+        months = "; ".join(f"{_month_label(p['month'])} about {_approx(p['value'], fmt)} "
+                           f"(likely {_approx(p['low'], fmt)} to {_approx(p['high'], fmt)})" for p in f["forecast"])
+        return (f"Ori's forecast on the Forecasts page, computed by the portal from the monthly history of the "
+                f"{f['label']} card through {_month_label(history[kpi_id][-1]['month'])} (it is not a data set): "
+                f"{f['headline']}. {f['detail']} By month: {months}. Explain what drives it from that history "
+                f"(query the months it is built on); it is an estimate, not a figure in the data.")
+    if kind == "anomaly":
+        found = anomalies(one, meta)
+        if not found:
+            return None
+        a = found[0]
+        return f"Ori flagged this on Home from the {meta[kpi_id]['label']} card's monthly history: {a['headline']}. {a['detail']}"
+    return None

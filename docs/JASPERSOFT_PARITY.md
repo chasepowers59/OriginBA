@@ -11,7 +11,7 @@ does not do yet, and the order to close the gaps. Evidence is the code; each row
   charted, downloaded as CSV, or saved as a view. Plain "how much" questions are answered by
   the vetted metrics first, at no model cost. Unprompted, Ori reads the home page: the
   period in a paragraph, the large moves against the prior period, any month outside the
-  year before it, and a three-month projection for each card whose projections have held on
+  year before it, and a three-month forecast for each card whose forecasts have held on
   the client's own past (and silence for the ones that have not). Jaspersoft has nothing
   comparable.
 - **One money rule.** Every total the portal shows counts only frozen, non-cancelled money

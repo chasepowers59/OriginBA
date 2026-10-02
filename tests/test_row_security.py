@@ -151,7 +151,11 @@ class EnforcementTests(unittest.TestCase):
         for kpi in out["kpis"]:
             self.assertTrue(any(f["id"] == "Service Type" for f in get_snapshot(kpi["snapshot_id"], "dev")["fields"]),
                             kpi["id"])
-        self.assertTrue(all('"Service Type" IN' in sql for sql, _ in self.executed))
+        # every DATA query carries the rule; a card routed to a pre-aggregate also reads that
+        # aggregate's build identity ("Canvas Build", no customer rows), which has none to carry
+        data = [sql for sql, _ in self.executed if '"Canvas Build"' not in sql]
+        self.assertTrue(data)
+        self.assertTrue(all('"Service Type" IN' in sql for sql in data))
 
 
 class ScheduleTests(unittest.TestCase):

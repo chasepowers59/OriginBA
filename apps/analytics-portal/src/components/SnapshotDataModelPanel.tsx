@@ -65,7 +65,7 @@ export function SnapshotDataModelPanel({
   if (!model) {
     return (
       <div className="glass-panel p-8 text-center text-sm text-fg-muted">
-        Data model documentation is not available for this domain yet.
+        Data model documentation is not available for this data set yet.
       </div>
     );
   }
@@ -155,11 +155,11 @@ function OverviewTab({
       <section className="glass-panel space-y-4 p-5">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
-            Governed canvas
+            Data set table
           </p>
           <p className="mt-2 font-mono text-sm text-primary">{model.snapshot_table}</p>
           <p className="mt-1 text-xs text-fg-muted">
-            End-user Domain points at this table — not live C2M joins at report runtime.
+            Reports read this table, rebuilt from CISADM on a schedule — never live joins against C2M while you report.
           </p>
         </div>
         <div>
@@ -190,24 +190,25 @@ function OverviewTab({
           </div>
         ) : (
           <p className="text-xs text-fg-muted">
-            This domain is primarily for counts and workflow monitoring — no single trusted dollar
+            This data set is primarily for counts and workflow monitoring — no single trusted dollar
             measure is published.
           </p>
         )}
       </section>
 
       <section className="glass-panel space-y-4 p-5">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
-            Driving C2M table
-          </p>
-          <p className="mt-2 font-mono text-sm text-heading">
-            CISADM.{model.driving_table ?? "—"}
-          </p>
-          <p className="mt-1 text-xs text-fg-muted">
-            Population and grain are anchored here during the nightly refresh.
-          </p>
-        </div>
+        {/* named only when the grain key traces to CISADM (build_portal_catalog.driving_table) */}
+        {model.driving_table ? (
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
+              Driving C2M table
+            </p>
+            <p className="mt-2 font-mono text-sm text-heading">CISADM.{model.driving_table}</p>
+            <p className="mt-1 text-xs text-fg-muted">
+              The data set's rows are this table's: its grain key comes from here.
+            </p>
+          </div>
+        ) : null}
         {model.population_filter ? (
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-widest text-fg-muted">
@@ -221,7 +222,7 @@ function OverviewTab({
         <div className="grid grid-cols-2 gap-3 text-center">
           <StatCard label="Source tables" value={String(model.source_tables.length)} />
           <StatCard label="Join steps" value={String(model.join_paths.length)} />
-          <StatCard label="Domain fields" value={String(metadata.fields?.length ?? 0)} />
+          <StatCard label="Fields" value={String(metadata.fields?.length ?? 0)} />
           <StatCard label="Field groups" value={String(model.field_groups.length)} />
         </div>
         {model.refresh_sql ? (
@@ -258,7 +259,7 @@ function TablesTab({ model }: { model: SnapshotDataModel }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-fg-muted">
-        These Oracle tables are combined during the canvas refresh. Analysts query the flattened{" "}
+        These CISADM tables are combined when the data set is rebuilt. Reports and the SQL page read the flattened{" "}
         <span className="font-mono text-primary">{model.snapshot_table}</span> table in the portal.
       </p>
       {grouped.map(({ role, tables }) => (
@@ -294,7 +295,7 @@ function JoinsTab({ model, onPrint }: { model: SnapshotDataModel; onPrint?: () =
   if (!model.join_paths.length) {
     return (
       <div className="glass-panel p-8 text-center text-sm text-fg-muted">
-        No join paths were parsed for this canvas (may use UNION or a custom refresh pattern).
+        No join paths were parsed for this data set (it may combine sources with UNION).
       </div>
     );
   }
@@ -377,7 +378,7 @@ function FieldsTab({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-fg-muted">
           {fields.length} of {totalCount} fields available for filters, group-by, and metrics in
-          this Domain.
+          this data set.
         </p>
         <div className="flex flex-wrap gap-2">
           <input

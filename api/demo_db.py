@@ -211,6 +211,7 @@ def execute_query(
     organization_id: str,
     max_rows: int = 5000,
     current_schema: str | None = None,
+    timeout_ms: int | None = None,
 ) -> tuple[list[str], list[list[Any]]]:
     """current_schema pins unqualified names for the in-database workspace (the
     Oracle analogue of the Postgres side's search_path). Identifier-validated
@@ -218,7 +219,7 @@ def execute_query(
     binds = binds or {}
     with demo_connection(organization_id) as conn:
         try:
-            conn.call_timeout = _CALL_TIMEOUT_MS
+            conn.call_timeout = timeout_ms or _CALL_TIMEOUT_MS
         except Exception:  # noqa: BLE001 -- older thick-mode handles lack it
             pass
         with conn.cursor() as cur:

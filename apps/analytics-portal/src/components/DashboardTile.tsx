@@ -102,7 +102,8 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
 
   const total = useMemo(() => {
     if (!result) return null;
-    return kpiHeadline(result.rows, measureKey, queryMeasureAgg);
+    return kpiHeadline(result.rows, measureKey, queryMeasureAgg,
+      result.totals?.[measureKey] == null ? null : Number(result.totals[measureKey]));
   }, [result, measureKey, queryMeasureAgg]);
 
   useEffect(() => {

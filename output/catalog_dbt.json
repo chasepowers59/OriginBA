@@ -1000,7 +1000,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 7,
     "domain_table": "rpt_account_person",
-    "driving_table": "CI_ACCT",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -1952,7 +1952,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 10,
     "domain_table": "rpt_batch",
-    "driving_table": "CI_BATCH_CTRL",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -2228,7 +2228,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 20,
     "domain_table": "rpt_bill",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_BILL",
     "field_groups": [
      {
       "fields": [
@@ -2826,7 +2826,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 10,
     "domain_table": "rpt_bill_factor_price",
-    "driving_table": "CI_BF",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -3159,7 +3159,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 34,
     "domain_table": "rpt_bill_segment",
-    "driving_table": "CI_ACCT",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -3288,6 +3288,13 @@
       "on": "u.uom_cd = c.uom_cd",
       "role": "model",
       "table": "uom_class"
+     },
+     {
+      "alias": "p",
+      "join_type": "left join",
+      "on": "p.bseg_id = q.bseg_id and p.uom_cd = q.uom_cd",
+      "role": "step",
+      "table": "priced_units"
      },
      {
       "alias": "du",
@@ -4104,7 +4111,7 @@
      "type": "numeric"
     },
     {
-     "description": "The CONSUMPTION total for the segment, in the unit named by \"Billed Usage UOM\". NULL when the segment does not bill exactly one consumption unit, because a figure that could be kilowatt-hours or gallons depending on the row is worse than none. Excludes demand, tiered breakdowns (which repeat the same quantity split into tiers) and derived identifiers like days and equivalent residential units. Additive across segments only within one unit.",
+     "description": "The CONSUMPTION total for the segment, in the unit named by \"Billed Usage UOM\". When the segment measures several consumption units, it is the one the charge lines priced on (CityCorp measures water in GAL and TGAL and prices in TGAL); NULL when no single unit resolves, because a figure that could be kilowatt-hours or gallons depending on the row is worse than none. Excludes demand, tiered breakdowns (which repeat the same quantity split into tiers) and derived identifiers like days and equivalent residential units. Additive across segments only within one unit.",
      "group": "billing",
      "id": "Billed Usage",
      "label": "Billed Usage",
@@ -5366,7 +5373,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 27,
     "domain_table": "rpt_bill_segment_read",
-    "driving_table": "CI_BSEG",
+    "driving_table": "CI_BSEG_READ",
     "field_groups": [
      {
       "fields": [
@@ -6310,7 +6317,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 40,
     "domain_table": "rpt_billable_charge",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_B_CHG_LINE",
     "field_groups": [
      {
       "fields": [
@@ -7133,7 +7140,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 53,
     "domain_table": "rpt_billed_charge",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_BSEG_CALC_LN",
     "field_groups": [
      {
       "fields": [
@@ -8351,7 +8358,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 30,
     "domain_table": "rpt_billed_usage",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_BSEG_SQ",
     "field_groups": [
      {
       "fields": [
@@ -9314,7 +9321,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 18,
     "domain_table": "rpt_case",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_CASE",
     "field_groups": [
      {
       "fields": [
@@ -9841,7 +9848,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 2,
     "domain_table": "rpt_characteristics",
-    "driving_table": "CI_CHAR_TYPE_L",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -10103,7 +10110,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 17,
     "domain_table": "rpt_credit_rating_history",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_CR_RAT_HIST",
     "field_groups": [
      {
       "fields": [
@@ -12155,7 +12162,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 9,
     "domain_table": "rpt_customer_contact",
-    "driving_table": "CI_ACCT",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -12681,7 +12688,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 15,
     "domain_table": "rpt_customer_notification",
-    "driving_table": "CI_ACCT",
+    "driving_table": "F1_SVC_TASK",
     "field_groups": [
      {
       "fields": [
@@ -13179,7 +13186,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 16,
     "domain_table": "rpt_debt_process",
-    "driving_table": "CI_ACCT",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -14109,7 +14116,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 38,
     "domain_table": "rpt_device_asset",
-    "driving_table": "CI_LOOKUP_VAL_L",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -15538,7 +15545,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 19,
     "domain_table": "rpt_device_event",
-    "driving_table": "CI_PREM",
+    "driving_table": "D1_DVC_EVT",
     "field_groups": [
      {
       "fields": [
@@ -16049,7 +16056,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 10,
     "domain_table": "rpt_exception",
-    "driving_table": "CI_CUST_CL_L",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -16809,7 +16816,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 14,
     "domain_table": "rpt_field_activity",
-    "driving_table": "CI_LOOKUP_VAL_L",
+    "driving_table": "D1_ACTIVITY",
     "field_groups": [
      {
       "fields": [
@@ -17705,7 +17712,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 48,
     "domain_table": "rpt_financial_txn",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_FT",
     "field_groups": [
      {
       "fields": [
@@ -19054,7 +19061,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 31,
     "domain_table": "rpt_gl",
-    "driving_table": "CI_ACCT",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -19832,7 +19839,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 11,
     "domain_table": "rpt_measurement",
-    "driving_table": "CI_PREM",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -20332,7 +20339,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 13,
     "domain_table": "rpt_on_off_history",
-    "driving_table": "CI_LOOKUP_VAL_L",
+    "driving_table": "D1_ON_OFF_HIST",
     "field_groups": [
      {
       "fields": [
@@ -20740,7 +20747,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 7,
     "domain_table": "rpt_pay_plan",
-    "driving_table": "CI_ACCT",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -21371,7 +21378,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 33,
     "domain_table": "rpt_payment",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_PAY_SEG",
     "field_groups": [
      {
       "fields": [
@@ -22071,7 +22078,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 35,
     "domain_table": "rpt_payment_tender",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_PAY_TNDR",
     "field_groups": [
      {
       "fields": [
@@ -22753,7 +22760,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 41,
     "domain_table": "rpt_premise_sp",
-    "driving_table": "CI_LOOKUP_VAL_L",
+    "driving_table": "CI_SP",
     "field_groups": [
      {
       "fields": [
@@ -23943,7 +23950,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 24,
     "domain_table": "rpt_rate_configuration",
-    "driving_table": "C1_CALC_GRP_L",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -24500,7 +24507,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 14,
     "domain_table": "rpt_rate_schedule_history",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_SA_RS_HIST",
     "field_groups": [
      {
       "fields": [
@@ -25126,7 +25133,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 15,
     "domain_table": "rpt_sa_aged_balance",
-    "driving_table": "CI_ACCT",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -25733,7 +25740,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 28,
     "domain_table": "rpt_service_agreement",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_SA",
     "field_groups": [
      {
       "fields": [
@@ -26870,7 +26877,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 22,
     "domain_table": "rpt_tender_control",
-    "driving_table": "CI_DEP_CTL",
+    "driving_table": "CI_TNDR_CTL",
     "field_groups": [
      {
       "fields": [
@@ -27336,7 +27343,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 2,
     "domain_table": "rpt_todo",
-    "driving_table": "CI_LOOKUP_VAL_L",
+    "driving_table": null,
     "field_groups": [
      {
       "fields": [
@@ -27656,7 +27663,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 17,
     "domain_table": "rpt_unbilled_revenue",
-    "driving_table": "CI_ACCT",
+    "driving_table": "CI_SA",
     "field_groups": [
      {
       "fields": [
@@ -28291,7 +28298,7 @@
    "data_model": {
     "columns_traced_to_cisadm": 26,
     "domain_table": "rpt_usage_txn",
-    "driving_table": "CI_PREM",
+    "driving_table": "D1_USAGE_SCALAR_DTL",
     "field_groups": [
      {
       "fields": [
