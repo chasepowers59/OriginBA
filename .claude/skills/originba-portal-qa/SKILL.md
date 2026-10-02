@@ -73,6 +73,8 @@ balances below the past-due card, and KPI cards never using the pre-aggregates (
 A green check is not the end: READ the numbers it agreed on (past due > receivables was
 consistent and wrong).
 
+`python3 scripts/check_timings_live.py --org citycorp [--budget 5]` times every demo surface through the running API, twice each (cold, then warm), and exits 1 when a WARM answer is over the budget. It is how the numbers in the performance skill are re-measured; read-only, no model call.
+
 Operated, not just loaded: `e2e/explorer-interactions.spec.ts` (every period, compare, cross-filter
 and its removal, sort, the Excel export's About sheet) and `e2e/builder-interactions.spec.ts`
 (every visual type, a date's grain, a field dragged to Filters), plus `e2e/builder-drag.spec.ts`
