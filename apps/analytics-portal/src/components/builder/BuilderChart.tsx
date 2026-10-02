@@ -26,6 +26,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { formatCurrency, formatNumber, valueAxis } from "@/lib/format";
+import { singleValue } from "@/lib/singleValue";
 import { emphasisFills } from "@/lib/chartEmphasis";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import {
@@ -274,6 +275,25 @@ export function BuilderChart({
         style={{ height, borderColor: "var(--border)", color: "var(--foreground-subtle)" }}
       >
         {emptyMessage}
+      </div>,
+    );
+  }
+
+  // One row and no category is a number, not a chart: the Home card's own figure, shown as
+  // itself with the way to break it down (lib/singleValue).
+  const single = singleValue({ xKey, rows: data, series });
+  if (single) {
+    return frame(
+      <div data-testid="single-value" className="flex flex-col items-center justify-center gap-3 px-4 py-10 text-center">
+        <div className="flex flex-wrap items-end justify-center gap-x-10 gap-y-4">
+          {single.values.map((v) => (
+            <div key={v.label}>
+              <p className="text-4xl font-semibold tabular-nums text-fg">{v.text}</p>
+              <p className="mt-1 text-sm text-fg-muted">{v.label}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-sm text-fg-subtle">One number for everything in the window — add a column to break it down.</p>
       </div>,
     );
   }
