@@ -39,7 +39,7 @@ project, `desktop` (1440 x 900), and the phone-only specs are gone (in git histo
 
 | Spec | Command | Time |
 | --- | --- | --- |
-| Crawl: every route on Ellensburg | `npx playwright test e2e/crawl.spec.ts` | ~4 min, 56 visits |
+| Crawl: every route on Ellensburg | `npx playwright test e2e/crawl.spec.ts` (`CRAWL_ORGS=ellensburg,citycorp` for both); it first waits, up to 10 min, for `/portal/health` to report the organization warmed, so a crawl started right after an API restart is not a false red | ~4 min, 56 visits |
 | Accessibility (axe, WCAG 2.1 AA) incl. every Settings tab | `npx playwright test e2e/a11y.spec.ts` (`COLOR_SCHEME=dark` for dark) | ~1 min |
 | Pixels (local baselines, Ellensburg; retake after a rebuild) | `npx playwright test e2e/visual.spec.ts` | ~1 min |
 | Ori (naming, the home panel with stubbed routes), data quality, library | `npx playwright test e2e/ori.spec.ts e2e/ori-findings.spec.ts e2e/dq.spec.ts e2e/library.spec.ts` | ~1 min |
