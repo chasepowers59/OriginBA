@@ -136,7 +136,10 @@ What College Station's volume (3.47M bills, 16.5M segments, 35.8M FTs) adds, mea
   row: 16 at College Station), and CISADM has no index on `BILL_DT`, so each pass is a full scan
   of 3.47M bills: about 3 s warm, far more cold. **Recommended to the client DBA**: a CM_ index on
   `CISADM.CI_BILL (BILL_DT)` (or `(BILL_CYC_CD, BILL_DT)`), which turns every pass into a range
-  scan of the month's ~50K bills. Nothing in the report needs to change for it.
+  scan of the month's ~50K bills. Nothing in the report needs to change for it. The DDL, for the
+  client DBA (our account holds no `CREATE ANY INDEX` there):
+
+      CREATE INDEX CISADM.CM_CI_BILL_BILL_DT ON CISADM.CI_BILL (BILL_DT) ONLINE;
 - **Aged Debt As Of Date was rewritten for this volume** (35.8M FTs): the first shape joined every
   FT to its SA, account, segment and bill up front and copied all 35M rows to TEMP for two passes
   (15 minutes, then the VPN dropped the connection). The base now reads CI_FT alone, the optional
