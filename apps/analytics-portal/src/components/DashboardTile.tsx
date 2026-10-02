@@ -25,6 +25,8 @@ type DashboardTileProps = {
 export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTileProps) {
   const { filter } = useCrossFilter();
   const [result, setResult] = useState<QueryResponse | null>(null);
+  // the last day the tile's window covers, so a time bucket it ends inside is named for what it holds
+  const [windowEnd, setWindowEnd] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dimensionKey, setDimensionKey] = useState("");
   // Whether the query ACTUALLY grouped by a time bucket. Deriving "is this a time
@@ -81,6 +83,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
         setMeasureKey(chartedMeasureColumn(response.columns, measures.length));
         setQueryMeasureField(primaryMeasure.field ?? "*");
         setQueryMeasureAgg(primaryMeasure.agg ?? "count");
+        setWindowEnd(dates.filters[0] && !dates.all_dates ? end : null);
         setShows(filterDisclosure({
           allDates: Boolean(groupDate) && dates.all_dates,
           window: dates.filters[0] ? { field: dates.filters[0].field, start, end } : null,
@@ -216,6 +219,7 @@ export function DashboardTile({ tile, days, onCrossSelect, onData }: DashboardTi
           ]}
           sortTimeSeries={isTimeSeries}
           xGrain={tile.time_grain ?? null}
+          windowEnd={windowEnd}
           selectedCategory={filter && filter.field === dimensionKey ? filter.value : null}
           onCategorySelect={dimensionKey.startsWith("TD") ? undefined : handleClick}
           height={240}

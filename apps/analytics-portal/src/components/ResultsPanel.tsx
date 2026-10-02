@@ -353,6 +353,7 @@ export function ResultsPanel({
             selectedCategory={drillFilter?.value ?? null}
             onCategorySelect={onDrillSelect}
             sortTimeSeries={sortTimeSeries}
+            windowEnd={dateRange?.[1] ?? null}
             emptyMessage="No chart data for this selection"
           />
         </div>

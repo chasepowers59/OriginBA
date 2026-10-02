@@ -59,6 +59,14 @@ type FilItem = ShelfFilter;
 
 const GRAINS = ["month", "quarter", "year"];
 
+
+/** The last day of the window on the time column, from its between filter: the chart names a bucket it cuts short. */
+function windowEndFor(cols: { kind: string; field: string }[], fils: { field: string; op: string; value: unknown }[]): string | null {
+  const time = cols.find((c) => c.kind === "time");
+  const f = time && fils.find((x) => x.field === time.field && x.op === "between");
+  return Array.isArray(f?.value) && typeof f.value[1] === "string" ? f.value[1] : null;
+}
+
 export function VisualBuilder({
   initialCanvas,
   initialQuestion,
@@ -596,6 +604,7 @@ export function VisualBuilder({
                     // axis has to read chronologically rather than ranked by size.
                     sortTimeSeries={cols.some((c) => c.kind === "time")}
                     xGrain={cols.find((c) => c.kind === "time")?.grain ?? null}
+                    windowEnd={windowEndFor(cols, fils)}
                     emptyMessage={asking ? "Set the report parameters above, then run the report" : undefined}
                   />
                 )}

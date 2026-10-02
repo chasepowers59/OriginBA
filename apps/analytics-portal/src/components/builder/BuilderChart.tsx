@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/chart";
 import { formatCurrency, formatNumber, valueAxis } from "@/lib/format";
 import { singleValue } from "@/lib/singleValue";
+import { partialBucket, partialLabel, partialNote } from "@/lib/partialBucket";
 import { emphasisFills } from "@/lib/chartEmphasis";
 import { isOrderedAxis, orderChartRows } from "@/lib/chartOrder";
 import {
@@ -66,6 +67,8 @@ type BuilderChartProps = {
   sortTimeSeries?: boolean;
   /** Grain of the time bucket on the x axis, so its ticks can name the period. */
   xGrain?: string | null;
+  /** The last day the window covers: a time bucket it ends inside is named for what it holds. */
+  windowEnd?: string | null;
 };
 
 // Series colors come from the theme's --chart-1..5 (light + dark aware, defined in
@@ -139,6 +142,7 @@ export function BuilderChart({
   onCategorySelect,
   emptyMessage = "Drop a dimension and a measure to see a chart",
   sortTimeSeries = false,
+  windowEnd = null,
   xGrain = null,
 }: BuilderChartProps) {
   const [measureRef, width] = useElementWidth();
@@ -168,10 +172,23 @@ export function BuilderChart({
     );
   }, [rows, xKey, series, ordered]);
 
-  // A time bucket is a timestamp; naming its period beats truncating its first instant.
+  // A time bucket is a timestamp; naming its period beats truncating its first instant. The
+  // bucket the window ends inside holds only part of its period, and says so, or a month of two
+  // days reads as a collapse (CityCorp "Billed revenue by month", Dec 4 to Jun 2, 2026).
+  const partial = useMemo(() => {
+    if (!sortTimeSeries || !data.length) return null;
+    const last = String(data[data.length - 1][xKey]);
+    const cut = partialBucket(last, xGrain ?? "month", windowEnd);
+    return cut ? { bucket: last, label: formatTimeBucket(last, xGrain), through: cut.through } : null;
+  }, [data, xKey, sortTimeSeries, xGrain, windowEnd]);
   const labels = useMemo(
-    () => data.map((d) => (sortTimeSeries ? formatTimeBucket(String(d[xKey]), xGrain) : String(d[xKey]))),
-    [data, xKey, sortTimeSeries, xGrain],
+    () => data.map((d) => {
+      const raw = String(d[xKey]);
+      if (!sortTimeSeries) return raw;
+      const label = formatTimeBucket(raw, xGrain);
+      return partial && raw === partial.bucket ? partialLabel(label, partial.through) : label;
+    }),
+    [data, xKey, sortTimeSeries, xGrain, partial],
   );
   const layout = chartLayout({
     ...BUILDER_AXIS,
@@ -265,6 +282,7 @@ export function BuilderChart({
     <div ref={measureRef} className="w-full min-w-0">
       {pie?.note && layout.showChart ? <p className="mb-2 text-xs text-fg-muted">{pie.note}</p> : null}
       {node}
+      {partial && layout.showChart ? <p className="mt-2 text-xs text-fg-muted">{partialNote(partial.label, partial.through)}</p> : null}
     </div>
   );
 
