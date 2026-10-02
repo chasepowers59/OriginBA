@@ -1,6 +1,6 @@
 "use client";
 
-import { alignsRight, formatCellValue, formatDateTime, formatNumber } from "@/lib/format";
+import { alignsRight, formatCellValue, formatDate, formatDateTime, formatNumber } from "@/lib/format";
 import { SlowNotice } from "@/components/SlowNotice";
 
 /**
@@ -41,6 +41,7 @@ type DqResponse = {
   acknowledged?: number;
   refresh_marker?: string;
   built_at?: string | null;
+  aged_to?: string | null;   // a frozen copy: every "Days ..." column is aged to this date, not to the build
   rules: DqRule[];
   error?: string;
 };
@@ -144,6 +145,9 @@ export function DataQualityBoard() {
             to act in CIS.
             {data.built_at ? (
               <span className="text-fg-subtle"> · data refreshed {formatDateTime(data.built_at)}</span>
+            ) : null}
+            {data.aged_to ? (
+              <span className="text-fg-subtle"> · ages counted to {formatDate(data.aged_to)}, this organization&apos;s data-as-of date</span>
             ) : null}
           </p>
           {markErr ? <p role="alert" className="mt-2 text-sm text-over">{markErr}</p> : null}

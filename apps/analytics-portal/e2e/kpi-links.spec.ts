@@ -26,5 +26,10 @@ for (const [ws, label] of [["billing", "Billed amount"], ["debt", "Accounts rece
     const rows = (await (await answered).json()).rows as Record<string, number>[];
     expect(rows).toHaveLength(1);
     expect(Math.abs(Number(rows[0].m0) - card.value)).toBeLessThan(0.005);
+    // and the builder shows that one number as a number, not "Nothing to compare" (2026-10-02)
+    const shown = page.getByTestId("single-value");
+    await expect(shown).toBeVisible({ timeout: 30_000 });
+    await expect(shown).toContainText("add a column to break it down");
+    await expect(shown).not.toContainText("Nothing to compare");
   });
 }

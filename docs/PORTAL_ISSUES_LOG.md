@@ -22,6 +22,8 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 | Found | Issue | Fix | Pinned by |
 | --- | --- | --- | --- |
+| 2026-10-02 | "See where this number comes from" on a Home card opened the builder with the right question and showed "Nothing to compare: one group (Not recorded)" where the reader expected the number (Ellensburg, Payments) | portal/round-4: a one-row result with no category is shown as its number (every measure, formatted by its series) with "add a column to break it down"; the chart layer's notes stay for every other case | src/lib/singleValue.test.ts; e2e/kpi-links.spec.ts |
+| 2026-10-02 | Data Quality on a frozen TEST copy aged every "Days ..." column to the BUILD date: CityCorp's "Bill window open over 30 days" held 2,559 of its 2,592 Act-now findings, the dead tail's bill cycles aged 101 days to a build four months after the anchor | portal/round-4: the runner takes the build-to-anchor gap off every "Days ..." column (shown, compared and ordered) when the organization declares `data_as_of`; the page says "ages counted to Jun 2, 2026, this organization's data-as-of date"; a live organization is unchanged | tests/test_dq_oracle_orgs.py (AnchoredAgingTests); e2e/dq.spec.ts |
 | 2026-10-02 | Crawl false red: `/explore/rpt_bill_segment_read` failed at CityCorp in a crawl started a minute after an API restart (the page passed alone 4 s later; the warmer finished CityCorp one minute after the failure). A page opened while its organization is still warming pays the cold cost of a >1M-row data set | portal/round-3: the crawl waits (bounded, 10 min) for `/portal/health` to report the organization's last warm before it opens anything; with warming off it crawls as before | e2e/crawl.spec.ts (`waitForWarm`) |
 | 2026-09-28 | The opening report of a >1M-row data set was slow on the first visit (~25 s at Ellensburg for rpt_billed_charge) | Pre-aggregates, phases 1 and 2, live on Ellensburg (measured 2026-10-02 through the running API, a 12-month monthly sum each): rpt_billed_charge 1.8 s via agg_billed_charge_daily, rpt_gl 1.5 s via agg_gl_daily, rpt_financial_txn 0.7 s via agg_financial_txn_daily, rpt_billed_usage 0.5 s via agg_billed_usage_daily; a query the routing cannot prove equal still reads the data set | api/aggregate_routing.py tests; originba_dbt tests/test_aggregate_parity.py (weekly QA on live Oracle) |
 | 2026-10-02 | CityCorp Home: "Last 30 days to Jul 17, 2026" showed $42.9K of payments against a $4M month. The 07-17 anchor (chosen 10-01 from bills alone) sits past where the TEST copy's activity ends: daily counts show bills, payments and transactions all normal through 06-02, payments gone by mid-June, and the later bill cycles (06-24/25, 07-02/03, 07-13 to 07-17) running with no payments | portal/round-3 f415f199: `data_as_of` 2026-06-02 with the daily evidence in its note; remove the key when the copy is refreshed | tests/test_data_as_of.py; scripts/check_kpi_consistency_live.py --org citycorp |
@@ -165,6 +167,15 @@ find the issue. Skill: `.claude/skills/originba-portal-qa`. Never paste real cli
 
 ## Decisions
 
+- 2026-10-02 (frozen TEST copies, Chase: "you choose what is best for the app"): **a `data_as_of` anchor
+  governs windows, Ori's history and Data Quality's aging; reports do not re-age.** On a copy that
+  stopped receiving activity, every "Days ..." column is computed to the BUILD date by dbt
+  (`as_of_date: runtime`), so a report such as "Which bill cycles have the longest-open bills?" shows
+  the dead tail aged to the build while Data Quality (which takes the build-to-anchor gap off) shows it
+  aged to the anchor. The principled fix, building the copy with `as_of_date` pinned to its anchor, was
+  weighed and declined: the weekly parity against the client's own CMS_SA_SNAPSHOT (refreshed to
+  SYSDATE) and the nightly point-in-time probe against CIS would both go red by construction. A
+  refreshed copy removes the anchor and the difference with it.
 - 2026-09-29 (Chase: "go with your recommendations"):
   - **UI-2 colour meaning:** one hue per series (`--chart-1`); the leading bar is emphasised by strength of that hue, not by another colour; red (`--over`) only for negative values and explicit thresholds; the cross-filter selection keeps `--chart-selected`. Replaces the primary-to-red value ramp.
   - **UI-4 one glossary, one grouping:** user-facing words are **data set** (never canvas, reporting table, domain, snapshot), **report** (a ready-to-run question), **view** (a saved view), **dashboard**, **workstream** (the business area); organization, never tenant; unit of measure, never UOM. The Library groups by workstream only (the pack chips go); the builder's nav item is **Build**; data set pages sit under Library.

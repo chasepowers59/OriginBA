@@ -37,6 +37,54 @@ ORACLE_RULES = [
 ]
 
 
+class AnchoredAgingTests(unittest.TestCase):
+    """A frozen TEST copy declares data_as_of; its canvases were built later, so every "Days ..."
+    column (computed at build time) overstates the age by the gap between the build and the
+    anchor. CityCorp 2026-10-02: 2,559 "stuck bills" that were the dead tail's bill cycles,
+    aged 101 days to the build date. The runner takes the gap off before comparing."""
+
+    SQL = ('SELECT\n  "Bill ID",\n  "Window Start Date",\n  "Days Bill Open"\n'
+           'FROM ORIGINBA_REPORTING.RPT_BILL\nWHERE\n  "Days Bill Open" > 30\nORDER BY\n  "Days Bill Open" DESC\n')
+
+    def test_every_days_column_is_aged_to_the_anchor(self):
+        out = dq_routes._anchor_aging(self.SQL, 121)
+        self.assertIn('"Days Bill Open" - 121 AS "Days Bill Open"', out)      # the worklist shows the anchored age
+        self.assertIn('("Days Bill Open" - 121) > 30', out)                   # the test ages to the anchor
+        self.assertIn('ORDER BY\n  ("Days Bill Open" - 121) DESC', out)
+        self.assertEqual(out.count("- 121"), 3)
+        self.assertEqual(dq_routes._anchor_aging(self.SQL, 0), self.SQL)        # no gap, no rewrite
+        plain = 'SELECT "Bill ID" FROM ORIGINBA_REPORTING.RPT_BILL WHERE "Is Complete" = 0'
+        self.assertEqual(dq_routes._anchor_aging(plain, 121), plain)           # nothing ages here
+
+    def test_the_gap_is_the_build_date_minus_the_anchor(self):
+        with mock.patch.object(dq_routes, "data_as_of", return_value="2026-06-02"), \
+             mock.patch.object(dq_routes, "refresh_marker", return_value="20261001092800:20261001091500:39"):
+            self.assertEqual(dq_routes.aging_gap_days("citycorp", "oracle"), 121)
+        with mock.patch.object(dq_routes, "data_as_of", return_value=None):
+            self.assertEqual(dq_routes.aging_gap_days("ellensburg", "oracle"), 0)   # a live organization ages to its build
+        with mock.patch.object(dq_routes, "data_as_of", return_value="2026-06-02"), \
+             mock.patch.object(dq_routes, "refresh_marker", return_value="none"):
+            self.assertEqual(dq_routes.aging_gap_days("citycorp", "oracle"), 0)     # no build known: nothing to take off
+
+    def test_anchored_rules_run_rewritten_and_the_payload_says_so(self):
+        rules = [{"id": "bill_window_open", "key_column": "Bill ID", "object": "Bill", "severity": "action",
+                  "title": "Bill window open over 30 days", "action": "Look.", "sql": self.SQL}]
+        seen = []
+
+        def fake_query(sql, organization_id=None, max_rows=None, timeout_ms=None):
+            seen.append(sql)
+            return ["Bill ID", "Window Start Date", "Days Bill Open", dq_routes.TOTAL_COL], [["1", "2026-06-22", 40, 1]]
+
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "rules.oracle.yml"
+            path.write_text(yaml.safe_dump(rules))
+            with mock.patch.object(dq_routes, "oracle_query", side_effect=fake_query), \
+                 mock.patch.object(dq_routes, "aging_gap_days", return_value=121):
+                out = dq_routes._run_rules("citycorp", "oracle", path)
+        self.assertIn('("Days Bill Open" - 121) > 30', seen[0])
+        self.assertEqual(out[0]["rows"], [["1", "2026-06-22", "40"]])
+
+
 def _ctx():
     return AuthContext(id="u1", email="u1@utility.gov", display_name="u1", role="editor",
                        client_id="ellensburg", organization_id="ellensburg",
