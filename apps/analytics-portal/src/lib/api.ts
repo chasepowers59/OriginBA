@@ -519,16 +519,17 @@ export function fetchAssistantStatus(): Promise<AssistantStatus> {
 export async function askAssistantStream(
   question: string,
   thread: AssistantMessage[],
+  threadOrganization: string | null,
   context: { canvas_id: string; period?: string; filters?: string[] } | null,
   onStep: (event: { type: string; data: Record<string, unknown> }) => void,
 ): Promise<AssistantResponse> {
   const res = await fetch(`${API_BASE}/portal/assistant/stream`, {
     method: "POST",
     headers: await resolveRequestHeaders(),
-    body: JSON.stringify({ question, thread, context: context ?? null }),
+    body: JSON.stringify({ question, thread, thread_organization: threadOrganization ?? null, context: context ?? null }),
     cache: "no-store",
   });
-  if (res.status === 404 || res.status === 405) return askAssistant(question, thread, context);
+  if (res.status === 404 || res.status === 405) return askAssistant(question, thread, threadOrganization, context);
   if (!res.ok || !res.body) throw new Error(parseApiError(await res.text(), res.statusText));
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -598,11 +599,12 @@ export function createEmbedToken(viewId: string, ttlMinutes = 24 * 60): Promise<
 export function askAssistant(
   question: string,
   thread: AssistantMessage[],
+  threadOrganization: string | null,
   context?: { canvas_id: string; period?: string; filters?: string[] } | null,
 ): Promise<AssistantResponse> {
   return fetchJson<AssistantResponse>("/portal/assistant", {
     method: "POST",
-    body: JSON.stringify({ question, thread, context: context ?? null }),
+    body: JSON.stringify({ question, thread, thread_organization: threadOrganization ?? null, context: context ?? null }),
   });
 }
 

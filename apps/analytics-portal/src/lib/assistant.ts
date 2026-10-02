@@ -38,6 +38,16 @@ export function threadFor(turns: Turn[]): AssistantMessage[] {
   return [];
 }
 
+/** The organization the thread was had in, as the API stamped it: sent back with it so the
+ *  server can refuse a thread from another organization. Null before any answer. */
+export function threadOrganizationFor(turns: Turn[]): string | null {
+  for (let i = turns.length - 1; i >= 0; i -= 1) {
+    const t = turns[i];
+    if (t.role === "assistant") return t.response.thread_organization ?? null;
+  }
+  return null;
+}
+
 /** "3 steps · 2 queries" -- the footer under an answer. An admin (settings:manage) also sees
  *  "· 1,240 tokens (22,000 cached) · <model>": cost is theirs to watch, not every reader's.
  *  Cached reads are the bulk of a question's tokens and cost a tenth; they are shown apart

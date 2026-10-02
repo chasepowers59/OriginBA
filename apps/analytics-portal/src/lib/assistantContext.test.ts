@@ -21,14 +21,28 @@ describe("the page the assistant is asked from", () => {
   });
 });
 
-describe("the conversation survives moving between pages", () => {
+describe("the conversation survives moving between pages, inside one organization", () => {
   it("round-trips through session storage, and an unusable store is an empty conversation", () => {
     const store = new Map<string, string>();
     const storage = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) };
-    saveTurns([{ role: "user", text: "hi" }], storage);
-    expect(loadTurns(storage)).toEqual([{ role: "user", text: "hi" }]);
-    expect(loadTurns({ getItem: () => "{not json", setItem: () => undefined })).toEqual([]);
-    expect(loadTurns(undefined)).toEqual([]);
+    saveTurns([{ role: "user", text: "hi" }], storage, "ellensburg");
+    expect(loadTurns(storage, "ellensburg")).toEqual([{ role: "user", text: "hi" }]);
+    expect(loadTurns({ getItem: () => "{not json", setItem: () => undefined }, "ellensburg")).toEqual([]);
+    expect(loadTurns(undefined, "ellensburg")).toEqual([]);
+  });
+
+  // 2026-10-02: the Ellensburg thread (a cancelled-tender table) showed under CityCorp's
+  // banner after the organization switch, and a follow-up would have carried it into
+  // CityCorp's model context. The switch reloads the page; session storage survives it.
+  it("another organization never sees it, and no organization means no conversation", () => {
+    const store = new Map<string, string>();
+    const storage = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) };
+    saveTurns([{ role: "user", text: "ellensburg's question" }], storage, "ellensburg");
+    expect(loadTurns(storage, "citycorp")).toEqual([]);
+    expect(loadTurns(storage, null)).toEqual([]);
+    saveTurns([{ role: "user", text: "citycorp's question" }], storage, "citycorp");
+    expect(loadTurns(storage, "ellensburg")).toEqual([{ role: "user", text: "ellensburg's question" }]);
+    expect(loadTurns(storage, "citycorp")).toEqual([{ role: "user", text: "citycorp's question" }]);
   });
 });
 

@@ -4,6 +4,7 @@
  * is mounted, reads it and sends it with the question.
  */
 import type { Turn } from "./assistant";
+import { getActiveOrganization } from "./auth";
 
 /** One of Ori's own items (a forecast, an unusual month): the server restates its figures. */
 export type OriItem = { kind: "forecast" | "anomaly"; kpi_id: string };
@@ -37,7 +38,19 @@ export function contextLabel(c: PageContext): string {
 }
 
 type Store = Pick<Storage, "getItem" | "setItem">;
+// One conversation PER ORGANIZATION: the switch is a full reload that session storage
+// survives, and a thread had in one organization must never show, or be sent back, in another.
 const TURNS_KEY = "originba_assistant_turns";
+function turnsKey(org: string): string {
+  return `${TURNS_KEY}:${org}`;
+}
+function activeOrg(): string | null {
+  try {
+    return typeof document === "undefined" ? null : getActiveOrganization();
+  } catch {
+    return null;
+  }
+}
 // Kept to the last few exchanges: rows ride along in each answer.
 const MAX_STORED_TURNS = 12;
 
@@ -49,9 +62,10 @@ function sessionStore(): Store | undefined {
   }
 }
 
-export function loadTurns(store: Store | undefined = sessionStore()): Turn[] {
+export function loadTurns(store: Store | undefined = sessionStore(), org: string | null = activeOrg()): Turn[] {
+  if (!org) return [];
   try {
-    const raw = store?.getItem(TURNS_KEY);
+    const raw = store?.getItem(turnsKey(org));
     const turns = raw ? JSON.parse(raw) : [];
     return Array.isArray(turns) ? turns : [];
   } catch {
@@ -59,9 +73,10 @@ export function loadTurns(store: Store | undefined = sessionStore()): Turn[] {
   }
 }
 
-export function saveTurns(turns: Turn[], store: Store | undefined = sessionStore()): void {
+export function saveTurns(turns: Turn[], store: Store | undefined = sessionStore(), org: string | null = activeOrg()): void {
+  if (!org) return;
   try {
-    store?.setItem(TURNS_KEY, JSON.stringify(turns.slice(-MAX_STORED_TURNS)));
+    store?.setItem(turnsKey(org), JSON.stringify(turns.slice(-MAX_STORED_TURNS)));
   } catch {
     /* storage full or unavailable: the conversation just won't follow the reader */
   }
