@@ -29,7 +29,7 @@ const FORECAST: OriForecast = {
   total: 8_550_000, total_low: 7_850_000, total_high: 9_250_000, typical_error_pct: 6.2, checks: 24,
   headline: "Billed revenue: about $8,550,000.00 over May to Jun 2026",
   detail: "Likely between $7,850,000.00 and $9,250,000.00.",
-  question: "What is driving the billed revenue projection?",
+  question: "What is driving the billed revenue forecast?",
 };
 
 describe("the forecast chart's rows", () => {
@@ -39,27 +39,27 @@ describe("the forecast chart's rows", () => {
     expect(rows[0]).toEqual({ month: "2026-03", actual: 4_071_002.11 });
   });
 
-  it("the projection grows out of the last actual month, its range starting at no width", () => {
+  it("the forecast grows out of the last actual month, its range starting at no width", () => {
     expect(forecastRows(FORECAST)[1]).toEqual({
       month: "2026-04", actual: 3_342_118.2, projected: 3_342_118.2, range: [3_342_118.2, 3_342_118.2],
     });
   });
 
-  it("the projected months carry the projection and its likely range, never an actual", () => {
+  it("the forecast months carry the forecast and its likely range, never an actual", () => {
     expect(forecastRows(FORECAST).slice(2)).toEqual([
       { month: "2026-05", projected: 4_200_000, range: [3_900_000, 4_500_000] },
       { month: "2026-06", projected: 4_350_000, range: [3_950_000, 4_750_000] },
     ]);
   });
 
-  it("with no projection the actual months stand alone", () => {
+  it("with no forecast the actual months stand alone", () => {
     expect(forecastRows({ ...FORECAST, forecast: [] })).toEqual([
       { month: "2026-03", actual: 4_071_002.11 },
       { month: "2026-04", actual: 3_342_118.2 },
     ]);
   });
 
-  it("with no actual months the projection stands alone", () => {
+  it("with no actual months the forecast stands alone", () => {
     expect(forecastRows({ ...FORECAST, history: [] }).map((r) => r.actual)).toEqual([undefined, undefined]);
   });
 });
@@ -98,7 +98,7 @@ describe("whether Ori's panel shows", () => {
     expect(oriPanelShows({ ...read, brief: "   " }, trends)).toBe(false);
   });
 
-  it("any one of the brief, a finding, an unusual month or a projection is enough", () => {
+  it("any one of the brief, a finding, an unusual month or a forecast is enough", () => {
     expect(oriPanelShows({ ...read, brief: "Billed revenue fell 18%." }, trends)).toBe(true);
     expect(oriPanelShows({ ...read, findings: [FINDING] }, trends)).toBe(true);
     expect(oriPanelShows(read, { ...trends, anomalies: [ANOMALY] })).toBe(true);
@@ -119,10 +119,10 @@ describe("the forecast chart's frame", () => {
   });
 });
 
-// "Ask Ori about this" on a projection sent the bare question and Ori denied the projection
+// "Ask Ori about this" on a forecast sent the bare question and Ori denied the forecast
 // existed (2026-10-01). The ask now names the item; the server restates its figures.
 describe("asking Ori about one of its own items", () => {
-  it("a projection names its data set and itself", () => {
+  it("a forecast names its data set and itself", () => {
     const ask = oriAsk({ ...FORECAST, snapshot_id: "rpt_payment" }, "forecast");
     expect(ask.question).toBe(FORECAST.question);
     expect(ask.context).toMatchObject({ canvas_id: "rpt_payment", ori_item: { kind: "forecast", kpi_id: "billed_revenue" } });
