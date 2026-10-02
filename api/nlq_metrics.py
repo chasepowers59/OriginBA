@@ -261,14 +261,30 @@ NOT_CANCELLED = MONEY_FILTERS["rpt_payment_tender"]
 
 METRICS: list[NlqMetric] = [
     # ------------------------------------------------------------- Customers
+    # Two customer counts, each named for what it is (2026-10-02): "how many customers" means
+    # the accounts being billed, the Home card's own definition (api/executive_dashboard.py);
+    # every account in CIS, open or closed, is the other metric and answers to "accounts in
+    # CIS". The same question used to count every account: 92.8K at Ellensburg against the
+    # card's 12.2K.
     NlqMetric(
-        id="total_customers",
-        label="Total customer accounts",
+        id="billing_accounts",
+        label="Billing accounts (at least one active service agreement)",
         category="Customers",
         patterns=[r"how\s+many\s+customers", r"total\s+customers", r"customer\s+count",
-                  r"number\s+of\s+(customers|accounts)"],
+                  r"number\s+of\s+customers", r"billing\s+accounts", r"active\s+customers"],
         snapshot_id="rpt_customer_account",
         example="How many customers do we have?",
+        build=lambda _p: {"kind": "scalar", "windowless": True,
+                          "query": _count(filters=[{"field": "Active SA Count", "op": "gte", "value": 1}])},
+    ),
+    NlqMetric(
+        id="total_customers",
+        label="Accounts in CIS (every account, open or closed)",
+        category="Customers",
+        patterns=[r"accounts?\s+in\s+cis", r"total\s+accounts", r"all\s+accounts",
+                  r"number\s+of\s+accounts", r"how\s+many\s+accounts"],
+        snapshot_id="rpt_customer_account",
+        example="How many accounts are in CIS?",
         build=lambda _p: {"kind": "scalar", "windowless": True, "query": _count()},
     ),
     NlqMetric(

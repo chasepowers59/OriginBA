@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchNlqMetricCatalog, runAnalyticsNlq } from "@/lib/api";
 import { pinReportUrl } from "@/lib/pinReport";
+import { groupMetrics } from "@/lib/nlqMetrics";
 import type { NlqMetricCatalogItem, NlqResponse } from "@/lib/types";
 import { NlqAnswerCard } from "./NlqAnswerCard";
 
@@ -27,13 +28,14 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
       .catch(() => setCatalog([]));
   }, []);
 
-  const grouped = useMemo(() => {
-    const map = new Map<string, NlqMetricCatalogItem[]>();
-    for (const m of catalog) {
-      map.set(m.category, [...(map.get(m.category) ?? []), m]);
-    }
-    return [...map.entries()];
-  }, [catalog]);
+  const grouped = useMemo(() => groupMetrics(catalog), [catalog]);
+
+  const chooseMetric = (m: NlqMetricCatalogItem) => {
+    setSelectedMetric(m.id);
+    setQuery(m.example);
+    setDays(m.default_days);
+    void runQuery(m.example, m.id);
+  };
 
   const runQuery = async (q: string, metricId?: string) => {
     const text = q.trim();
@@ -81,6 +83,27 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
+        {grouped.length ? (
+          // Folded under Ori, the form showed a free-text box and a disabled button with no way to
+          // see the metrics it answers (2026-10-02): the picker lists them wherever the form is.
+          <select
+            aria-label="Choose a metric"
+            className="input-modern w-full"
+            value={selectedMetric}
+            disabled={loading}
+            onChange={(e) => {
+              const m = catalog.find((x) => x.id === e.target.value);
+              if (m) chooseMetric(m);
+            }}
+          >
+            <option value="">Choose a metric…</option>
+            {grouped.map(({ category, items }) => (
+              <optgroup key={category} label={category}>
+                {items.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+              </optgroup>
+            ))}
+          </select>
+        ) : null}
         <input
           type="text"
           value={query}
@@ -149,7 +172,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
 
       {!compact && grouped.length ? (
         <div className="mt-4 max-h-64 space-y-3 overflow-y-auto">
-          {grouped.map(([category, items]) => (
+          {grouped.map(({ category, items }) => (
             <div key={category}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
                 {category}
@@ -159,12 +182,7 @@ export function NlqSearchPanel({ compact }: { compact?: boolean }) {
                   <button
                     key={m.id}
                     type="button"
-                    onClick={() => {
-                      setSelectedMetric(m.id);
-                      setQuery(m.example);
-                      setDays(m.default_days);
-                      void runQuery(m.example, m.id);
-                    }}
+                    onClick={() => chooseMetric(m)}
                     className={`chip text-left text-[11px] ${selectedMetric === m.id ? "chip-active" : ""}`}
                   >
                     {m.label}
