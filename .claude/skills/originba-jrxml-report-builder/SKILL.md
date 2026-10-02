@@ -180,7 +180,8 @@ Rules that are not obvious from the schema:
 
 When several SQL reports share a layout (title, window line, header row, detail row,
 subreport under each row, totals, confidential footer), write them as SPECS and emit the
-JRXML: `scripts/jaspersoft/generate_sql_report_pack.py` -> four main reports + four
+JRXML: `scripts/jaspersoft/generate_sql_report_pack.py` -> seven main reports (payments, AP
+requests, GL, billing by cycle, adjustments, aged debt, top usage customers) + their
 subreports + input-control JSON, `tests/test_sql_report_pack.py` proves the committed files
 are what the generator emits, pass the validator, keep the SQL conventions (TRIM on CHAR
 flags, `COALESCE` not `NVL`, `dt < $P{TO_DT} + INTERVAL '1' DAY`, only lifecycle literals),
