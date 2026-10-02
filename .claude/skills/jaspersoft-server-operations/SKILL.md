@@ -65,7 +65,7 @@ ever printed. A login is org-scoped (`user|Org`) or a superuser; superuser paths
 | | |
 | --- | --- |
 | `scripts/jaspersoft/jrs_repository.py --env X [--org Y] whoami / search / list / perms / jobs / job / users / roles / export / run` | read the server: who am I, where is a resource, what a folder holds, who can see it, what is scheduled, a report's PDF |
-| `scripts/jaspersoft/jrs_repository.py --env X --org Y --confirm Y [--i-mean-prod] [--dry-run] import / copy / move / delete / mkdir / perms-set / job-run / job-delete` | WRITE the server. Every write must name the org back (`--confirm`), prod also needs `--i-mean-prod`, and `--dry-run` prints the exact call. `tests/test_jrs_repository_ops.py` pins the calls and the guards |
+| `scripts/jaspersoft/jrs_repository.py --env X --org Y --confirm Y [--i-mean-prod] [--dry-run] import / copy / move / delete / mkdir / perms-set / job-delete` | WRITE the server. Every write must name the org back (`--confirm`), prod also needs `--i-mean-prod`, and `--dry-run` prints the exact call. `tests/test_jrs_repository_ops.py` pins the calls and the guards |
 | `scripts/jaspersoft/jrs_inventory.py snapshot [--orgs] [--split] / diff / summary / clients / environments` | backup + inventory + comparison; `jaspersoft/inventory/{README,CLIENTS,ENVIRONMENTS}.md` are generated |
 | `scripts/jaspersoft/jrs_deploy_report_units.py --org X --datasource Y [--run FROM TO]` | create/overwrite report units from the finance-pack specs and execute them |
 | `scripts/jaspersoft/jrs_run_sweep.py --env X --org Y [--folder F] --out jaspersoft/sweeps/<env>_<org>_<date>.json` | RUN everything in a folder and classify it: Ad Hoc views through queryExecutions with the view as datasource (ok / EMPTY / error), report units through the reports service, dashboards through dashboardExecutions. The post-promotion smoke, and the before/after of a server upgrade (diff the two JSON files by uri). On the test server dashboards answer `ERR_CONNECTION_REFUSED` from the server's own headless export engine, not from the dashboard: classified `export-engine`, and the UI opens them fine (Chase, 2026-09-18) |
@@ -167,7 +167,7 @@ test|prod|internal` and `--org <Org>` (the login becomes `user|Org`; paths are t
 | Rearrange folders | `mkdir`, `move`, `copy` (destination is a FOLDER; the resource keeps its name); Ad Hoc views and dashboards keep working because references are by URI and the server rewrites them on move | `list` the new place; `jrs_run_sweep.py --folder <new>` runs everything there |
 | Retire a resource | `export` it to a zip first, then `delete` | the zip re-imports it |
 | Who can see what | `perms /uri`; change with `perms-set /uri role/ROLE_X:18 ...` (REPLACES the list: name every recipient you keep; 18 = read+execute, 30 = full, 1 = administer) | `perms` again |
-| Scheduled reports | `jobs [--report /uri]`, `job ID`, `job-run ID`, `job-delete ID`. Jobs are NOT in a repository export: list them before an upgrade or a move (a moved report's jobs follow it; a deleted report's jobs die) | `jobs` before and after |
+| Scheduled reports | `jobs [--report /uri]`, `job ID`, `job-delete ID` (no run-now: JRS 10 has no `POST /rest_v2/jobs/{id}/run`; a job runs on its trigger or from the UI). Jobs are NOT in a repository export: list them before an upgrade or a move (a moved report's jobs follow it; a deleted report's jobs die) | `jobs` before and after |
 | Users and roles | `users [--role R]`, `roles` (read). Creating users is a UI task here: it needs the org's password policy and is not something to script against a client tenant | |
 | The whole check for one org in one command (upgrade morning, post-promotion) | `jrs_validate.py --env prod --org Y [--folder /SmartCity] [--cap 20] [--baseline <before>.json] --label post_upgrade [--exclude <hanging folders>]`: snapshot (rollback zip), inventory diff vs the last committed tree, sweep with a per-resource cap (past it = SLOW, move on), compare with the baseline, write `jaspersoft/sweeps/<env>_<org>_<label>_<stamp>.md` | the .md: verdict line, broke / went empty / now slow / healed / missing / new, inventory added/removed/changed, errors, slow list |
 | Does everything still load (upgrade, promotion) | `jrs_run_sweep.py --env prod --org Y --folder /SmartCity --types view,report --workers 3 --timeout 120 --out jaspersoft/sweeps/<name>.json`, ONE org at a time on prod; then `jrs_run_sweep.py compare before.json after.json` | broke / healed / emptied / slower lists; row-count drift is the snapshot refresh |
@@ -522,7 +522,7 @@ every Ad Hoc view descriptor in the org (minutes on 300 views; the slow step).
   --into /SmartCity/Report/Standard_Offering`.
 Scheduling, for the record: a job = report + trigger (once / simple / calendar) + fixed parameter
 values + output formats + destination (repository folder, email, FTP), runs as its creator; REST
-`/rest_v2/jobs` (our `jobs / job / job-run / job-delete`). A schedulable standard report needs
+`/rest_v2/jobs` (our `jobs / job / job-delete`). A schedulable standard report needs
 RELATIVE date defaults (last month), which the pack's FROM_DT / TO_DT do not have yet.
 
 ## College_Station PROD -> TEST, 21 custom resources + their domains (2026-09-25)

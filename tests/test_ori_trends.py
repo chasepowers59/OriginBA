@@ -72,6 +72,29 @@ class MonthTests(unittest.TestCase):
                           {"month": "2025-04", "value": 0.0}, {"month": "2025-05", "value": 7.5}])
         self.assertEqual(ori_series.series_from_rows(months, []), [])
 
+    def test_a_trailing_month_far_below_a_typical_month_is_incomplete(self):
+        # CityCorp 2026-10-02: the TEST copy's June held 21% of a typical month's bills; the
+        # calendar called it complete and every forecast drew a collapse followed by a recovery
+        steady = [{"month": f"2025-{m:02d}", "value": 100.0 + m} for m in range(1, 13)]
+        series, dropped = ori_series.trim_incomplete_tail(steady + [{"month": "2026-01", "value": 21.0}])
+        self.assertEqual(series, steady)
+        self.assertEqual(dropped, [{"month": "2026-01", "pct": 20}])
+        # a month at 80% of typical is a month, not a gap
+        series, dropped = ori_series.trim_incomplete_tail(steady + [{"month": "2026-01", "value": 85.0}])
+        self.assertEqual(len(series), 13)
+        self.assertEqual(dropped, [])
+        # two thin trailing months are both left out; a third thin month is a trend, kept
+        two = steady + [{"month": "2026-01", "value": 10.0}, {"month": "2026-02", "value": 5.0}]
+        series, dropped = ori_series.trim_incomplete_tail(two)
+        self.assertEqual([p["month"] for p in series], [p["month"] for p in steady])
+        self.assertEqual([d["month"] for d in dropped], ["2026-01", "2026-02"])
+        three = two + [{"month": "2026-03", "value": 7.0}]
+        self.assertEqual(ori_series.trim_incomplete_tail(three), (three, []))
+        # too little history to call a month typical: nothing is dropped
+        short = steady[:5] + [{"month": "2025-06", "value": 1.0}]
+        self.assertEqual(ori_series.trim_incomplete_tail(short), (short, []))
+        self.assertEqual(ori_series.trim_incomplete_tail([]), ([], []))
+
     def test_a_month_the_last_build_did_not_finish_is_not_complete(self):
         # review 2026-09-29: builds stopped Sep 20, today Oct 3 -> September has 19 days of data
         kpi = {"id": "k", "snapshot_id": "rpt_payment", "date_field": "Payment Date",
@@ -175,6 +198,16 @@ class ForecastTests(unittest.TestCase):
         self.assertIn("same months last year", f["detail"])
         self.assertIn("Jun to Aug 2026", f["question"])
         self.assertIn("forecast", f["question"])   # the word the page uses (2026-10-01)
+
+    def test_a_forecast_says_which_incomplete_month_it_left_out(self):
+        history = {"bills": [{"month": f"{2024 + (m - 1) // 12}-{(m - 1) % 12 + 1:02d}", "value": 1000.0} for m in range(1, 30)]}
+        meta = {"bills": {"label": "Bills", "format": "number", "incomplete_months": [{"month": "2026-06", "pct": 21}]}}
+        out = forecasts(history, meta)
+        self.assertEqual(len(out), 1)
+        self.assertIn("Jun 2026 is left out: it holds 21% of a typical month and looks incomplete.", out[0]["detail"])
+        self.assertEqual(out[0]["forecast"][0]["month"], "2026-06")
+        out = forecasts(history, {"bills": {"label": "Bills", "format": "number"}})
+        self.assertNotIn("left out", out[0]["detail"])
 
     def test_a_level_series_without_a_season_uses_the_twelve_month_average(self):
         # Ellensburg payments, 2026-09-29: last year's months missed by 17.7%, the 12-month average by 14.6%
