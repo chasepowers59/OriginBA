@@ -558,3 +558,17 @@ directory the utility's import reads); the upgrade rebuilt that side. Fix is on 
 (recreate the directory / permissions) or the four jobs' `folderPath` (PUT /rest_v2/jobs/<id>,
 prod write). The `job` subcommand truncates at 800 characters; `jrs_get.py` prints the whole thing
 with passwords masked. `jrs_repository.py run --format csv --param K=V` reproduces a job's run.
+
+## Changing a scheduled job's time: the UI, not REST (FDL prod, 2026-10-02)
+
+- `GET /rest_v2/jobs/<id>` never returns the FTP/SFTP password, so a full `PUT` of the job
+  descriptor cannot be proven to keep it; on prod that is a silent outage waiting for the next run.
+- The bulk model update (`POST /rest_v2/jobs?id=<id>`, body with only `trigger`) is the call that
+  would leave the password alone, and on JRS 10 it refuses every trigger shape: `simpleTrigger`
+  -> 400 "Please use ReportJobSimpleTriggerModel ... instead of ReportJobSimpleTrigger" (with or
+  without `replaceTriggerIgnoreType=true`); `simpleTriggerModel` -> 400 "Could not resolve type id".
+  Nothing changed on any attempt (version read back).
+- So: change a job's schedule in the UI (Schedule -> edit -> Schedule tab), which keeps the output
+  settings, and "Run now" there to retry. There is still no REST run-now on JRS 10.
+- SFTP "Connection reset" at `Session.connect` is refused BEFORE login (network / SFTPGo Defender /
+  session limit), not credentials or folder. FDL's five jobs all connect as one user at 10:00:00Z.
