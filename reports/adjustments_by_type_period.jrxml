@@ -15,7 +15,7 @@
     <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
     <query language="SQL"><![CDATA[
-SELECT TRIM(a.adj_type_cd) AS ADJ_TYPE_CD, COALESCE(al.descr, TRIM(a.adj_type_cd)) AS ADJ_TYPE_DESCR,
+SELECT /*+ NO_EXPAND */ TRIM(a.adj_type_cd) AS ADJ_TYPE_CD, COALESCE(al.descr, TRIM(a.adj_type_cd)) AS ADJ_TYPE_DESCR,
        COUNT(*) AS ADJUSTMENTS, COALESCE(SUM(a.adj_amt), 0) AS NET_AMT,
        COALESCE(SUM(CASE WHEN a.adj_amt > 0 THEN a.adj_amt ELSE 0 END), 0) AS DEBIT_AMT,
        COALESCE(SUM(CASE WHEN a.adj_amt < 0 THEN a.adj_amt ELSE 0 END), 0) AS CREDIT_AMT,

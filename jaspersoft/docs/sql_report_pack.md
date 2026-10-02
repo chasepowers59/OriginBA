@@ -56,6 +56,108 @@ first cut listed every code ever *configured*, and Ellensburg's carried Auto Pay
 Cloud tender types no tender has ever used (18 configured, 10 used); Chase asked for activity
 only (2026-09-17). The `EXISTS` compares CHAR to CHAR untrimmed so Oracle keeps its indexes.
 
+## Top Usage Customers (College Station's request, 2026-10-01)
+
+`top_usage_customers` ranks the N accounts that used the most of ONE service in a window (default:
+last calendar year, on the bill segment's service period end date), each with its month-by-month
+usage and billed amount underneath. Parameters: **Service type** (required pick-list of service
+types with a unit configured), **Top N** (default 10), optional **Units of measure** (multi,
+follows the service), **SA types** (multi, follows the service), **Customer class**, **CIS division**.
+
+- **Billed usage, not meter reads.** What the customer was billed for, after VEE and estimation,
+  with rebills replacing cancels: frozen segments (`50`) of completed bills (`C`), `CI_BSEG_SQ`
+  measured rows (`TRIM(sqi_cd) IS NULL`), `BILL_SQ`. Meter-side tables carry unbilled and
+  re-estimated reads and, at College Station TEST, a partial `D1_MSRMT` load.
+- **One unit at a time.** Usage adds only within a unit. Left blank, the report uses the service's
+  most-billed unit that is not a peak unit (`CI_UOM.MSR_PEAK_QTY_SW`); every row prints the unit.
+  The unit list shows the units configured for the service (an activity check would scan
+  `CI_BSEG_SQ`, which has no index on the unit).
+- **Account grain.** An account's usage of the service across all its agreements; the address is
+  the agreement with the most usage (`+n more` when the account has several premises). Share % is
+  of all accounts in the same filters; the Total row is the top N's combined share.
+- **Billed amount** is the calc headers of the same frozen segments, so a month's subtotal equals
+  its row.
+
+Measured on College Station TEST (2025, 2026-10-01):
+- every `CI_BSEG_SQ` row carries a padded blank SQI (Oracle `IS NULL` alone matches nothing);
+- electric bills **KWH** (consumption) beside **KW** (peak), and KW has more rows (559,454 vs
+  559,331), which is why the peak flag decides the default; **KWHR** is "Renewable Energy Credit";
+- water bills **MGW** ("Mille Gallons", thousands) and **MGW2** (second register of compound
+  meters, 206 segments a year): pick both to include compound meters;
+- **residential sewer is priced in gallons under the same MGW code commercial sewer prices in
+  thousands** ("$4.50/1000", capped at 10,000 vs "$5.35 per MGW"), so a Wastewater ranking mixes
+  scales there: rank Water, or rank sewer within one SA type;
+- the top 10 water accounts tied to the client's own `BSEG_SQ_USAGE_RPT_CURR` exactly (usage and
+  segment counts), and the monthly subtotal of the top account equals its row (49,891 MGW,
+  $169,764.52);
+- the main query takes about 80 s there (no date index on `CI_BSEG`/`CI_BILL`); the monthly
+  subreports use the account and agreement indexes.
+
+On Origin_DEV (Ellensburg TEST data) the defaults resolve to KWH, GAL and CCF; the report renders
+for E, W and G and matched the direct query to the cent (#1 electric 22,906,800 KWH, $1,363,434.78).
+
+**JRS 10 refuses a report query that starts with `WITH`** (a generic "An error has occurred ...
+contact your system administrator" before the query runs; a real SQL error says "Error executing
+SQL statement"). The emitter wraps CTE queries as `SELECT * FROM (...) q`; a test holds every
+emitted query to `SELECT`.
+
+## College Station test org (promoted 2026-10-02)
+
+Promoted from Origin_DEV with `jrs_promote.py` (import clean, all 31 package files equal on
+re-export, every unit and pick-list bound to `CollegeStation_DS`). Validated by running each unit
+as a PDF on the server and comparing its Total row with the unit's own SQL run directly on
+College Station's TEST database with the same parameters (`validate_pack.py` in the session
+scratchpad; June 2026 is the last complete month there, bills stop 2026-09-11):
+
+| Unit | Window | PDF total = direct SQL |
+| --- | --- | --- |
+| Payments by Tender Type | Jun 2026 | 52,068 tenders, $17,606,957.50; 183 cancelled, $89,451.22 |
+| Adjustments by Type | Jun 2026 | 57,646 adjustments, net ($137,107.71) |
+| Adjustment / AP requests | Jun 2026 | 609 requests, $86,768.05 |
+| Top Usage Customers (Water, top 10) | 2025 | 348 bills, 254,967 MGW, 5.47% share; #1 = 49,891 MGW, the same as the client's `BSEG_SQ_USAGE_RPT_CURR` |
+
+Server-side timings on College Station test after the fixes below (June 2026; Top Usage 2025;
+the server's own PDF run, queue empty, cache warm): Payments 16 s · AP requests 11 s · GL 22 s
+(was a 600 s timeout) · Billing by Cycle 26 s (19 min cold, until the client adds the index below)
+· Adjustments 32 s (was 160 s) · Top Usage 211 s · Aged Debt 308 s (was over 15 min and failing).
+Origin_DEV (Ellensburg data): every unit under 35 s, Aged Debt 45 s.
+
+What College Station's volume (3.47M bills, 16.5M segments, 35.8M FTs) adds, measured the same day:
+
+- **The first run of a window is disk-bound.** Billing by Cycle for one month is 50,568 bills and
+  248,577 segments; the plan is right (CI_BILL scan, then indexed probes into segments and charge
+  headers), but cold it took over ten minutes and warm it takes 3 s; GL by Distribution Code 18 s
+  warm. The promotion tool's execution pass, cold and at the 600 s ceiling, timed out on both.
+- **The optimizer's bill estimate is 357, not 50,568**: `TRIM(bill_stat_flg) = 'C'` hides the
+  column from statistics. Harmless here (the plan is still the right one).
+- **With binds, every optional filter was OR-expanded.** The server sends `$P{}` as bind
+  variables, and Oracle turned each `$P{X} IS NULL OR EXISTS (...)` into a UNION-ALL branch that
+  re-scanned the driving table: Billing by Cycle cost 140K with binds against 35K with literals,
+  four full scans of CI_BILL instead of one. The literal-value runs that proved the numbers never
+  showed it. Every query block that receives optional filters now carries `/*+ NO_EXPAND */`
+  (the generator injects it; a test holds it); with binds the plans are back to one branch
+  (Billing 35,083; GL 1,553; Aged Debt 4,561). Postgres reads the hint as a comment.
+
+- **Billing by Cycle re-reads CI_BILL once per cycle** (its service-type subreport runs per cycle
+  row: 16 at College Station), and CISADM has no index on `BILL_DT`, so each pass is a full scan
+  of 3.47M bills: about 3 s warm, far more cold. **Recommended to the client DBA**: a CM_ index on
+  `CISADM.CI_BILL (BILL_DT)` (or `(BILL_CYC_CD, BILL_DT)`), which turns every pass into a range
+  scan of the month's ~50K bills. Nothing in the report needs to change for it. The DDL, for the
+  client DBA (our account holds no `CREATE ANY INDEX` there):
+
+      CREATE INDEX CISADM.CM_CI_BILL_BILL_DT ON CISADM.CI_BILL (BILL_DT) ONLINE;
+- **Aged Debt As Of Date was rewritten for this volume** (35.8M FTs). The first shape joined every
+  FT to its SA, account, segment and bill up front and copied all 35M rows to TEMP for two passes
+  (15 minutes, then the VPN dropped the connection); with `TRIM()` on the flags and `TRUNC()` on the
+  date the optimizer also estimated 178 rows of 30M and read the table through an index one row at a
+  time. Now: the base reads CI_FT alone with `FULL(ft)`, the optional filters are guarded `EXISTS`,
+  the DUE date is a scalar subquery Oracle evaluates only when Age By is DUE, and the per-SA totals
+  and the FIFO running sum are window functions over the same rows: one scan, one sort, no
+  temporary table. **College Station: 173 s** (direct run, June 2026). Same numbers at Ellensburg
+  (36,599 SAs, $2,583,801.04, every bucket) and the same rows at College Station as the slow shape.
+  No temporary table matters twice: Oracle will not result-cache a query that uses one, and the
+  top-N subreport (one run per SA type: 79 at Ellensburg) relies on that cache.
+
 ## Semantics, so the totals reconcile
 
 - **Billed amount** is calc headers of frozen segments, the same figure as

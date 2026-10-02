@@ -15,20 +15,23 @@
     <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
     <query language="SQL"><![CDATA[
-SELECT TO_CHAR(f.accounting_dt, 'YYYY-MM') AS ACCT_MONTH, COUNT(*) AS GL_LINES,
-       COALESCE(SUM(CASE WHEN g.amount > 0 THEN g.amount ELSE 0 END), 0) AS DEBIT_AMT,
-       COALESCE(SUM(CASE WHEN g.amount < 0 THEN -g.amount ELSE 0 END), 0) AS CREDIT_AMT,
-       COALESCE(SUM(g.amount), 0) AS NET_AMT
-FROM CISADM.CI_FT_GL g
-JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id
-WHERE TRIM(f.freeze_sw) = 'Y' AND f.accounting_dt >= $P{FROM_DT} AND f.accounting_dt < $P{TO_DT} + INTERVAL '1' DAY AND TRIM(g.dst_id) = TRIM($P{DST_ID})
-  AND COALESCE(TRIM(g.gl_acct), '(no GL account)') = $P{GL_ACCT}
-  AND ($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))
+SELECT ACCT_MONTH, GL_LINES, DEBIT_AMT, CREDIT_AMT, NET_AMT FROM (
+  SELECT /*+ NO_EXPAND RESULT_CACHE */ TRIM(g.dst_id) AS DST_ID, COALESCE(TRIM(g.gl_acct), '(no GL account)') AS GL_ACCT,
+         TO_CHAR(f.accounting_dt, 'YYYY-MM') AS ACCT_MONTH, COUNT(*) AS GL_LINES,
+         COALESCE(SUM(CASE WHEN g.amount > 0 THEN g.amount ELSE 0 END), 0) AS DEBIT_AMT,
+         COALESCE(SUM(CASE WHEN g.amount < 0 THEN -g.amount ELSE 0 END), 0) AS CREDIT_AMT,
+         COALESCE(SUM(g.amount), 0) AS NET_AMT
+  FROM CISADM.CI_FT_GL g
+  JOIN CISADM.CI_FT f ON f.ft_id = g.ft_id
+  WHERE TRIM(f.freeze_sw) = 'Y' AND f.accounting_dt >= $P{FROM_DT} AND f.accounting_dt < $P{TO_DT} + INTERVAL '1' DAY
+      AND ($P{DST_ID_F} IS NULL OR TRIM(g.dst_id) = TRIM($P{DST_ID_F}))
   AND ($P{GL_ACCT_F} IS NULL OR TRIM(g.gl_acct) = TRIM($P{GL_ACCT_F}))
   AND ($P{GL_DIVISION_F} IS NULL OR TRIM(f.gl_division) = TRIM($P{GL_DIVISION_F}))
   AND ($P{CIS_DIVISION_F} IS NULL OR TRIM(f.cis_division) = TRIM($P{CIS_DIVISION_F}))
   AND ($P{FT_TYPE_FLG_F} IS NULL OR TRIM(f.ft_type_flg) = TRIM($P{FT_TYPE_FLG_F}))
-GROUP BY TO_CHAR(f.accounting_dt, 'YYYY-MM')
+  GROUP BY TRIM(g.dst_id), COALESCE(TRIM(g.gl_acct), '(no GL account)'), TO_CHAR(f.accounting_dt, 'YYYY-MM')
+) x
+WHERE x.DST_ID = TRIM($P{DST_ID}) AND x.GL_ACCT = $P{GL_ACCT}
 ORDER BY ACCT_MONTH
 ]]></query>
     <parameter name="FROM_DT" class="java.sql.Date">

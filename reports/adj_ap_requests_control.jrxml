@@ -15,7 +15,7 @@
     <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
     <query language="SQL"><![CDATA[
-SELECT TRIM(r.pymnt_sel_stat_flg) AS REQ_STATUS, COALESCE(rl.descr, TRIM(r.pymnt_sel_stat_flg)) AS REQ_STATUS_DESCR,
+SELECT /*+ NO_EXPAND */ TRIM(r.pymnt_sel_stat_flg) AS REQ_STATUS, COALESCE(rl.descr, TRIM(r.pymnt_sel_stat_flg)) AS REQ_STATUS_DESCR,
        TRIM(a.adj_status_flg) AS ADJ_STATUS, COALESCE(al.descr, TRIM(a.adj_status_flg)) AS ADJ_STATUS_DESCR,
        CASE WHEN TRIM(r.pymnt_sel_stat_flg) = 'X' AND TRIM(a.adj_status_flg) IN ('30', '50') THEN 'Cancel the adjustment: its A/P request was canceled'
             WHEN TRIM(r.pymnt_sel_stat_flg) = 'P' AND TRIM(a.adj_status_flg) = '60' THEN 'Paid, but the adjustment was canceled: recover'

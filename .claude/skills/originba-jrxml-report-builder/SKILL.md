@@ -152,6 +152,17 @@ Rules that are not obvious from the schema:
   Y/N flags stay `java.lang.String`.
 - **A dummy main query needs a real field**: REP8 uses `SELECT 1 FROM CISADM.CI_ACCT WHERE ROWNUM=1`
   with `<field name="1">` -- Oracle names the column `1`. Alias it (`SELECT 1 AS DUMMY`) in new work.
+- **Never start a report query with `WITH` on JRS 10** (measured 2026-10-01, Origin_DEV): the
+  server fails it with a generic "An error has occurred ... contact your system administrator"
+  before the query runs (a real SQL error reads "Error executing SQL statement for: <unit>"). Wrap
+  the CTEs: `SELECT * FROM (WITH ... SELECT ...) q`. The pack emitter does it and its test holds
+  every emitted query to `SELECT`. To find a server-only failure, fill the JRXML locally with
+  JasperReports 7.0.7 and ojdbc11 from the letterprint classpath, then bisect on the server.
+- **Optional filters need `/*+ NO_EXPAND */` on their query block** (measured at College Station
+  2026-10-02): with JDBC binds Oracle OR-expands `$P{X} IS NULL OR <pred>` into one UNION-ALL
+  branch per filter, each re-scanning the driving table (4x the cost, 600 s timeouts at 3.5M
+  bills). A literal-value run never shows it, so prove a report's plan with binds
+  (`EXPLAIN PLAN FOR ... :X ...`), not only with values.
 - **Heavy logic belongs in Oracle.** A JRXML query is a thin `SELECT` over a view or refreshed
   table; REP8 went from a giant inline query to `SELECT ... FROM JRS2C2M.REP8_AGED_BALANCE`
   (refreshed by `REFRESH_NEWARK_REP8_AGED_BALANCE`, `sql/clients/newark/rep8_aged_balance/`).
@@ -169,7 +180,8 @@ Rules that are not obvious from the schema:
 
 When several SQL reports share a layout (title, window line, header row, detail row,
 subreport under each row, totals, confidential footer), write them as SPECS and emit the
-JRXML: `scripts/jaspersoft/generate_sql_report_pack.py` -> four main reports + four
+JRXML: `scripts/jaspersoft/generate_sql_report_pack.py` -> seven main reports (payments, AP
+requests, GL, billing by cycle, adjustments, aged debt, top usage customers) + their
 subreports + input-control JSON, `tests/test_sql_report_pack.py` proves the committed files
 are what the generator emits, pass the validator, keep the SQL conventions (TRIM on CHAR
 flags, `COALESCE` not `NVL`, `dt < $P{TO_DT} + INTERVAL '1' DAY`, only lifecycle literals),

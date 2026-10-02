@@ -15,7 +15,7 @@
     <style name="TotalText" style="Base" fontSize="9" bold="true" forecolor="#000000" backcolor="#E7F2F8" mode="Opaque"/>
     <style name="FooterConfidential" style="Base" fontSize="7" forecolor="#5B6470"/>
     <query language="SQL"><![CDATA[
-SELECT TO_CHAR(e.pay_dt, 'YYYY-MM') AS PAY_MONTH,
+SELECT /*+ NO_EXPAND */ TO_CHAR(e.pay_dt, 'YYYY-MM') AS PAY_MONTH,
        COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN 1 END) AS TENDERS,
        COALESCE(SUM(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NULL THEN t.tender_amt ELSE 0 END), 0) AS TENDER_AMT,
        COUNT(CASE WHEN NULLIF(TRIM(t.can_rsn_cd), '') IS NOT NULL THEN 1 END) AS CANCELLED,
