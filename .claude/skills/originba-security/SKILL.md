@@ -96,6 +96,19 @@ Evidence: `tests/test_client_admin.py`, and live `scripts/check_tenant_isolation
    held (an open redirect, 2026-10-05). `lib/safeNext` admits only a same-site path; any new
    "return to" parameter, in the UI or the API, goes through it or its server-side twin.
 
+6. **Every route is guarded or named public, by test.** `tests/test_route_guards.py` walks the
+   app's route table; a new route without a permission or role gate fails CI. Add a public
+   route only to its PUBLIC list, with the reason.
+7. **A failure a person sees never carries driver text.** Use `api/public_errors.public_error`
+   for anything shown, `scrub` for strings the server reads back (it keeps the codes the
+   classifiers need). `tests/test_public_errors.py` refuses a broad `except` returning raw text.
+8. **Tests never see a real credential.** No `.env` under `ENVIRONMENT=test`; conftest strips
+   secret-shaped keys; never assert on a value that could be a credential in a way that prints it.
+9. **A password change retires the tokens before it** (`password_fingerprint` in every token,
+   checked per request). Any new way of issuing a token passes `pwv=`; the test checks every issuer.
+10. **The open production items are listed** at the end of `docs/SECURITY_AUDIT_2026-09-01.md`
+   ("Remaining, in order of risk"). Read them before claiming the portal production-ready.
+
 ## What the fences must block (test these, not just the happy path)
 
 Postgres: internal schemas qualified AND unqualified (`pg_catalog`, `pg_class`,

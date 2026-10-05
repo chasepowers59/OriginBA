@@ -10,6 +10,7 @@ from api.demo_db import execute_query
 from api.query_builder import QueryValidationError, build_query
 from api.reporting_dates import reporting_today, window_date_field
 from api.snapshot_catalog import allowed_fields, boolean_fields, get_snapshot, snapshot_backend
+from api.public_errors import scrub
 
 
 COMPARE_MODES = ("prior_period", "mom", "yoy")
@@ -424,5 +425,5 @@ def execute_kpi_definition(
             "prior_value": None,
             "change_pct": None,
             "trend": [],
-            "error": f"Query failed: {exc}",
+            "error": f"Query failed: {scrub(exc)}",   # codes kept for the classifiers, hosts removed
         }

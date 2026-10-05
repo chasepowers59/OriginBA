@@ -3,17 +3,17 @@ import { asOrg } from "./org";
 
 /**
  * Every page says when the reporting data stopped refreshing: Ellensburg's tables sat 19 days old
- * (2026-09-29) with no page saying so. Live Ellensburg was rebuilt that day, so it shows no notice;
- * a stale answer is stubbed to show the notice.
+ * (2026-09-29) with no page saying so. The live check follows the API's own answer, because a
+ * skipped nightly (VPN down) makes an org genuinely stale; a stale answer is also stubbed.
  *
  *   npx playwright test e2e/freshness.spec.ts
  */
-test("fresh data shows no notice", async ({ page, context }, info) => {
+test("the notice shows exactly when the live data is stale", async ({ page, context }, info) => {
   await asOrg(context, info);
   const answered = page.waitForResponse((r) => r.url().includes("/portal/freshness"));
   await page.goto("/reports");
-  await answered;
-  await expect(page.getByTestId("stale-data")).toHaveCount(0);
+  const { stale } = await (await answered).json();
+  await expect(page.getByTestId("stale-data")).toHaveCount(stale ? 1 : 0);
 });
 
 test("stale data is named on every page", async ({ page, context }, info) => {

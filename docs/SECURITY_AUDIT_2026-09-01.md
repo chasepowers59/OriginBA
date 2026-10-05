@@ -238,3 +238,42 @@ real blast radius of C1, C4, M1 and M2 — the validators are the only barrier t
 could be measured. **A workspace role holding column-restricted SELECT on
 `cisadm`+`reporting` would neutralise most of the CRITICAL findings independently of
 the regex layer, and is worth confirming first.**
+
+---
+
+## Production-readiness round — 2026-10-05
+
+A read-only audit of production hardening (headers, sign-in, sessions, errors, logging,
+embeds, uploads), the HTTP isolation harness widened to every stored object, and a walk of
+the portal with sign-in ON as a reader and an editor. Branch `portal/round-10`.
+
+### Fixed, each with its test
+
+| Finding | Fix | Pinned by |
+| --- | --- | --- |
+| A route could ship without any permission check; rule 6 was enforced route by route | The app's own route table is walked: every route is PUBLIC with its reason, SESSION_ONLY, or authenticated AND gated; no route takes an organization from the request; a planted unguarded route proves the check bites | `tests/test_route_guards.py` |
+| Isolation was proven for saved views only | Dashboards, notes, alerts, schedules (and run-now), embed links, letter runs, content packs and the admin surfaces, tried by CityCorp users with the organization header forged to Ellensburg: 67 of 67 held | `scripts/check_tenant_isolation.py` |
+| Driver and mail-server text reached users on nine routes (the SQL workspace for every role; the data-source save path, the H1 leak back on a second path) | `api/public_errors.py`: a connection failure reads as the unreachable note with the request's reference; any other message keeps its first line with hosts, addresses and connection strings removed; a static rule refuses any broad `except` that returns raw exception text | `tests/test_public_errors.py` |
+| Tests could resolve real client credentials (the app loaded `.env` on import; the lookup falls back to the process environment); a failing assertion printed CityCorp's TEST credentials into a local session log | No `.env` under `ENVIRONMENT=test`; conftest strips secret-shaped keys; the credential test isolates the environment and asserts without printing. The printed value went to no file, commit or push; rotating that TEST password is the owner's call | `tests/test_credential_isolation.py`, `tests/conftest.py` |
+| Sign-in timing listed accounts (an unknown email skipped PBKDF2) | A dummy check does the same work | `tests/test_auth_hardening.py` |
+| A token outlived a password change | Tokens carry a fingerprint of the password hash, checked on every request; a change or an admin reset retires older tokens; change-password returns a fresh token | `tests/test_auth_hardening.py`, harness |
+| A token's `typ` was never checked | Only `typ: access` opens a session (the embed secret is shared) | `tests/test_auth_hardening.py` |
+| Change-password had no attempt limit | Limited like sign-in | `tests/test_auth_hardening.py` |
+| Sign-ins were not audited | `login` and `login_failed` (with IP) in the audit trail; the failure row commits before the 401 | `tests/test_auth_hardening.py`, harness |
+| No security headers on the API; docs and schema public; localhost:3000 always an allowed origin | nosniff, deny framing, no-referrer, deny-all CSP, HSTS outside development; docs only in development; localhost origins only in development | `tests/test_production_headers.py` |
+| The app set only frame headers | nosniff, Referrer-Policy, Permissions-Policy, HSTS on every page; CSP adds base-uri, object-src, form-action; `poweredByHeader: false` | `src/lib/publicPaths.test.ts` |
+| An expired session left every panel reading "Invalid or expired token" | A 401 (with a session, on a page that needs one) returns to sign-in with `next` and a "session ended" note | `src/lib/sessionExpiry.test.ts` |
+| Open redirect after sign-in (`?next=` used as given) | `lib/safeNext`, same-site paths only (round 9) | `src/lib/safeNext.test.ts` |
+| A page the menu hides rendered when its address was typed | The shell applies the navigation's rule to the page itself | `src/lib/pageAccess.test.tsx` |
+| No root-layout error screen | `src/app/global-error.tsx` | — |
+
+### Remaining, in order of risk (not done in this round, with the reason)
+
+1. **Login rate limit is per process and keyed on the proxy's address.** Needs a shared store (the state Postgres) and the deployment's trusted-proxy setting (`--forwarded-allow-ips`), both deployment decisions.
+2. **No `script-src` CSP.** A nonce-based policy needs the color-mode inline script and Next's own scripts nonced; worth doing deliberately with a full regression, not inside this round.
+3. **Session token in sessionStorage** (readable by script) alongside the HttpOnly copy. Moving the browser to cookie-only auth changes every request path.
+4. **Logout does not revoke a token server-side** (a password change now does). Needs a revocation list or a per-user session version column (no migration mechanism yet, M4).
+5. **Embed links cannot be revoked one by one and share the session secret.** Needs a `jti` list and a separate key.
+6. **Password policy:** minimum 8, no breached-password check, PBKDF2 at 260k (OWASP: 600k). Raising the floor affects existing users at their next change.
+7. **No body-size cap** on content-pack import; **no audit of exports**; audit rows keep up to 300 characters of SQL, which can include customer literals; the request log's organization is the raw header, not the resolved one.
+8. **No rate limits** on the SQL workspace, queries, exports and the public embed data route; Ori's spend caps are opt-in.

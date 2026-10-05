@@ -37,6 +37,7 @@ from api.snapshot_catalog import org_backend
 from api.summary_cache import cached
 from api.warehouse_db import warehouse_configured, warehouse_connection
 from api.row_security import require_unrestricted
+from api.public_errors import scrub
 
 ROOT = Path(__file__).resolve().parent.parent
 # Rules resolution order: the sibling originba_dbt checkout is the SOURCE (dev machines),
@@ -121,7 +122,7 @@ def _run_rule(rule: dict[str, Any], run) -> dict[str, Any]:
         entry["capped"] = entry["total"] > ROW_CAP
     except Exception as e:  # noqa: BLE001
         # an exception with no message has no first line; that must not escape the rule
-        entry["error"] = (str(e).splitlines() or [type(e).__name__])[0][:200]
+        entry["error"] = (scrub(e) or type(e).__name__)[:200]   # hosts and addresses removed; the codes the classifiers read stay
         entry["columns"], entry["rows"] = [], []
         entry["count"] = entry["total"] = 0
     return entry

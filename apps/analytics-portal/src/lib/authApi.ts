@@ -64,11 +64,17 @@ export async function logout(): Promise<void> {
   await clearAccessToken();
 }
 
-export function changePassword(current_password: string, new_password: string): Promise<AuthUser> {
-  return authFetch<AuthUser>("/auth/change-password", {
+/** A password change retires every token issued before it (the API returns a fresh one), so the
+ *  session continues on the new token rather than being signed out by its own change. */
+export async function changePassword(current_password: string, new_password: string): Promise<AuthUser> {
+  const res = await authFetch<AuthUser & { access_token?: string | null }>("/auth/change-password", {
     method: "POST",
     body: JSON.stringify({ current_password, new_password }),
   });
+  if (res.access_token) await storeAccessToken(res.access_token);
+  const { access_token: _fresh, ...user } = res;
+  void _fresh;
+  return user;
 }
 
 /**

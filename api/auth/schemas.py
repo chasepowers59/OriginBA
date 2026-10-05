@@ -59,6 +59,12 @@ class ChangePasswordRequest(BaseModel):
     new_password: str = Field(min_length=8, max_length=128)
 
 
+class PasswordChangedResponse(AuthUserPublic):
+    """The account after a password change, and the fresh token to continue on: the change
+    retires every token issued before it."""
+    access_token: str | None = None
+
+
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"

@@ -18,7 +18,10 @@ sys.path.insert(0, str(ROOT))
 
 from dotenv import load_dotenv
 
-load_dotenv(ROOT / ".env")
+# Never under tests: the real .env holds every client's credentials, and once loaded into the
+# process every later test could resolve them (2026-10-05: a credential test printed one).
+if os.environ.get("ENVIRONMENT") != "test":
+    load_dotenv(ROOT / ".env")
 
 from contextlib import asynccontextmanager
 
@@ -44,10 +47,20 @@ async def lifespan(_app: FastAPI):
     stop.set()
 
 
+def _docs_urls() -> dict[str, str | None]:
+    """The interactive docs and the full schema exist on a development machine only: in
+    production they hand anyone a map of every route and parameter (audit 2026-10-05)."""
+    from api.security import is_development
+    if is_development():
+        return {"docs_url": "/docs", "redoc_url": "/redoc", "openapi_url": "/openapi.json"}
+    return {"docs_url": None, "redoc_url": None, "openapi_url": None}
+
+
 app = FastAPI(
     title="OriginBA Analytics API",
     description="NLQ and governed snapshot explorer (demo DB only for /snapshots)",
     lifespan=lifespan,
+    **_docs_urls(),
 )
 
 # scheme://host[:port] -- http and https only, and never a bare "*".
@@ -55,11 +68,10 @@ _ORIGIN_RE = re.compile(r"^https?://[A-Za-z0-9.\-]+(?::\d+)?$")
 
 
 def _cors_origins() -> list[str]:
-    origins = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://originba-analytics-portal.vercel.app",
-    ]
+    from api.security import is_development
+    origins = ["https://originba-analytics-portal.vercel.app"]
+    if is_development():   # a developer's own UI; never a production origin (audit 2026-10-05)
+        origins += ["http://localhost:3000", "http://127.0.0.1:3000"]
     # Audit M9: this list is used with allow_credentials=True. Starlette treats a "*"
     # entry as allow-all, and WITH credentials it echoes the caller's origin instead of
     # sending "*" -- so any website could make credentialed calls carrying a logged-in
@@ -81,6 +93,24 @@ def _cors_origins() -> list[str]:
 # Installed BEFORE CORS: the middleware added last runs outermost, so CORS wraps this one
 # and a 500 answered here still carries CORS headers (else the browser shows a CORS error).
 install_request_tracing(app)
+
+
+@app.middleware("http")
+async def security_headers(request, call_next):
+    """Every API response says what it is and how it may be used. The API serves JSON and
+    files, never pages, so nothing in a response may load or frame anything."""
+    from api.security import is_development
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    if request.url.path not in ("/docs", "/redoc"):   # development-only pages that load their own scripts
+        response.headers.setdefault("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'")
+    if not is_development():
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return response
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins(),

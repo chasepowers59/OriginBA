@@ -32,6 +32,7 @@ API = f"http://127.0.0.1:{PORT}"
 STATE_DB = "originba_isolation_check"   # on the disposable Docker Postgres (5433)
 STATE_URL = f"postgresql://originba:originba@localhost:5433/{STATE_DB}?sslmode=disable"
 HOME, OTHER = "ellensburg", "demo25"
+THIRD = "citycorp"   # the store checks below need no warehouse: they hold with the VPN down
 PROBE = ("rpt_customer_account", {"dimensions": [], "measures": [{"field": "*", "agg": "count"}],
                                    "filters": [], "all_dates": True, "limit": 5})
 RESULTS: list[tuple[bool, str]] = []
@@ -123,7 +124,8 @@ def main() -> int:
         admin = sign_in("admin@origin.local", admin_pw)
         users = {}
         for key, role, org in (("ell_user", "user", HOME), ("ell_editor", "editor", HOME),
-                               ("ell_admin", "client_admin", HOME), ("demo_user", "user", OTHER)):
+                               ("ell_admin", "client_admin", HOME), ("demo_user", "user", OTHER),
+                               ("cc_user", "user", THIRD), ("cc_editor", "editor", THIRD)):
             pw = secrets.token_urlsafe(18)
             status, _ = call("POST", "/auth/users", admin, {
                 "email": f"{key}@isolation.test", "display_name": key, "password": pw,
@@ -189,6 +191,94 @@ def main() -> int:
         check(vid not in ids(theirs), "the Demo 25 user does not")
         check(call("DELETE", f"/portal/saved-views/{vid}", d)[0] in (403, 404),
               "the Demo 25 user cannot delete it")
+
+        print("\nEvery stored thing stays inside its client (CityCorp against Ellensburg)")
+        cu, ce = users["cc_user"], users["cc_editor"]
+        listed_ids = lambda out, key: {x.get("id") for x in (out.get(key) or [])} if isinstance(out, dict) else set()
+        # dashboards
+        status, board = call("POST", "/portal/dashboards", e, {"title": "Ellensburg board", "days": 30, "tiles": []})
+        check(status == 200, "an Ellensburg editor saves a dashboard")
+        bid = board.get("id")
+        check(call("POST", "/portal/dashboards", cu, {"title": "x", "tiles": []})[0] == 403, "a CityCorp user cannot save a dashboard")
+        for org in (None, HOME):
+            _, theirs = call("GET", "/portal/dashboards", ce, org=org)
+            check(bid not in listed_ids(theirs, "dashboards"),
+                  "CityCorp does not list the Ellensburg dashboard" + (" (header forged to Ellensburg)" if org else ""))
+        check(call("GET", f"/portal/dashboards/{bid}", ce, org=HOME)[0] == 404, "CityCorp cannot open it by id, header forged")
+        check(call("PUT", f"/portal/dashboards/{bid}", ce, {"title": "Taken"}, org=HOME)[0] in (403, 404), "CityCorp cannot change it")
+        check(call("DELETE", f"/portal/dashboards/{bid}", ce, org=HOME)[0] in (403, 404), "CityCorp cannot delete it")
+        check(call("GET", f"/portal/dashboards/{bid}", e)[0] == 200, "and it is still Ellensburg's afterwards")
+        # saved views
+        check(call("PATCH", f"/portal/saved-views/{vid}", ce, {"title": "Taken"}, org=HOME)[0] in (403, 404),
+              "CityCorp cannot rename the Ellensburg view, header forged")
+        _, cc_views = call("GET", "/portal/saved-views", ce, org=HOME)
+        check(vid not in ids(cc_views), "CityCorp does not list the Ellensburg view, header forged")
+        # notes
+        status, note = call("POST", "/annotations", e, {"target_type": "saved_view", "target_id": vid, "text": "Ellensburg note"})
+        check(status == 200, "an Ellensburg editor notes the view")
+        nid = (note.get("annotation") or note).get("id")
+        check(call("GET", f"/annotations?target_type=saved_view&target_id={vid}", ce, org=HOME)[0] == 404,
+              "CityCorp cannot read the Ellensburg note")
+        check(call("POST", "/annotations", ce, {"target_type": "saved_view", "target_id": vid, "text": "x"}, org=HOME)[0] == 404,
+              "CityCorp cannot note the Ellensburg view")
+        check(call("DELETE", f"/annotations/{nid}", ce, org=HOME)[0] in (403, 404), "CityCorp cannot delete the Ellensburg note")
+        # alerts
+        status, alert = call("POST", "/kpi-alerts", e, {"saved_view_id": vid, "condition": "above", "threshold": 1,
+                                                        "recipients": ["qa@isolation.test"]})
+        check(status == 200, "an Ellensburg editor sets an alert on the view")
+        aid = (alert.get("alert") or alert).get("id")
+        _, cc_alerts = call("GET", "/kpi-alerts", ce, org=HOME)
+        check(aid not in listed_ids(cc_alerts, "alerts"), "CityCorp does not list the Ellensburg alert")
+        check(call("DELETE", f"/kpi-alerts/{aid}", ce, org=HOME)[0] in (403, 404), "CityCorp cannot delete it")
+        check(call("POST", "/kpi-alerts", ce, {"saved_view_id": vid, "condition": "above", "threshold": 1,
+                                               "recipients": ["x@isolation.test"]}, org=HOME)[0] in (400, 403, 404),
+              "CityCorp cannot alert on the Ellensburg view")
+        # schedules
+        status, sched = call("POST", "/report-schedules", e, {"saved_view_id": vid, "recipients": ["qa@isolation.test"]})
+        check(status == 200, "an Ellensburg editor schedules the view")
+        sid = (sched.get("schedule") or sched).get("id")
+        _, cc_scheds = call("GET", "/report-schedules", ce, org=HOME)
+        check(sid not in listed_ids(cc_scheds, "schedules"), "CityCorp does not list the Ellensburg schedule")
+        check(call("DELETE", f"/report-schedules/{sid}", ce, org=HOME)[0] in (403, 404), "CityCorp cannot delete it")
+        check(call("POST", f"/report-schedules/{sid}/run-now", ce, org=HOME)[0] in (403, 404), "CityCorp cannot run it")
+        check(call("POST", "/report-schedules", ce, {"saved_view_id": vid, "recipients": ["x@isolation.test"]}, org=HOME)[0]
+              in (400, 403, 404), "CityCorp cannot schedule the Ellensburg view")
+        # embed links
+        check(call("POST", "/portal/embed-tokens", ce, {"view_id": vid}, org=HOME)[0] in (403, 404),
+              "CityCorp cannot make an embed link to the Ellensburg view")
+        check(call("POST", "/portal/embed-tokens", cu, {"view_id": vid})[0] == 403, "a CityCorp user cannot make embed links")
+        # letters and admin surfaces
+        status, runs = call("GET", "/portal/letters/runs", ce, org=HOME)
+        check(status in (200, 403) and runs.get("organization_id", THIRD) == THIRD,
+              "CityCorp's letter runs are CityCorp's, header forged")
+        for path in ("/portal/health", "/auth/users", "/auth/audit-log"):
+            check(call("GET", path, ce)[0] == 403, f"a CityCorp editor: GET {path} is refused")
+        # an editor exports a content pack of their OWN client's shared work, never another's
+        status, pack = call("GET", "/portal/content-pack", ce, org=HOME)
+        packed = json.dumps(pack)
+        check(status == 200 and pack.get("source_organization") == THIRD and vid not in packed and bid not in packed,
+              "CityCorp's content pack is CityCorp's alone, header forged")
+        status, orgs = call("GET", "/auth/organizations", ce)
+        check(status == 403 or [o.get("id") for o in orgs] == [THIRD], "a CityCorp editor sees no other client in the picker")
+
+        print("\nSessions end when they should")
+        pw_old = secrets.token_urlsafe(18)
+        call("POST", "/auth/users", admin, {"email": "rotate@isolation.test", "display_name": "rotate", "password": pw_old,
+                                             "role": "user", "organization_id": THIRD})
+        stale = sign_in("rotate@isolation.test", pw_old)          # signs in, and changes the forced first password
+        check(call("GET", "/auth/me", stale)[0] == 200, "a fresh token opens a session")
+        fresh_pw = secrets.token_urlsafe(18)
+        status, changed = call("POST", "/auth/change-password", stale,
+                               {"current_password": PASSWORDS["rotate@isolation.test"], "new_password": fresh_pw})
+        check(status == 200 and bool(changed.get("access_token")), "a password change returns a fresh token")
+        check(call("GET", "/auth/me", stale)[0] == 401, "the token from before the change no longer opens a session")
+        check(call("GET", "/auth/me", changed.get("access_token"))[0] == 200, "the fresh token does")
+        status, _ = call("POST", "/auth/login", body={"email": "nobody@isolation.test", "password": "wrong-password-1"})
+        check(status == 401, "an unknown email is refused like a wrong password")
+        _, trail = call("GET", "/auth/audit-log", admin)
+        entries = trail if isinstance(trail, list) else trail.get("entries", [])
+        actions = {x.get("action") for x in entries}
+        check({"login", "login_failed"} <= actions, "sign-ins, failed and successful, are in the audit trail")
 
         print("\nThe root admin crosses clients, and only by choosing to")
         check(served_org(admin, org=HOME) == HOME, "admin switched to Ellensburg is served Ellensburg")

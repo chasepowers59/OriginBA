@@ -33,6 +33,7 @@ from api.data_version import data_version
 from api.summary_cache import cached
 from api.row_security import enforce as enforce_row_rules, readable, require_unrestricted, row_filters
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
+from api.public_errors import public_error
 from api.snapshot_catalog import (CatalogError, allowed_fields, boolean_fields, get_snapshot,
                                   list_snapshots, list_workstreams,
                                   load_catalog, snapshot_backend)
@@ -218,7 +219,7 @@ def _query_failure(prefix: str, exc: Exception) -> HTTPException:
         return HTTPException(status_code=503, detail=DATABASE_UNREACHABLE_NOTE)
     if is_transient_error(str(exc)):
         return HTTPException(status_code=504, detail="This took too long to load. Try a shorter period.")
-    return HTTPException(status_code=502, detail=f"{prefix}: {exc}")
+    return HTTPException(status_code=502, detail=public_error(prefix, exc))
 
 
 def _serialize_value(value: Any) -> Any:
@@ -726,7 +727,7 @@ def snapshot_raw_sql(
     try:
         columns, rows = execute_query(capped, organization_id=org_id, max_rows=min(body.limit, 500))
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Raw SQL failed: {exc}") from exc
+        raise HTTPException(status_code=502, detail=public_error("Raw SQL failed", exc)) from exc
 
     serialized_rows = [
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}

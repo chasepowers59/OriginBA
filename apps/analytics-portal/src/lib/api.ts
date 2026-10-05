@@ -27,12 +27,13 @@ import type { SystemHealth } from "./systemHealth";
 import { ORI } from "./ori";
 import type { ScheduleRun } from "./scheduleHistory";
 import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
-import { authHeaders, activeOrganizationHeader } from "./auth";
+import { activeOrganizationHeader, authHeaders, clearAccessToken, getAccessToken } from "./auth";
 import { localIsoDate, saveBlob } from "@/lib/format";
 import { ApiError, parseApiError } from "@/lib/apiErrors";
 import type { LetterDetail, LetterList, LetterPdf } from "@/lib/letters";
 import type { LetterRun, RunFilters } from "@/lib/letterRuns";
 import { parseSse } from "@/lib/sse";
+import { endsSession, expiredLoginUrl } from "@/lib/sessionExpiry";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -70,9 +71,21 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
     cache: "no-store",
   });
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== "undefined"
+        && endsSession(res.status, path, { hasSession: Boolean(getAccessToken()), page: window.location.pathname })) {
+      endSessionNow();
+    }
     throw new ApiError(parseApiError(await res.text(), res.statusText), res.status);
   }
   return res.json() as Promise<T>;
+}
+
+/** A session that ran out mid-use goes back to sign-in, and then to the same page, instead of
+ *  every panel reading "Invalid or expired token" (audit 2026-10-05). */
+function endSessionNow(): void {
+  void clearAccessToken().finally(() => {
+    window.location.replace(expiredLoginUrl(window.location.pathname, window.location.search));
+  });
 }
 
 export function fetchPortalConfig(): Promise<PortalConfig> {

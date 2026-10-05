@@ -31,6 +31,7 @@ from api.sql_workspace_validator import (
 from api.warehouse_db import execute_query as execute_warehouse_query
 from api.warehouse_db import warehouse_configured
 from api.row_security import require_unrestricted
+from api.public_errors import public_error
 
 
 router = APIRouter(prefix="/database", tags=["database"])
@@ -203,7 +204,7 @@ def list_tables(
         try:
             tables = _list_warehouse_tables(org_id, search.strip().lower())
         except Exception as exc:
-            raise HTTPException(status_code=502, detail=f"Failed to list tables: {exc}") from exc
+            raise HTTPException(status_code=502, detail=public_error("Failed to list tables", exc)) from exc
         return {
             "organization_id": org_id,
             "engine": engine,
@@ -217,7 +218,7 @@ def list_tables(
         try:
             tables = _list_oracle_reporting_tables(org_id, search.strip())
         except Exception as exc:
-            raise HTTPException(status_code=502, detail=f"Failed to list tables: {exc}") from exc
+            raise HTTPException(status_code=502, detail=public_error("Failed to list tables", exc)) from exc
         return {
             "organization_id": org_id,
             "engine": engine,
@@ -256,7 +257,7 @@ def list_tables(
     try:
         columns, rows = execute_demo_query(sql, binds, organization_id=org_id, max_rows=200)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Failed to list tables: {exc}") from exc
+        raise HTTPException(status_code=502, detail=public_error("Failed to list tables", exc)) from exc
 
     items = []
     for row in rows:
@@ -310,7 +311,7 @@ def execute_sql(
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Query failed: {exc}") from exc
+        raise HTTPException(status_code=502, detail=public_error("Query failed", exc)) from exc
     elapsed_ms = int((time.perf_counter() - started) * 1000)
 
     has_more = len(raw_rows) > page_size
@@ -373,7 +374,7 @@ def count_sql(
         _, count_rows = _run(engine, count_sql_text, org_id, 1)
         total = int(count_rows[0][0]) if count_rows else 0
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Count failed: {exc}") from exc
+        raise HTTPException(status_code=502, detail=public_error("Count failed", exc)) from exc
 
     return {
         "organization_id": org_id,

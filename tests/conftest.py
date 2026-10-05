@@ -16,6 +16,14 @@ import os
 
 os.environ.setdefault("ENVIRONMENT", "test")
 
+# No secret from the developer's shell or .env reaches a test (2026-10-05: a test resolved
+# CityCorp's real credentials from the process environment and printed them on failure).
+# Tests that need a value set their own with mock.patch.dict.
+import re  # noqa: E402
+_SECRET = re.compile(r"(PASSWORD|PASSWD|SECRET|API_KEY|TOKEN|_DB_USER|_ORACLE_USER|_ORACLE_DSN|_CONNECT_STRING|DATABASE_URL)", re.I)
+for _key in [k for k in os.environ if _SECRET.search(k)]:
+    os.environ.pop(_key)
+
 # No test may reach a live Oracle database. 2026-09-29: a warmer-loop test stubbed the jobs it
 # knew about, and the two added that day (Ori history, data quality) queried the real
 # Ellensburg instance on every run, from a thread that outlived the test. Replacing the pool
