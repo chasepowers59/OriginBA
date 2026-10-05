@@ -27,7 +27,7 @@ import type { SystemHealth } from "./systemHealth";
 import { ORI } from "./ori";
 import type { ScheduleRun } from "./scheduleHistory";
 import type { AssistantMessage, AssistantResponse, AssistantStatus, IntegrityOverview, AssistantSpend } from "@/lib/types";
-import { activeOrganizationHeader, authHeaders, clearAccessToken } from "./auth";
+import { activeOrganizationHeader, authHeaders, clearAccessToken, getAccessToken } from "./auth";
 import { localIsoDate, saveBlob } from "@/lib/format";
 import { ApiError, parseApiError } from "@/lib/apiErrors";
 import type { LetterDetail, LetterList, LetterPdf } from "@/lib/letters";
@@ -71,7 +71,10 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
     cache: "no-store",
   });
   if (!res.ok) {
-    if (typeof window !== "undefined" && endsSession(res.status, path)) endSessionNow();
+    if (typeof window !== "undefined"
+        && endsSession(res.status, path, { hasSession: Boolean(getAccessToken()), page: window.location.pathname })) {
+      endSessionNow();
+    }
     throw new ApiError(parseApiError(await res.text(), res.statusText), res.status);
   }
   return res.json() as Promise<T>;
