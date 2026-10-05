@@ -71,7 +71,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
     cache: "no-store",
   });
   if (!res.ok) {
-    if (typeof window !== "undefined"
+    if (res.status === 401 && typeof window !== "undefined"
         && endsSession(res.status, path, { hasSession: Boolean(getAccessToken()), page: window.location.pathname })) {
       endSessionNow();
     }
