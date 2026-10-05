@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { createEmbedToken } from "@/lib/api";
+import { useCallback, useEffect, useState } from "react";
+import { createEmbedToken, listEmbedLinks, turnOffEmbedLink, type EmbedLinkRecord } from "@/lib/api";
 import { EMBED_LIFETIMES, embedLink, embedSnippet } from "@/lib/embed";
 import { FormError, Modal } from "@/components/Modal";
 import { formatDateTime } from "@/lib/format";
@@ -9,7 +9,8 @@ import { formatDateTime } from "@/lib/format";
 /**
  * A signed, expiring link to one organization-wide saved view, for another site to frame.
  * The link shows this view only, with its creator's access; the sites allowed to frame it
- * are the portal's EMBED_ALLOWED_ORIGINS.
+ * are the portal's EMBED_ALLOWED_ORIGINS. Links already shared are listed with a Turn off
+ * for each, so a link sent to the wrong place can be withdrawn before it expires.
  */
 export function EmbedDialog({ viewId, title, onClose }: { viewId: string; title: string; onClose: () => void }) {
   const [minutes, setMinutes] = useState<number>(EMBED_LIFETIMES[2].minutes);
@@ -17,13 +18,30 @@ export function EmbedDialog({ viewId, title, onClose }: { viewId: string; title:
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  const [links, setLinks] = useState<EmbedLinkRecord[] | null>(null);
   const origin = typeof window === "undefined" ? "" : window.location.origin;
+
+  const loadLinks = useCallback(() => {
+    listEmbedLinks(viewId).then((r) => setLinks(r.links)).catch(() => setLinks(null));
+  }, [viewId]);
+  useEffect(loadLinks, [loadLinks]);
+
+  async function onTurnOff(id: string) {
+    setError(null);
+    try {
+      await turnOffEmbedLink(id);
+      loadLinks();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not turn the link off.");
+    }
+  }
 
   async function onCreate() {
     setBusy(true);
     setError(null);
     try {
       setMade(await createEmbedToken(viewId, minutes));
+      loadLinks();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create the embed link.");
     } finally {
@@ -80,6 +98,27 @@ export function EmbedDialog({ viewId, title, onClose }: { viewId: string; title:
           </button>
         </div>
       )}
+      {links && links.length > 0 ? (
+        <section className="mt-5 border-t border-edge-subtle pt-4" aria-labelledby="embed-shared">
+          <h3 id="embed-shared" className="text-xs font-semibold text-heading">Links already shared</h3>
+          {made && error ? <FormError>{error}</FormError> : null}
+          <ul className="mt-2 space-y-2">
+            {links.map((l) => (
+              <li key={l.id} className="flex items-center justify-between gap-3 text-xs" data-testid="embed-link-row">
+                <span className="text-fg-muted">
+                  {l.created_by}, made {formatDateTime(l.created_at)}
+                  {l.revoked_at ? <> &middot; turned off</> : <> &middot; expires {formatDateTime(l.expires_at)}</>}
+                </span>
+                {l.revoked_at ? null : (
+                  <button type="button" onClick={() => void onTurnOff(l.id)} className="btn-ghost text-xs">
+                    Turn off
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </Modal>
   );
 }

@@ -49,6 +49,7 @@ class EmbedTests(unittest.TestCase):
         self.patches = [
             mock.patch.dict(os.environ, {"PORTAL_AUTH_SECRET": SECRET}),
             mock.patch.object(sv, "VIEWS_PATH", Path(self.tmp.name) / "v.json"),
+            mock.patch.object(embed, "EMBED_LINKS_PATH", Path(self.tmp.name) / "links.json"),
             mock.patch.object(sv._pss, "enabled", return_value=False),
             mock.patch("api.snapshot_catalog.snapshot_backend", return_value=("postgres", "postgres", "reporting")),
             mock.patch("api.warehouse_db.execute_query", side_effect=run),
@@ -97,14 +98,17 @@ class EmbedTests(unittest.TestCase):
 
     def test_the_lifetime_is_capped_at_a_day(self):
         token = self._token(ttl=60 * 24 * 30)
-        exp = jwt.decode(token, SECRET, algorithms=["HS256"])["exp"]
+        exp = jwt.decode(token, embed.embed_key(), algorithms=["HS256"])["exp"]
         self.assertLessEqual(exp - time.time(), 24 * 3600 + 5)
 
     def test_expired_tampered_or_foreign_tokens_are_refused(self):
-        good = jwt.decode(self._token(), SECRET, algorithms=["HS256"])
-        bad = [jwt.encode({**good, "exp": int(time.time()) - 5}, SECRET, algorithm="HS256"),
+        key = embed.embed_key()
+        good = jwt.decode(self._token(), key, algorithms=["HS256"])
+        bad = [jwt.encode({**good, "exp": int(time.time()) - 5}, key, algorithm="HS256"),
                jwt.encode(good, "another-secret-another-secret-another-secret", algorithm="HS256"),
-               jwt.encode({**good, "purpose": "access"}, SECRET, algorithm="HS256"),
+               jwt.encode({**good, "purpose": "access"}, key, algorithm="HS256"),
+               # signed with the SESSION secret: embed links have their own key (2026-10-05)
+               jwt.encode(good, SECRET, algorithm="HS256"),
                "not-a-token"]
         for token in bad:
             with self.assertRaises(HTTPException) as err:
@@ -125,6 +129,54 @@ class EmbedTests(unittest.TestCase):
             with self.assertRaises(HTTPException) as err:
                 embed.embed_data(token)
         self.assertEqual(err.exception.status_code, 403)
+
+    def test_the_embed_key_is_not_the_session_secret(self):
+        self.assertNotEqual(embed.embed_key(), SECRET)
+        with mock.patch.dict(os.environ, {"PORTAL_EMBED_SECRET": "e" * 40}):
+            self.assertEqual(embed.embed_key(), "e" * 40)
+
+    def test_a_link_can_be_turned_off_and_the_others_keep_working(self):
+        first, second = self._token(), self._token()
+        links = embed.list_embed_links(self.view["id"], ctx=self.alice)["links"]
+        self.assertEqual(len(links), 2)
+        self.assertNotIn("token", links[0])          # the link itself is never stored or shown again
+        first_id = jwt.decode(first, embed.embed_key(), algorithms=["HS256"])["jti"]
+        embed.revoke_embed_link(first_id, ctx=self.alice)
+        with self.assertRaises(HTTPException) as err:
+            embed.embed_data(first)
+        self.assertEqual(err.exception.status_code, 401)
+        self.assertIn("turned off", err.exception.detail)
+        self.assertTrue(embed.embed_data(second)["rows"])
+        listed = {l["id"]: l for l in embed.list_embed_links(self.view["id"], ctx=self.alice)["links"]}
+        self.assertTrue(listed[first_id]["revoked_at"])
+
+    def test_only_the_owner_or_an_admin_lists_or_turns_off_links(self):
+        token = self._token()
+        link_id = jwt.decode(token, embed.embed_key(), algorithms=["HS256"])["jti"]
+        for call in (lambda: embed.list_embed_links(self.view["id"], ctx=_user("bob")),
+                     lambda: embed.revoke_embed_link(link_id, ctx=_user("bob"))):
+            with self.assertRaises(HTTPException) as err:
+                call()
+            self.assertEqual(err.exception.status_code, 403)
+        embed.revoke_embed_link(link_id, ctx=_user("root", role="admin"))
+
+    def test_a_link_with_no_record_is_refused(self):
+        claims = jwt.decode(self._token(), embed.embed_key(), algorithms=["HS256"])
+        forged = jwt.encode({**claims, "jti": "never-issued"}, embed.embed_key(), algorithm="HS256")
+        with self.assertRaises(HTTPException) as err:
+            embed.embed_data(forged)
+        self.assertEqual(err.exception.status_code, 401)
+
+    def test_another_organizations_link_cannot_be_turned_off(self):
+        token = self._token()
+        link_id = jwt.decode(token, embed.embed_key(), algorithms=["HS256"])["jti"]
+        other = AuthContext(id="eve", email="eve@other.gov", display_name="eve", role="admin", client_id="dev",
+                            organization_id="citycorp", organization_name="CityCorp", permissions=set(PERMS),
+                            workstreams=["*"], row_rules=())
+        with self.assertRaises(HTTPException) as err:
+            embed.revoke_embed_link(link_id, ctx=other)
+        self.assertEqual(err.exception.status_code, 404)
+        self.assertTrue(embed.embed_data(token)["rows"])
 
 
 if __name__ == "__main__":
