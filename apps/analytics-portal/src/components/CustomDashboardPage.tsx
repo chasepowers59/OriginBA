@@ -75,11 +75,16 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
   }, []);
 
   useEffect(() => {
+    // Effects can run twice (Strict Mode, a remount): a fresh board starts with one placeholder
+    // only when it has no tiles yet, and a superseded fetch never lands, or either would wipe a
+    // tile pinned in between (2026-10-05: "Pin to dashboard → New dashboard" showed an empty board).
     if (!dashboardId) {
-      setTiles([emptyTile(0)]);
+      setTiles((current) => (current.length ? current : [emptyTile(0)]));
       return;
     }
+    let superseded = false;
     fetchDashboard(dashboardId).then((d) => {
+      if (superseded) return;
       setBoard(d);
       setTitle(d.title);
       setDays(d.days);
@@ -88,6 +93,9 @@ function CustomDashboardInner({ dashboardId }: { dashboardId?: string }) {
       setTiles(d.tiles.length ? d.tiles : [emptyTile(0)]);
       setBoardLoaded(true);
     });
+    return () => {
+      superseded = true;
+    };
   }, [dashboardId]);
 
   useEffect(() => {
