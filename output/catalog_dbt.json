@@ -4361,7 +4361,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "description": "The usage request C2M billing raised (C1_USAGE), which this usage transaction answers. It names the service agreement and bill segment the usage is billed on; blank while billing has not asked for it.",
      "group": "billing",
      "id": "Usage Request ID",
      "label": "Usage Request ID",
@@ -9253,6 +9253,8 @@
        "Case Duration Minutes",
        "Case Duration Hours",
        "Log Entry Count",
+       "Hours In Current Status",
+       "Status Change Count",
        "Account ID",
        "Main Customer Name",
        "Customer Class",
@@ -9345,7 +9347,9 @@
     "trusted_measures": [
      "Case Duration Minutes",
      "Case Duration Hours",
-     "Log Entry Count"
+     "Log Entry Count",
+     "Hours In Current Status",
+     "Status Change Count"
     ]
    },
    "date_fields": [
@@ -9588,6 +9592,22 @@
      "type": "bigint"
     },
     {
+     "description": "Hours the case has spent in its current status, as of the as-of date; 0 once it is parked in a final status. Average it, do not sum it.",
+     "group": "customer_ops",
+     "id": "Hours In Current Status",
+     "label": "Hours In Current Status",
+     "role": "measure",
+     "type": "numeric"
+    },
+    {
+     "description": "Pre-aggregated count, additive at this data set's grain.",
+     "group": "customer_ops",
+     "id": "Status Change Count",
+     "label": "Status Change Count",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
      "group": "customer_ops",
      "id": "Account ID",
@@ -9708,6 +9728,25 @@
      ],
      "id": "Log Entry Count",
      "label": "Log Entry Count"
+    },
+    {
+     "aggs": [
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Hours In Current Status",
+     "label": "Hours In Current Status"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Status Change Count",
+     "label": "Status Change Count"
     }
    ],
    "poc_enabled": true,
@@ -9746,7 +9785,9 @@
    "trusted_measures": [
     "Case Duration Minutes",
     "Case Duration Hours",
-    "Log Entry Count"
+    "Log Entry Count",
+    "Hours In Current Status",
+    "Status Change Count"
    ],
    "usage_guidance": null,
    "use_case": "Customer cases: type, status, owner, and how long each has been open or took to close.",
@@ -16478,7 +16519,7 @@
      "type": "boolean"
     },
     {
-     "description": "",
+     "description": "Days since the item was created, as of the as-of date, while it is still open; null once it closes. An age: average it, do not sum it.",
      "group": "field_ops",
      "id": "Days Open",
      "label": "Days Open",
@@ -16878,6 +16919,9 @@
        "Measurement Reference Date/Time",
        "Created Date/Time",
        "Status Updated Date/Time",
+       "Days Open",
+       "Closed Date/Time",
+       "Days To Close",
        "Number of Retries",
        "Appointment Required",
        "Appointment Window Start",
@@ -17000,7 +17044,10 @@
      "D1_DVC_CFG",
      "D1_MSRMT_CYC_L"
     ],
-    "trusted_measures": []
+    "trusted_measures": [
+     "Days Open",
+     "Days To Close"
+    ]
    },
    "date_fields": [
     {
@@ -17034,6 +17081,10 @@
     {
      "id": "Status Updated Date/Time",
      "label": "Status Updated Date/Time"
+    },
+    {
+     "id": "Closed Date/Time",
+     "label": "Closed Date/Time"
     },
     {
      "id": "Appointment Window Start",
@@ -17442,6 +17493,30 @@
      "type": "timestamp"
     },
     {
+     "description": "Days since the item was created, as of the as-of date, while it is still open; null once it closes. An age: average it, do not sum it.",
+     "group": "field_ops",
+     "id": "Days Open",
+     "label": "Days Open",
+     "role": "measure",
+     "type": "integer"
+    },
+    {
+     "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
+     "group": "field_ops",
+     "id": "Closed Date/Time",
+     "label": "Closed Date/Time",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Days from creation to the final status, once the item has closed; null while it is open. Average it, do not sum it.",
+     "group": "field_ops",
+     "id": "Days To Close",
+     "label": "Days To Close",
+     "role": "measure",
+     "type": "integer"
+    },
+    {
      "description": "",
      "group": "field_ops",
      "id": "Number of Retries",
@@ -17694,6 +17769,24 @@
      ],
      "id": "*",
      "label": "Number of records"
+    },
+    {
+     "aggs": [
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Days Open",
+     "label": "Days Open"
+    },
+    {
+     "aggs": [
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Days To Close",
+     "label": "Days To Close"
     }
    ],
    "poc_enabled": true,
@@ -17730,7 +17823,10 @@
    "skip_sample_rows": false,
    "summary": "MDM field activity.",
    "table_name": "rpt_field_activity",
-   "trusted_measures": [],
+   "trusted_measures": [
+    "Days Open",
+    "Days To Close"
+   ],
    "usage_guidance": null,
    "use_case": "Field work: the type, status, dates and outcome of every field activity.",
    "workstream": "field_ops",
@@ -25302,7 +25398,7 @@
   },
   "rpt_sa_aged_balance": {
    "data_model": {
-    "columns_traced_to_cisadm": 15,
+    "columns_traced_to_cisadm": 19,
     "domain_table": "rpt_sa_aged_balance",
     "driving_table": null,
     "field_groups": [
@@ -25338,7 +25434,11 @@
        "Customer Class",
        "Customer Class Code",
        "Collection Class",
-       "Bill Cycle"
+       "Bill Cycle",
+       "CIS Division",
+       "Premise ID",
+       "Premise Address",
+       "City"
       ],
       "id": "debt",
       "label": "Collections & Debt"
@@ -25361,6 +25461,13 @@
       "on": "da.acct_id = f.acct_id",
       "role": "model",
       "table": "dim_account"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = sa.characteristic_prem_id",
+      "role": "model",
+      "table": "dim_premise"
      }
     ],
     "population_filter": null,
@@ -25372,6 +25479,7 @@
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
      "CI_LOOKUP_VAL_L",
+     "CI_PREM",
      "CI_REV_CL_L",
      "CI_SA",
      "CI_SA_TYPE",
@@ -25485,6 +25593,22 @@
     {
      "id": "Bill Cycle",
      "label": "Bill Cycle"
+    },
+    {
+     "id": "CIS Division",
+     "label": "CIS Division"
+    },
+    {
+     "id": "Premise ID",
+     "label": "Premise ID"
+    },
+    {
+     "id": "Premise Address",
+     "label": "Premise Address"
+    },
+    {
+     "id": "City",
+     "label": "City"
     }
    ],
    "fields": [
@@ -25735,6 +25859,38 @@
      "label": "Bill Cycle",
      "role": "dimension",
      "type": "varchar(60)"
+    },
+    {
+     "description": "",
+     "group": "debt",
+     "id": "CIS Division",
+     "label": "CIS Division",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "debt",
+     "id": "Premise ID",
+     "label": "Premise ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Address component, as held in C2M. Not validated or standardised here.",
+     "group": "debt",
+     "id": "Premise Address",
+     "label": "Premise Address",
+     "role": "dimension",
+     "type": "varchar(254)"
+    },
+    {
+     "description": "Address component, as held in C2M. Not validated or standardised here.",
+     "group": "debt",
+     "id": "City",
+     "label": "City",
+     "role": "dimension",
+     "type": "varchar(90)"
     }
    ],
    "grain": "service agreement + snapshot date",
@@ -29131,7 +29287,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "description": "The usage request C2M billing raised (C1_USAGE), which this usage transaction answers. It names the service agreement and bill segment the usage is billed on; blank while billing has not asked for it.",
      "group": "meter_ops",
      "id": "Usage Request ID",
      "label": "Usage Request ID",
