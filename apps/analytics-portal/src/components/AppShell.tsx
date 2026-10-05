@@ -13,6 +13,7 @@ import OrgSwitcher from "@/components/OrgSwitcher";
 import { useBrand, usePortalConfig } from "@/components/PortalThemeProvider";
 import type { SnapshotSummary, WorkstreamGroup } from "@/lib/types";
 import { isRestricted, visibleNav } from "@/lib/rowRules";
+import { NoOrganization, needsOrganization } from "@/components/NoOrganization";
 import { clientLogo } from "@/lib/branding";
 import { fetchFreshness } from "@/lib/api";
 import { freshnessNotice, type Freshness } from "@/lib/freshness";
@@ -230,9 +231,11 @@ export function AppShell({
           </p>
         ) : null}
         {/* bottom room so the floating Ask Ori button never covers the page's last content */}
-        <main className="min-w-0 animate-fade-in pb-24">{children}</main>
+        <main className="min-w-0 animate-fade-in pb-24">
+          {needsOrganization(user) ? <NoOrganization email={user!.email} /> : children}
+        </main>
       </div>
-      {user && !isRestricted(user) ? <AssistantDrawer /> : null}
+      {user && !isRestricted(user) && !needsOrganization(user) ? <AssistantDrawer /> : null}
 
       <footer className="portal-footer no-print mt-8 py-6 text-center text-xs">
         {brand.name} · {brand.footer}
