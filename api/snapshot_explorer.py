@@ -734,11 +734,11 @@ def snapshot_raw_sql(
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
         for row in rows
     ]
-    from api.access_audit import record_access_event
+    from api.access_audit import record_access_event, sql_for_audit
     record_access_event(
         actor_email=ctx.email, actor_id=ctx.id, action="raw_sql_run",
         target_type="snapshot", target_id=snapshot_id,
-        detail=f"rows={len(serialized_rows)}; sql: {body.sql[:300]}")
+        detail=f"rows={len(serialized_rows)}; sql: {sql_for_audit(body.sql)}")
     return {
         "client": org_id,
         "organization_id": org_id,

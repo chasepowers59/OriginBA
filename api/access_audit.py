@@ -7,8 +7,21 @@ logs: every write is wrapped, and a broken audit DB degrades to silence, not 500
 """
 from __future__ import annotations
 
+import re
+
 from api.auth.database import get_session_factory
 from api.auth.service import log_audit
+
+_STRING = re.compile(r"'(?:[^']|'')*'")
+_LONG_NUMBER = re.compile(r"\b\d{5,}(?:\.\d+)?\b")
+
+
+def sql_for_audit(sql: str, limit: int = 300) -> str:
+    """The statement's shape, never its values: a customer's name or account number typed into
+    a WHERE clause does not belong in the audit trail. String literals and numbers of five or
+    more digits become ?; small numbers (a LIMIT, a flag) stay."""
+    shape = _LONG_NUMBER.sub("?", _STRING.sub("?", sql or ""))
+    return " ".join(shape.split())[:limit]
 
 
 def record_access_event(*, actor_email: str, action: str, target_type: str,

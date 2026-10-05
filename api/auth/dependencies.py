@@ -6,7 +6,7 @@ from dataclasses import dataclass, replace
 from typing import Annotated, Callable
 
 import jwt
-from fastapi import Depends, Header, HTTPException
+from fastapi import Request, Depends, Header, HTTPException
 
 from api.auth.config import auth_disabled
 from api.auth.database import get_session_factory
@@ -183,14 +183,19 @@ def _resolve_auth_context(
 
 
 def get_auth_context(
+    request: Request,
     authorization: str | None = Header(None),
     x_organization_id: str | None = Header(None),
 ) -> AuthContext:
-    return _resolve_auth_context(
+    ctx = _resolve_auth_context(
         authorization,
         allow_password_change_pending=False,
         active_organization=x_organization_id,
     )
+    # the request log names the client actually served, not the header as sent
+    # (api/request_tracing.py), which a non-admin may forge and is then ignored
+    request.state.served_organization = ctx.effective_organization_id()
+    return ctx
 
 
 def get_session_auth_context(authorization: str | None = Header(None)) -> AuthContext:
