@@ -98,3 +98,14 @@ class UserAccessGroup(Base):
 
     user: Mapped[User] = relationship("User", back_populates="group_links")
     group: Mapped[AccessGroup] = relationship("AccessGroup", back_populates="members")
+
+
+class RevokedToken(Base):
+    """A session its owner signed out of: its token id never opens a session again. Kept
+    only until the token would have expired anyway (api/auth/routes.py logout prunes)."""
+    __tablename__ = "portal_revoked_tokens"
+
+    jti: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    revoked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)

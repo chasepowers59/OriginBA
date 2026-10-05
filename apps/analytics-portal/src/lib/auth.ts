@@ -39,6 +39,10 @@ export type AccessGroup = {
   member_count: number;
 };
 
+/** The API's floor for a NEW password (api/auth/password_policy.py); it also refuses the
+ *  person's email and common passwords, and says which in its answer. */
+export const PASSWORD_MIN_LENGTH = 12;
+
 const TOKEN_KEY = "portal_access_token";
 const SESSION_COOKIE = "portal_session";
 const TOKEN_COOKIE = "portal_access_token";

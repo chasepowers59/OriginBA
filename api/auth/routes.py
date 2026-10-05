@@ -3,16 +3,20 @@
 from __future__ import annotations
 
 import secrets
+from datetime import datetime, timezone
 from typing import Any, Literal
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.responses import RedirectResponse
+from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
 from api.auth.config import access_token_minutes, auth_disabled
 from api.auth import oidc
 from api.auth.database import get_session_factory
+from api.auth.models import RevokedToken
+from api.auth.password_policy import password_problem
 from api.auth.dependencies import AuthContext, get_auth_context, get_session_auth_context, require_permission
 from api.auth.rate_limit import check_login_rate_limit, clear_login_attempts, record_login_failure
 from api.auth.schemas import (
@@ -30,7 +34,7 @@ from api.auth.schemas import (
     UserUpdate,
 )
 from api.auth.models import User
-from api.auth.security import create_access_token, hash_password, password_fingerprint
+from api.auth.security import create_access_token, decode_access_token, hash_password, password_fingerprint
 from api.auth.service import (
     sync_sso_access,
     AUDIT_CATEGORIES,
@@ -40,6 +44,7 @@ from api.auth.service import (
     create_group,
     create_user,
     delete_group,
+    get_user,
     list_audit_events,
     list_groups,
     list_users,
@@ -69,6 +74,12 @@ def _db_session():
     finally:
         session.close()
 
+
+
+def _require_strong(password: str | None, email: str) -> None:
+    """A password being SET meets the policy (api/auth/password_policy.py); sign-in never checks it."""
+    if password is not None and (problem := password_problem(password, email)):
+        raise HTTPException(status_code=400, detail=problem)
 
 @router.get("/status", response_model=AuthStatusResponse)
 def auth_status(authorization: str | None = Header(None)) -> AuthStatusResponse:
@@ -155,6 +166,7 @@ def change_password_route(
     # the current password is a credential check like sign-in, and limited the same way
     rate_key = f"change-password|{ctx.id}|{request.client.host if request.client else 'unknown'}"
     check_login_rate_limit(rate_key)
+    _require_strong(body.new_password, ctx.email)
     try:
         public = change_password(session, ctx.id, body.current_password, body.new_password)
         log_audit(
@@ -169,7 +181,6 @@ def change_password_route(
         clear_login_attempts(rate_key)
         # the change retires every token issued before it (api/auth/security.py password_fingerprint),
         # this one included: the caller continues on a fresh one
-        from api.auth.service import get_user
         user = get_user(session, ctx.id)
         token = create_access_token(
             user_id=public["id"], email=public["email"], role=public["role"],
@@ -179,6 +190,25 @@ def change_password_route(
     except AuthError as exc:
         record_login_failure(rate_key)
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/logout")
+def logout(
+    authorization: str = Header(...),
+    ctx: AuthContext = Depends(get_session_auth_context),
+    session: Session = Depends(_db_session, scope="function"),
+) -> dict[str, bool]:
+    """End THIS session on the server: its token id is recorded and never opens a session
+    again. Clearing the browser alone left a copied token working until it expired."""
+    payload = decode_access_token(authorization.split(" ", 1)[1].strip())
+    now = datetime.now(timezone.utc)
+    session.execute(delete(RevokedToken).where(RevokedToken.expires_at < now))
+    if payload.get("jti"):
+        session.merge(RevokedToken(jti=payload["jti"], user_id=ctx.id,
+                                   expires_at=datetime.fromtimestamp(int(payload["exp"]), timezone.utc)))
+    log_audit(session, actor_id=ctx.id, actor_email=ctx.email, action="logout",
+              target_type="user", target_id=ctx.id, detail="")
+    return {"signed_out": True}
 
 
 @router.get("/me", response_model=AuthUserPublic)
@@ -358,6 +388,7 @@ def admin_create_user(
     ctx: AuthContext = Depends(require_permission("users:manage")),
     session: Session = Depends(_db_session, scope="function"),
 ) -> AuthUserPublic:
+    _require_strong(body.password, body.email)
     try:
         public = create_user(session, ctx.role, body.model_dump(), _scope(ctx))
         log_audit(
@@ -382,6 +413,9 @@ def admin_update_user(
     ctx: AuthContext = Depends(require_permission("users:manage")),
     session: Session = Depends(_db_session, scope="function"),
 ) -> AuthUserPublic:
+    if body.password is not None:
+        target = get_user(session, user_id)
+        _require_strong(body.password, target.email if target else "")
     try:
         public = update_user(session, ctx.role, ctx.id, user_id, body.model_dump(exclude_unset=True),
                              _scope(ctx))

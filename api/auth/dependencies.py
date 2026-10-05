@@ -10,6 +10,7 @@ from fastapi import Depends, Header, HTTPException
 
 from api.auth.config import auth_disabled
 from api.auth.database import get_session_factory
+from api.auth.models import RevokedToken
 from api.auth.permissions import role_at_least
 from api.auth.security import token_password_current, decode_access_token
 from api.auth.service import get_user, user_to_public, workstreams_allowed
@@ -157,6 +158,8 @@ def _resolve_auth_context(
             raise HTTPException(status_code=401, detail="User inactive or not found")
         if not token_password_current(payload, user.password_hash):
             raise HTTPException(status_code=401, detail="Your password was changed. Sign in again.")
+        if payload.get("jti") and session.get(RevokedToken, payload["jti"]):
+            raise HTTPException(status_code=401, detail="You signed out of this session. Sign in again.")
         public = user_to_public(user)
 
     if public["must_change_password"] and not allow_password_change_pending:

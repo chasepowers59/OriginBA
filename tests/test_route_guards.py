@@ -33,6 +33,7 @@ PUBLIC = {
 SESSION_ONLY = {
     ("GET", "/auth/me"): "who am I",
     ("POST", "/auth/change-password"): "my own password, including the forced first change",
+    ("POST", "/auth/logout"): "ending my own session",
 }
 # Gates applied inside the endpoint or a helper it calls, named so they are reviewed.
 GATE_HELPERS = ("require_permission", "_assistant_for", "_require_data_source_manage", 'ctx.role != "admin"')

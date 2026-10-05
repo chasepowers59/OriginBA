@@ -60,7 +60,14 @@ export function resolveTenant(slug: string): Promise<PortalOrganization> {
   return authFetch<PortalOrganization>(`/auth/tenants/${encodeURIComponent(slug)}`);
 }
 
+/** Sign-out ends the session on the server first (its token is retired there, so a copy of
+ *  it stops working), then clears the browser. Clearing still happens if the server is away. */
 export async function logout(): Promise<void> {
+  try {
+    await authFetch<{ signed_out: boolean }>("/auth/logout", { method: "POST", signal: AbortSignal.timeout(SESSION_TIMEOUT_MS) });
+  } catch {
+    // an expired session or an unreachable server: the browser is cleared all the same
+  }
   await clearAccessToken();
 }
 

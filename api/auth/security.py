@@ -13,7 +13,7 @@ import jwt
 from api.auth.config import access_token_minutes, jwt_algorithm, jwt_secret
 from api.auth.permissions import permissions_for_role
 
-PBKDF2_ITERATIONS = 260_000
+PBKDF2_ITERATIONS = 600_000   # OWASP 2023 floor for PBKDF2-HMAC-SHA256; older hashes upgrade at sign-in
 
 
 def hash_password(password: str) -> str:
@@ -37,6 +37,14 @@ def verify_password(password: str, encoded: str) -> bool:
         )
         return hmac.compare_digest(actual, expected)
     except (ValueError, TypeError):
+        return False
+
+
+def needs_rehash(encoded: str) -> bool:
+    """Whether a stored hash was made at fewer iterations than new ones are."""
+    try:
+        return int(encoded.split("$")[1]) < PBKDF2_ITERATIONS
+    except (IndexError, ValueError):
         return False
 
 
@@ -88,6 +96,7 @@ def create_access_token(
         "exp": int((now + timedelta(minutes=access_token_minutes())).timestamp()),
         "typ": "access",
         "pwv": pwv,
+        "jti": secrets.token_urlsafe(16),   # what sign-out records (api/auth/models.py RevokedToken)
     }
     return jwt.encode(payload, jwt_secret(), algorithm=jwt_algorithm())
 

@@ -8,7 +8,7 @@ import { organizationForRole, rolePatch } from "@/lib/adminOrgBinding";
 import { auditActionLabel } from "@/lib/auditLabels";
 import { groupDeletionWarning } from "@/lib/groupDeletion";
 import { formatDateTime } from "@/lib/format";
-import { roleLabel, type AccessGroup, type AuthUser, type PortalOrganization, type PortalRole } from "@/lib/auth";
+import { PASSWORD_MIN_LENGTH, roleLabel, type AccessGroup, type AuthUser, type PortalOrganization, type PortalRole } from "@/lib/auth";
 import { assignableRoles } from "@/lib/settingsAccess";
 import { RowRulesCell } from "@/components/RowRulesCell";
 import {
@@ -305,10 +305,10 @@ export function AdminAccessPanel() {
                       className="btn-ghost text-xs"
                       onClick={() => {
                         const next = window.prompt(`Set a new temporary password for ${user.email}`);
-                        if (next && next.length >= 8) {
+                        if (next && next.length >= PASSWORD_MIN_LENGTH) {
                           void runUserUpdate(user.id, { password: next });
                         } else if (next) {
-                          setError("Password must be at least 8 characters");
+                          setError(`Use at least ${PASSWORD_MIN_LENGTH} characters.`);
                         }
                       }}
                     >
@@ -339,9 +339,10 @@ export function AdminAccessPanel() {
           <input
             className="input-modern"
             type="password"
-            placeholder="Temporary password"
+            placeholder={`Temporary password (${PASSWORD_MIN_LENGTH}+ characters)`}
             value={newUser.password}
             onChange={(e) => setNewUser((s) => ({ ...s, password: e.target.value }))}
+            minLength={PASSWORD_MIN_LENGTH}
             required
           />
           <select
