@@ -75,6 +75,13 @@ consistent and wrong).
 
 `python3 scripts/check_timings_live.py --org citycorp [--budget 5]` times every demo surface through the running API, twice each (cold, then warm), and exits 1 when a WARM answer is over the budget. It is how the numbers in the performance skill are re-measured; read-only, no model call.
 
+**Walk it as the reader, not only as the admin.** Every e2e spec runs with the auth bypass, which
+signs everyone in as an administrator; the round-9 bugs (no-organization Home, lost `next`, open
+redirect) were invisible there. Start the API WITHOUT `PORTAL_AUTH_DISABLED` (keep
+`ENVIRONMENT=development`) and the UI with `NEXT_PUBLIC_PORTAL_AUTH_DISABLED=false`, both on the
+usual ports, and sign in as the smoke reader and editor (test credentials in
+`scripts/smoke_portal_auth.py`; never repeat them). Swap back to the bypass pair for the e2e suite.
+
 Operated, not just loaded: `e2e/explorer-interactions.spec.ts` (every period, compare, cross-filter
 and its removal, sort, the Excel export's About sheet) and `e2e/builder-interactions.spec.ts`
 (every visual type, a date's grain, a field dragged to Filters), plus `e2e/builder-drag.spec.ts`
