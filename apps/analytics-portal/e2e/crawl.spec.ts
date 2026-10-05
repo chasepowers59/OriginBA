@@ -1,5 +1,5 @@
 import { test, expect, type Page, type ConsoleMessage } from "@playwright/test";
-import { waitForWarm } from "./warm";
+import { WARM_HOOK_TIMEOUT_MS, waitForWarm } from "./warm";
 import fs from "node:fs";
 import path from "node:path";
 import { ORG } from "./org";
@@ -127,7 +127,10 @@ async function audit(page: Page) {
 
 for (const org of ORGS) {
   test.describe(`org ${org}`, () => {
-    test.beforeAll(async ({ request }) => { await waitForWarm(request, org); });
+    test.beforeAll(async ({ request }) => {
+      test.setTimeout(WARM_HOOK_TIMEOUT_MS);
+      await waitForWarm(request, org);
+    });
     for (const route of routes()) {
       test(`${route}`, async ({ page, context }, info) => {
         await context.addCookies([{ name: "portal_active_organization", value: org, url: info.project.use.baseURL! }]);
