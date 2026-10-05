@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from api.auth.models import AccessGroup, AuditLog, User, UserAccessGroup
 from api.auth.permissions import ROLES, can_assign_role, permissions_for_role
-from api.auth.security import hash_password, verify_password
+from api.auth.security import dummy_password_check, hash_password, verify_password
 from api.organizations import get_organization, is_valid_org_id
 from api.portal_config import load_portal_config
 from api.row_security import clean_rules
@@ -173,6 +173,7 @@ def authenticate_user(session: Session, email: str, password: str) -> User:
         .where(func.lower(User.email) == email.strip().lower())
     )
     if not user or not user.is_active:
+        dummy_password_check(password)   # same work, same time: timing must not list accounts
         raise AuthError("Invalid email or password")
     if not verify_password(password, user.password_hash):
         raise AuthError("Invalid email or password")

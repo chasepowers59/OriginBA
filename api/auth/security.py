@@ -40,6 +40,31 @@ def verify_password(password: str, encoded: str) -> bool:
         return False
 
 
+_DUMMY_HASH: str | None = None
+
+
+def dummy_password_check(password: str) -> None:
+    """The same PBKDF2 work as a real check, for an email with no active account: without it
+    an unknown email answered faster than a wrong password, and timing listed the accounts."""
+    global _DUMMY_HASH
+    if _DUMMY_HASH is None:
+        _DUMMY_HASH = hash_password(secrets.token_hex(16))
+    verify_password(password, _DUMMY_HASH)
+
+
+def password_fingerprint(encoded_hash: str) -> str:
+    """A short digest of the stored password hash, carried in every token: when the password
+    changes (or an administrator resets it) the fingerprint moves and older tokens stop working."""
+    return hashlib.sha256(f"pwv:{encoded_hash}".encode("utf-8")).hexdigest()[:16]
+
+
+def token_password_current(payload: dict[str, Any], encoded_hash: str) -> bool:
+    """Whether the token was issued under the account's current password. A token issued before
+    fingerprints existed carries none and is honoured until it expires (at most a working day)."""
+    pwv = payload.get("pwv")
+    return pwv is None or hmac.compare_digest(str(pwv), password_fingerprint(encoded_hash))
+
+
 def create_access_token(
     *,
     user_id: str,
@@ -48,6 +73,7 @@ def create_access_token(
     client_id: str,
     organization_id: str | None,
     workstreams: list[str],
+    pwv: str,
 ) -> str:
     now = datetime.now(timezone.utc)
     payload: dict[str, Any] = {
@@ -61,9 +87,14 @@ def create_access_token(
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(minutes=access_token_minutes())).timestamp()),
         "typ": "access",
+        "pwv": pwv,
     }
     return jwt.encode(payload, jwt_secret(), algorithm=jwt_algorithm())
 
 
 def decode_access_token(token: str) -> dict[str, Any]:
-    return jwt.decode(token, jwt_secret(), algorithms=[jwt_algorithm()])
+    payload = jwt.decode(token, jwt_secret(), algorithms=[jwt_algorithm()])
+    # the same secret signs embed links: only a session token opens a session
+    if payload.get("typ") != "access":
+        raise jwt.InvalidTokenError("not an access token")
+    return payload

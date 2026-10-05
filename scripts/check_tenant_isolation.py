@@ -261,6 +261,25 @@ def main() -> int:
         status, orgs = call("GET", "/auth/organizations", ce)
         check(status == 403 or [o.get("id") for o in orgs] == [THIRD], "a CityCorp editor sees no other client in the picker")
 
+        print("\nSessions end when they should")
+        pw_old = secrets.token_urlsafe(18)
+        call("POST", "/auth/users", admin, {"email": "rotate@isolation.test", "display_name": "rotate", "password": pw_old,
+                                             "role": "user", "organization_id": THIRD})
+        stale = sign_in("rotate@isolation.test", pw_old)          # signs in, and changes the forced first password
+        check(call("GET", "/auth/me", stale)[0] == 200, "a fresh token opens a session")
+        fresh_pw = secrets.token_urlsafe(18)
+        status, changed = call("POST", "/auth/change-password", stale,
+                               {"current_password": PASSWORDS["rotate@isolation.test"], "new_password": fresh_pw})
+        check(status == 200 and bool(changed.get("access_token")), "a password change returns a fresh token")
+        check(call("GET", "/auth/me", stale)[0] == 401, "the token from before the change no longer opens a session")
+        check(call("GET", "/auth/me", changed.get("access_token"))[0] == 200, "the fresh token does")
+        status, _ = call("POST", "/auth/login", body={"email": "nobody@isolation.test", "password": "wrong-password-1"})
+        check(status == 401, "an unknown email is refused like a wrong password")
+        _, trail = call("GET", "/auth/audit-log", admin)
+        entries = trail if isinstance(trail, list) else trail.get("entries", [])
+        actions = {x.get("action") for x in entries}
+        check({"login", "login_failed"} <= actions, "sign-ins, failed and successful, are in the audit trail")
+
         print("\nThe root admin crosses clients, and only by choosing to")
         check(served_org(admin, org=HOME) == HOME, "admin switched to Ellensburg is served Ellensburg")
         check(served_org(admin, org=OTHER) == OTHER, "admin switched to Demo 25 is served Demo 25")

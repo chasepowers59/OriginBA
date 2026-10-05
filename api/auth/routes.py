@@ -16,6 +16,7 @@ from api.auth.database import get_session_factory
 from api.auth.dependencies import AuthContext, get_auth_context, get_session_auth_context, require_permission
 from api.auth.rate_limit import check_login_rate_limit, clear_login_attempts, record_login_failure
 from api.auth.schemas import (
+    PasswordChangedResponse,
     AccessGroupCreate,
     AccessGroupPublic,
     AccessGroupUpdate,
@@ -29,7 +30,7 @@ from api.auth.schemas import (
     UserUpdate,
 )
 from api.auth.models import User
-from api.auth.security import create_access_token, hash_password
+from api.auth.security import create_access_token, hash_password, password_fingerprint
 from api.auth.service import (
     sync_sso_access,
     AUDIT_CATEGORIES,
@@ -98,8 +99,14 @@ def login(
         user = authenticate_user(session, body.email, body.password)
     except AuthError as exc:
         record_login_failure(rate_key)
+        # committed here: the 401 below rolls the request's transaction back
+        log_audit(session, actor_id=None, actor_email=body.email.strip()[:200], action="login_failed",
+                  target_type="user", detail=f"ip={client_ip}", organization_id=None)
+        session.commit()
         raise HTTPException(status_code=401, detail=str(exc)) from exc
     clear_login_attempts(rate_key)
+    log_audit(session, actor_id=user.id, actor_email=user.email, action="login",
+              target_type="user", target_id=user.id, detail=f"ip={client_ip}")
     public = user_to_public(user)
 
     # Multi-tenant binding. When the login names an organization (a /<slug> tenant URL
@@ -128,6 +135,7 @@ def login(
         client_id=public["client_id"],
         organization_id=public.get("organization_id"),
         workstreams=public["workstreams"],
+        pwv=password_fingerprint(user.password_hash),
     )
     return LoginResponse(
         access_token=token,
@@ -137,12 +145,16 @@ def login(
     )
 
 
-@router.post("/change-password", response_model=AuthUserPublic)
+@router.post("/change-password", response_model=PasswordChangedResponse)
 def change_password_route(
     body: ChangePasswordRequest,
+    request: Request,
     ctx: AuthContext = Depends(get_session_auth_context),
     session: Session = Depends(_db_session, scope="function"),
-) -> AuthUserPublic:
+) -> PasswordChangedResponse:
+    # the current password is a credential check like sign-in, and limited the same way
+    rate_key = f"change-password|{ctx.id}|{request.client.host if request.client else 'unknown'}"
+    check_login_rate_limit(rate_key)
     try:
         public = change_password(session, ctx.id, body.current_password, body.new_password)
         log_audit(
@@ -154,8 +166,18 @@ def change_password_route(
             target_id=ctx.id,
             detail="Password updated",
         )
-        return AuthUserPublic(**public)
+        clear_login_attempts(rate_key)
+        # the change retires every token issued before it (api/auth/security.py password_fingerprint),
+        # this one included: the caller continues on a fresh one
+        from api.auth.service import get_user
+        user = get_user(session, ctx.id)
+        token = create_access_token(
+            user_id=public["id"], email=public["email"], role=public["role"],
+            client_id=public["client_id"], organization_id=public.get("organization_id"),
+            workstreams=public["workstreams"], pwv=password_fingerprint(user.password_hash))
+        return PasswordChangedResponse(**public, access_token=token)
     except AuthError as exc:
+        record_login_failure(rate_key)
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
@@ -316,7 +338,7 @@ def oidc_callback(
     token = create_access_token(
         user_id=public["id"], email=public["email"], role=public["role"],
         client_id=public["client_id"], organization_id=public.get("organization_id"),
-        workstreams=public["workstreams"])
+        workstreams=public["workstreams"], pwv=password_fingerprint(user.password_hash))
 
     dest = cfg.get("OIDC_POST_LOGIN_URL") or "/login"
     return RedirectResponse(f"{dest}#sso_token={token}")
