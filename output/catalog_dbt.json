@@ -1489,11 +1489,7 @@
      "W1_NODE",
      "W1_NODE_TYPE_L"
     ],
-    "trusted_measures": [
-     "Hierarchy Depth",
-     "Geo Latitude",
-     "Geo Longitude"
-    ]
+    "trusted_measures": []
    },
    "date_fields": [],
    "default_date_field": null,
@@ -1542,6 +1538,10 @@
     {
      "id": "Root Location ID",
      "label": "Root Location ID"
+    },
+    {
+     "id": "Hierarchy Depth",
+     "label": "Hierarchy Depth"
     },
     {
      "id": "Hierarchy Path",
@@ -1602,6 +1602,14 @@
     {
      "id": "Position",
      "label": "Position"
+    },
+    {
+     "id": "Geo Latitude",
+     "label": "Geo Latitude"
+    },
+    {
+     "id": "Geo Longitude",
+     "label": "Geo Longitude"
     },
     {
      "id": "Time Zone Code",
@@ -1698,11 +1706,11 @@
      "type": "text"
     },
     {
-     "description": "How many levels down from the root this node sits, from the recursive walk of W1_NODE. Root nodes are depth 1.",
+     "description": "How many levels down from the root this node sits, from the recursive walk of W1_NODE. Root nodes are depth 1. A level to group or filter by, not a measure.",
      "group": "assets",
      "id": "Hierarchy Depth",
      "label": "Hierarchy Depth",
-     "role": "measure",
+     "role": "dimension",
      "type": "integer"
     },
     {
@@ -1826,19 +1834,19 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The location node's latitude as recorded in Work and Asset. A coordinate, not a measure.",
      "group": "assets",
      "id": "Geo Latitude",
      "label": "Geo Latitude",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(15,6)"
     },
     {
-     "description": "",
+     "description": "The location node's longitude as recorded in Work and Asset. A coordinate, not a measure.",
      "group": "assets",
      "id": "Geo Longitude",
      "label": "Geo Longitude",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(15,6)"
     },
     {
@@ -1862,36 +1870,6 @@
      ],
      "id": "*",
      "label": "Number of records"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Hierarchy Depth",
-     "label": "Hierarchy Depth"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Geo Latitude",
-     "label": "Geo Latitude"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Geo Longitude",
-     "label": "Geo Longitude"
     }
    ],
    "poc_enabled": true,
@@ -1924,8 +1902,8 @@
      "id": "deepest_location_trees",
      "measures": [
       {
-       "agg": "max",
-       "field": "Hierarchy Depth"
+       "agg": "count",
+       "field": "*"
       }
      ],
      "title": "Which location trees run deepest?",
@@ -1938,11 +1916,7 @@
    "skip_sample_rows": false,
    "summary": "Asset locations with their hierarchy.",
    "table_name": "rpt_asset_location",
-   "trusted_measures": [
-    "Hierarchy Depth",
-    "Geo Latitude",
-    "Geo Longitude"
-   ],
+   "trusted_measures": [],
    "usage_guidance": null,
    "use_case": "Where assets sit in the location hierarchy, flattened into levels so you can count and filter assets by site, area or region.",
    "workstream": "assets",
@@ -1993,8 +1967,6 @@
      "CI_LOOKUP_VAL_L"
     ],
     "trusted_measures": [
-     "Run Number",
-     "Rerun Number",
      "Duration (min)"
     ]
    },
@@ -2018,6 +1990,14 @@
     {
      "id": "Program",
      "label": "Program"
+    },
+    {
+     "id": "Run Number",
+     "label": "Run Number"
+    },
+    {
+     "id": "Rerun Number",
+     "label": "Rerun Number"
     },
     {
      "id": "Run Status",
@@ -2054,19 +2034,19 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Which run of the batch process this is (CI_BATCH_RUN). An identifier, not a measure.",
      "group": "common",
      "id": "Run Number",
      "label": "Run Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
-     "description": "",
+     "description": "Which rerun of the batch run this is; 0 for the first attempt. An identifier, not a measure.",
      "group": "common",
      "id": "Rerun Number",
      "label": "Rerun Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
@@ -2141,27 +2121,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Run Number",
-     "label": "Run Number"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Rerun Number",
-     "label": "Rerun Number"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -2215,8 +2174,6 @@
    "summary": "Batch run monitoring.",
    "table_name": "rpt_batch",
    "trusted_measures": [
-    "Run Number",
-    "Rerun Number",
     "Duration (min)"
    ],
    "usage_guidance": null,
@@ -2688,7 +2645,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -2698,7 +2654,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -3029,7 +2984,7 @@
      "type": "timestamp"
     },
     {
-     "description": "The resolved characteristic value, whichever storage the characteristic type uses. This is the column to report on.",
+     "description": "The resolved characteristic value, whichever storage the characteristic type uses. This is the column to report on. A price or factor: do not sum it.",
      "group": "billing",
      "id": "Value",
      "label": "Value",
@@ -3092,7 +3047,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -3132,7 +3086,7 @@
      "id": "bill_factor_prices",
      "measures": [
       {
-       "agg": "sum",
+       "agg": "avg",
        "field": "Value"
       }
      ],
@@ -4039,7 +3993,7 @@
      "type": "timestamp"
     },
     {
-     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemise selectively (Newark: most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
+     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemize selectively (most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
      "group": "billing",
      "id": "Billed Amount",
      "label": "Billed Amount",
@@ -4047,7 +4001,7 @@
      "type": "numeric"
     },
     {
-     "description": "The part of \"Billed Amount\" the calc LINES itemise. Equals \"Billed Amount\" at a fully-itemising client (Ellensburg); partial where itemisation is selective (Newark). The charge-basis split columns partition THIS figure, to the cent.",
+     "description": "The part of \"Billed Amount\" the calc LINES itemize. Equals \"Billed Amount\" at a client that itemizes every charge; partial where itemization is selective. The charge-basis split columns partition THIS figure, to the cent.",
      "group": "billing",
      "id": "Itemized Charge Amount",
      "label": "Itemized Charge Amount",
@@ -4055,7 +4009,7 @@
      "type": "numeric"
     },
     {
-     "description": "The part of \"Billed Amount\" priced on metered consumption (calc lines with a consumption-class unit and no SQI). THIS is the amount that pairs with \"Billed Usage\". Caveat: clients that tier consumption through SQI multipliers (ellensburg water) price that revenue as Service Quantity instead.",
+     "description": "The part of \"Billed Amount\" priced on metered consumption (calc lines with a consumption-class unit and no SQI). THIS is the amount that pairs with \"Billed Usage\". Caveat: clients that tier consumption through SQI multipliers price that revenue as Service Quantity instead.",
      "group": "billing",
      "id": "Consumption Charge Amount",
      "label": "Consumption Charge Amount",
@@ -4071,7 +4025,7 @@
      "type": "numeric"
     },
     {
-     "description": "The part of \"Billed Amount\" priced on a DERIVED service quantity -- daily charges (SQI=DAYS averaging ~29 days), tier multipliers, ERU-based charges. 60% of ellensburg revenue. Not a usage charge even though tiered consumption can sit here.",
+     "description": "The part of \"Billed Amount\" priced on a DERIVED service quantity -- daily charges (SQI=DAYS averaging ~29 days), tier multipliers, ERU-based charges. Often the larger share of revenue. Not a usage charge even though tiered consumption can sit here.",
      "group": "billing",
      "id": "Service Quantity Charge Amount",
      "label": "Service Quantity Charge Amount",
@@ -4111,7 +4065,7 @@
      "type": "numeric"
     },
     {
-     "description": "The CONSUMPTION total for the segment, in the unit named by \"Billed Usage unit of measure\". When the segment measures several consumption units, it is the one the charge lines priced on (CityCorp measures water in GAL and TGAL and prices in TGAL); NULL when no single unit resolves, because a figure that could be kilowatt-hours or gallons depending on the row is worse than none. Excludes demand, tiered breakdowns (which repeat the same quantity split into tiers) and derived identifiers like days and equivalent residential units. Additive across segments only within one unit.",
+     "description": "The CONSUMPTION total for the segment, in the unit named by \"Billed Usage unit of measure\". When the segment measures several consumption units, it is the one the charge lines priced on (a client may measure water in gallons and thousands of gallons and price in thousands); NULL when no single unit resolves, because a figure that could be kilowatt-hours or gallons depending on the row is worse than none. Excludes demand, tiered breakdowns (which repeat the same quantity split into tiers) and derived identifiers like days and equivalent residential units. Additive across segments only within one unit.",
      "group": "billing",
      "id": "Billed Usage",
      "label": "Billed Usage",
@@ -4239,7 +4193,7 @@
      "type": "bigint"
     },
     {
-     "description": "On rpt_bill_segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (60% of ellensburg revenue). On rpt_billed_charge: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
+     "description": "On a bill segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (often the larger share of revenue). On a billed charge line: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
      "group": "billing",
      "id": "Average Price Per Unit",
      "label": "Average Price Per Unit",
@@ -5527,7 +5481,6 @@
      "D1_DVC_TYPE_L"
     ],
     "trusted_measures": [
-     "Sequence Number",
      "Start Register Reading",
      "End Register Reading",
      "Register Constant (Multiplier)",
@@ -5570,6 +5523,10 @@
     {
      "id": "Service Point ID",
      "label": "Service Point ID"
+    },
+    {
+     "id": "Sequence Number",
+     "label": "Sequence Number"
     },
     {
      "id": "Is Segment Level",
@@ -5718,11 +5675,11 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Ordering sequence within its parent. Part of the grain, not a measure.",
      "group": "billing",
      "id": "Sequence Number",
      "label": "Sequence Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -5790,7 +5747,7 @@
      "type": "timestamp"
     },
     {
-     "description": "",
+     "description": "The register reading at the start of the billed period. A reading, not a quantity: do not sum it; Raw Meter Movement is the additive difference.",
      "group": "billing",
      "id": "Start Register Reading",
      "label": "Start Register Reading",
@@ -5798,7 +5755,7 @@
      "type": "numeric"
     },
     {
-     "description": "",
+     "description": "The register reading at the end of the billed period. A reading, not a quantity: do not sum it; Raw Meter Movement is the additive difference.",
      "group": "billing",
      "id": "End Register Reading",
      "label": "End Register Reading",
@@ -5806,7 +5763,7 @@
      "type": "numeric"
     },
     {
-     "description": "The register multiplier applied to dial movement to get usage. Null is treated as 1 in the derived columns.",
+     "description": "The register multiplier applied to dial movement to get usage. Null is treated as 1 in the derived columns. A factor: do not sum it.",
      "group": "billing",
      "id": "Register Constant (Multiplier)",
      "label": "Register Constant (Multiplier)",
@@ -5830,7 +5787,7 @@
      "type": "numeric"
     },
     {
-     "description": "The register quantity on this copy of the read. One reading is carried at segment level, per service point and as an audit copy (Usage Flag 'X'), beside tier breakdowns and unit-less derived rows, and a cancelled segment keeps its reads: total it only with Is Frozen = true, Is Cancelled = false, Is Segment Level = true, Usage Flag = 'S' and Read Row Kind = 'measured', and never across units. That copy ties rpt_billed_usage's usage per unit exactly (Ellensburg 2026-09-30).",
+     "description": "The register quantity on this copy of the read. One reading is carried at segment level, per service point and as an audit copy (Usage Flag 'X'), beside tier breakdowns and unit-less derived rows, and a cancelled segment keeps its reads: total it only with Is Frozen = true, Is Cancelled = false, Is Segment Level = true, Usage Flag = 'S' and Read Row Kind = 'measured', and never across units. That copy ties the Billed Usage data set's usage per unit exactly.",
      "group": "billing",
      "id": "Measured Quantity",
      "label": "Measured Quantity",
@@ -6109,16 +6066,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Sequence Number",
-     "label": "Sequence Number"
-    },
-    {
-     "aggs": [
       "min",
       "max"
      ],
@@ -6127,7 +6074,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -6137,7 +6083,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -6147,7 +6092,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -6298,7 +6242,6 @@
    "summary": "The meter reads a bill segment was calculated from.",
    "table_name": "rpt_bill_segment_read",
    "trusted_measures": [
-    "Sequence Number",
     "Start Register Reading",
     "End Register Reading",
     "Register Constant (Multiplier)",
@@ -6448,9 +6391,7 @@
      "CI_SVC_TYPE_L"
     ],
     "trusted_measures": [
-     "Line Sequence",
      "Charge Amount",
-     "Calc Header Seq",
      "Billed Calculation Amount"
     ]
    },
@@ -6474,6 +6415,10 @@
     {
      "id": "Billable Charge ID",
      "label": "Billable Charge ID"
+    },
+    {
+     "id": "Line Sequence",
+     "label": "Line Sequence"
     },
     {
      "id": "Charge Description",
@@ -6514,6 +6459,10 @@
     {
      "id": "Bill Segment ID",
      "label": "Bill Segment ID"
+    },
+    {
+     "id": "Calc Header Seq",
+     "label": "Calc Header Seq"
     },
     {
      "id": "Is Billed",
@@ -6650,7 +6599,7 @@
      "group": "billing",
      "id": "Line Sequence",
      "label": "Line Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -6762,7 +6711,7 @@
      "group": "billing",
      "id": "Calc Header Seq",
      "label": "Calc Header Seq",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -7042,28 +6991,8 @@
       "min",
       "max"
      ],
-     "id": "Line Sequence",
-     "label": "Line Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
      "id": "Charge Amount",
      "label": "Charge Amount"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Calc Header Seq",
-     "label": "Calc Header Seq"
     },
     {
      "aggs": [
@@ -7110,9 +7039,7 @@
    "summary": "Charges that do not come from a rate.",
    "table_name": "rpt_billable_charge",
    "trusted_measures": [
-    "Line Sequence",
     "Charge Amount",
-    "Calc Header Seq",
     "Billed Calculation Amount"
    ],
    "usage_guidance": null,
@@ -7344,8 +7271,6 @@
      "CI_UOM_L"
     ],
     "trusted_measures": [
-     "Calc Header Seq",
-     "Calc Line Seq",
      "Billed Amount",
      "Base Amount",
      "Exempt Amount"
@@ -7379,6 +7304,14 @@
     {
      "id": "Bill Segment ID",
      "label": "Bill Segment ID"
+    },
+    {
+     "id": "Calc Header Seq",
+     "label": "Calc Header Seq"
+    },
+    {
+     "id": "Calc Line Seq",
+     "label": "Calc Line Seq"
     },
     {
      "id": "Bill ID",
@@ -7635,7 +7568,7 @@
      "group": "billing",
      "id": "Calc Header Seq",
      "label": "Calc Header Seq",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -7643,7 +7576,7 @@
      "group": "billing",
      "id": "Calc Line Seq",
      "label": "Calc Line Seq",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -8111,7 +8044,7 @@
      "type": "text"
     },
     {
-     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemise selectively (Newark: most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
+     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemize selectively (most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
      "group": "billing",
      "id": "Billed Amount",
      "label": "Billed Amount",
@@ -8143,7 +8076,7 @@
      "type": "numeric"
     },
     {
-     "description": "On rpt_bill_segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (60% of ellensburg revenue). On rpt_billed_charge: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
+     "description": "On a bill segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (often the larger share of revenue). On a billed charge line: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
      "group": "billing",
      "id": "Average Price Per Unit",
      "label": "Average Price Per Unit",
@@ -8219,26 +8152,6 @@
      ],
      "id": "*",
      "label": "Number of records"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Calc Header Seq",
-     "label": "Calc Header Seq"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Calc Line Seq",
-     "label": "Calc Line Seq"
     },
     {
      "aggs": [
@@ -8326,8 +8239,6 @@
    "summary": "Billed charges at calc-line grain.",
    "table_name": "rpt_billed_charge",
    "trusted_measures": [
-    "Calc Header Seq",
-    "Calc Line Seq",
     "Billed Amount",
     "Base Amount",
     "Exempt Amount"
@@ -9772,7 +9683,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -9782,7 +9692,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -9978,7 +9887,7 @@
      "type": "text"
     },
     {
-     "description": "The resolved characteristic value, whichever storage the characteristic type uses. This is the column to report on.",
+     "description": "The resolved characteristic value, whichever storage the characteristic type uses. This is the column to report on. A price or factor: do not sum it.",
      "group": "common",
      "id": "Value",
      "label": "Value",
@@ -11053,7 +10962,7 @@
      "type": "text"
     },
     {
-     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (College Station: 104,826 carry a code, 965 are on budget).",
+     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (at some clients most accounts carry a code and few are on budget).",
      "group": "customer_ops",
      "id": "Is On Budget",
      "label": "Is On Budget",
@@ -11269,7 +11178,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt more than 120 days past due as of the run date.",
      "group": "customer_ops",
      "id": "Arrears 120+ Days",
      "label": "Arrears 120+ Days",
@@ -13103,7 +13012,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -13357,7 +13265,6 @@
      "CI_SVC_TYPE_L"
     ],
     "trusted_measures": [
-     "Event Sequence",
      "Days Since Process Created",
      "SA Arrears Amount",
      "Process Arrears Amount",
@@ -13407,6 +13314,10 @@
     {
      "id": "Service Agreement ID",
      "label": "Service Agreement ID"
+    },
+    {
+     "id": "Event Sequence",
+     "label": "Event Sequence"
     },
     {
      "id": "Process Template",
@@ -13571,7 +13482,7 @@
      "group": "debt",
      "id": "Event Sequence",
      "label": "Event Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -13607,7 +13518,7 @@
      "type": "timestamp"
     },
     {
-     "description": "",
+     "description": "Days from the process's creation to the as-of date. Repeats on every row of the process; average it, do not sum it.",
      "group": "debt",
      "id": "Days Since Process Created",
      "label": "Days Since Process Created",
@@ -13687,7 +13598,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The service agreement's arrears in this debt process. Repeats on every event row of the process, so it is not additive across rows here; total it from rpt_service_agreement, or over one row per Process ID + Service Agreement ID.",
      "group": "debt",
      "id": "SA Arrears Amount",
      "label": "SA Arrears Amount",
@@ -13695,7 +13606,7 @@
      "type": "numeric(15,2)"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The arrears the whole process was opened for. Repeats on every service agreement and event row of the process -- not additive across rows; count distinct Process ID or average it, and total arrears from rpt_service_agreement.",
      "group": "debt",
      "id": "Process Arrears Amount",
      "label": "Process Arrears Amount",
@@ -13711,7 +13622,7 @@
      "type": "numeric"
     },
     {
-     "description": "Arrears when the debt process was discontinued (C1DC sequence 2). Null while the process is still running. Repeats across the process's rows.",
+     "description": "Arrears when the debt process was discontinued (C1DC sequence 2). Null while the process is still running. Repeats on every service agreement and event row of the process -- not additive across rows.",
      "group": "debt",
      "id": "Arrears at End",
      "label": "Arrears at End",
@@ -13719,7 +13630,7 @@
      "type": "numeric"
     },
     {
-     "description": "",
+     "description": "Arrears at Start less Arrears at End: what the process collected. Null while the process is still running. Repeats on every service agreement and event row of the process -- not additive across rows; average it, or read one row per Process ID.",
      "group": "debt",
      "id": "Arrears Reduction",
      "label": "Arrears Reduction",
@@ -13735,7 +13646,7 @@
      "type": "numeric"
     },
     {
-     "description": "",
+     "description": "Days from the process's start to its discontinuation, to two decimals. Null while the process is still running. Repeats on every row of the process; average it, do not sum it.",
      "group": "debt",
      "id": "Duration (Days)",
      "label": "Duration (Days)",
@@ -13966,17 +13877,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Event Sequence",
-     "label": "Event Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -13986,7 +13886,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -13996,7 +13895,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14006,7 +13904,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14016,7 +13913,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14026,7 +13922,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14044,7 +13939,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14057,7 +13951,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "pie",
+     "chart_type": "bar",
      "description": "A process that runs to completion without reducing arrears has cost money and recovered nothing. Percent of arrears collected is the measure that matters.",
      "dimensions": [
       "Process Template"
@@ -14066,7 +13960,7 @@
      "id": "collection_effectiveness",
      "measures": [
       {
-       "agg": "sum",
+       "agg": "avg",
        "field": "Arrears Reduction"
       }
      ],
@@ -14098,7 +13992,6 @@
    "summary": "Collection, severance and write-off processes with their events.",
    "table_name": "rpt_debt_process",
    "trusted_measures": [
-    "Event Sequence",
     "Days Since Process Created",
     "SA Arrears Amount",
     "Process Arrears Amount",
@@ -14980,7 +14873,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The install event's constant applied to the device's readings. A factor: do not sum it.",
      "group": "assets",
      "id": "Installation Constant",
      "label": "Installation Constant",
@@ -15419,7 +15312,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -15429,7 +15321,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -15449,7 +15340,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -16008,7 +15898,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -16222,8 +16111,7 @@
      "D1_VEE_RULE_L"
     ],
     "trusted_measures": [
-     "Days Open",
-     "Message Number"
+     "Days Open"
     ]
    },
    "date_fields": [
@@ -16310,6 +16198,10 @@
     {
      "id": "Service Point ID",
      "label": "Service Point ID"
+    },
+    {
+     "id": "Message Number",
+     "label": "Message Number"
     },
     {
      "id": "Review Complete",
@@ -16546,11 +16438,11 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The C2M message number of the exception's text, within its message category. An identifier, not a measure.",
      "group": "field_ops",
      "id": "Message Number",
      "label": "Message Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric"
     },
     {
@@ -16721,23 +16613,12 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
      ],
      "id": "Days Open",
      "label": "Days Open"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Message Number",
-     "label": "Message Number"
     }
    ],
    "poc_enabled": true,
@@ -16804,8 +16685,7 @@
    "summary": "Every exception, from all three C2M exception engines, in one data set.",
    "table_name": "rpt_exception",
    "trusted_measures": [
-    "Days Open",
-    "Message Number"
+    "Days Open"
    ],
    "usage_guidance": null,
    "use_case": "Every exception raised by billing, usage and meter-data validation in one place, to work the queue or spot patterns.",
@@ -18476,7 +18356,7 @@
      "type": "text"
     },
     {
-     "description": "The adjustment's amount (CI_ADJ.ADJ_AMT), on its AD transaction AND, with the SAME sign, on the AX transaction that cancels it -- so a plain sum counts every cancelled adjustment twice. Sum it with Is Adjustment = true and Adjustment Status Code = '50' (standing adjustments; 60 is cancelled). For the ledger net of charge and cancel, sum Current Amount instead. Ellensburg 2026-09-30: $15,572,430.42 unfiltered, $15,096,751.09 standing.",
+     "description": "The adjustment's amount (CI_ADJ.ADJ_AMT), on its AD transaction AND, with the SAME sign, on the AX transaction that cancels it -- so a plain sum counts every cancelled adjustment twice. Sum it with Is Adjustment = true and Adjustment Status Code = '50' (standing adjustments; 60 is cancelled). For the ledger net of charge and cancel, sum Current Amount instead.",
      "group": "finance",
      "id": "Adjustment Amount",
      "label": "Adjustment Amount",
@@ -19172,12 +19052,10 @@
      "CI_SVC_TYPE_L"
     ],
     "trusted_measures": [
-     "GL Sequence Number",
      "GL Amount",
      "Statistic Amount",
      "FT Current Amount",
-     "FT Total Amount (Payoff)",
-     "GL Extract Run Number"
+     "FT Total Amount (Payoff)"
     ]
    },
    "date_fields": [
@@ -19204,6 +19082,10 @@
     {
      "id": "FT ID",
      "label": "FT ID"
+    },
+    {
+     "id": "GL Sequence Number",
+     "label": "GL Sequence Number"
     },
     {
      "id": "GL Account",
@@ -19236,6 +19118,10 @@
     {
      "id": "GL Extract Batch Code",
      "label": "GL Extract Batch Code"
+    },
+    {
+     "id": "GL Extract Run Number",
+     "label": "GL Extract Run Number"
     },
     {
      "id": "Is Extracted to GL",
@@ -19352,7 +19238,7 @@
      "group": "finance",
      "id": "GL Sequence Number",
      "label": "GL Sequence Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -19476,7 +19362,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Which configured GL extract shipped this transaction (C1-GLFCX, GL Extract for Oracle Financial Cloud, at the reference client). Run numbers are issued PER BATCH CODE, so this column QUALIFIES the Run Number beside it: reconcile a GL file on the pair, never on the run number alone. Most clients configure a single extract and this reads as a constant; demo25 runs two (C1-GLFCX and GLDL), which is why the column is on the data set at all.",
+     "description": "Which configured GL extract shipped this transaction (C1-GLFCX, GL Extract for Oracle Financial Cloud, at the reference client). Run numbers are issued PER BATCH CODE, so this column QUALIFIES the Run Number beside it: reconcile a GL file on the pair, never on the run number alone. Most clients configure a single extract and this reads as a constant; a client running two (for example C1-GLFCX and GLDL) needs it.",
      "group": "finance",
      "id": "GL Extract Batch Code",
      "label": "GL Extract Batch Code",
@@ -19484,11 +19370,11 @@
      "type": "text"
     },
     {
-     "description": "Which run of the GL extract shipped this transaction to the financial system, numbered WITHIN its GL Extract Batch Code -- read the two together, because run 5 of one extract is a different file from run 5 of another. Null until the transaction has been extracted, which is the same population as a null Transferred to GL Date.",
+     "description": "Which run of the GL extract shipped this transaction to the financial system, numbered WITHIN its GL Extract Batch Code -- read the two together, because run 5 of one extract is a different file from run 5 of another. Null until the transaction has been extracted, which is the same population as a null Transferred to GL Date. An identifier, not a measure.",
      "group": "finance",
      "id": "GL Extract Run Number",
      "label": "GL Extract Run Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
@@ -19712,16 +19598,6 @@
       "min",
       "max"
      ],
-     "id": "GL Sequence Number",
-     "label": "GL Sequence Number"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
      "id": "GL Amount",
      "label": "GL Amount"
     },
@@ -19737,7 +19613,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -19747,23 +19622,12 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
      ],
      "id": "FT Total Amount (Payoff)",
      "label": "FT Total Amount (Payoff)"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "GL Extract Run Number",
-     "label": "GL Extract Run Number"
     }
    ],
    "poc_enabled": true,
@@ -19823,12 +19687,10 @@
    "summary": "General ledger distribution.",
    "table_name": "rpt_gl",
    "trusted_measures": [
-    "GL Sequence Number",
     "GL Amount",
     "Statistic Amount",
     "FT Current Amount",
-    "FT Total Amount (Payoff)",
-    "GL Extract Run Number"
+    "FT Total Amount (Payoff)"
    ],
    "usage_guidance": null,
    "use_case": "General ledger postings for each transaction, to reconcile to the ledger by account and distribution code.",
@@ -19947,8 +19809,7 @@
     "trusted_measures": [
      "Measurement Value",
      "Register Reading",
-     "Multiplier",
-     "Read Sequence"
+     "Multiplier"
     ]
    },
    "date_fields": [
@@ -19995,6 +19856,10 @@
     {
      "id": "Measuring Component Type Code",
      "label": "Measuring Component Type Code"
+    },
+    {
+     "id": "Read Sequence",
+     "label": "Read Sequence"
     },
     {
      "id": "Device Config ID",
@@ -20067,7 +19932,7 @@
      "type": "numeric(16,6)"
     },
     {
-     "description": "",
+     "description": "The dial reading the measurement was taken from. A reading, not a quantity: do not sum it.",
      "group": "meter_ops",
      "id": "Register Reading",
      "label": "Register Reading",
@@ -20131,7 +19996,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The measuring component's multiplier applied to its readings. A factor: do not sum it.",
      "group": "meter_ops",
      "id": "Multiplier",
      "label": "Multiplier",
@@ -20143,7 +20008,7 @@
      "group": "meter_ops",
      "id": "Read Sequence",
      "label": "Read Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -20268,7 +20133,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -20278,23 +20142,12 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
      ],
      "id": "Multiplier",
      "label": "Multiplier"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Read Sequence",
-     "label": "Read Sequence"
     }
    ],
    "poc_enabled": true,
@@ -20327,8 +20180,7 @@
    "trusted_measures": [
     "Measurement Value",
     "Register Reading",
-    "Multiplier",
-    "Read Sequence"
+    "Multiplier"
    ],
    "usage_guidance": null,
    "use_case": "Meter readings and interval data by measuring component, with their condition (actual or estimated).",
@@ -20441,7 +20293,6 @@
      "D1_ON_OFF_HIST"
     ],
     "trusted_measures": [
-     "Event Sequence",
      "Hours Since Previous Event"
     ]
    },
@@ -20461,6 +20312,10 @@
     {
      "id": "Install Event ID",
      "label": "Install Event ID"
+    },
+    {
+     "id": "Event Sequence",
+     "label": "Event Sequence"
     },
     {
      "id": "On/Off Event",
@@ -20533,7 +20388,7 @@
      "group": "meter_ops",
      "id": "Event Sequence",
      "label": "Event Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -20688,17 +20543,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Event Sequence",
-     "label": "Event Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -20735,7 +20579,6 @@
    "summary": "Connect and disconnect history.",
    "table_name": "rpt_on_off_history",
    "trusted_measures": [
-    "Event Sequence",
     "Hours Since Previous Event"
    ],
    "usage_guidance": null,
@@ -21370,7 +21213,7 @@
     "Paid vs Elapsed Schedule Variance"
    ],
    "usage_guidance": null,
-   "use_case": "Payment arrangements: who is on a plan, what is scheduled, and which plans are kept or broken.",
+   "use_case": "Pay plans: who is on a plan, what is scheduled, and which plans are kept or broken.",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
@@ -21974,7 +21817,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -21984,7 +21826,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22004,7 +21845,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22211,7 +22051,6 @@
      "Tender Amount",
      "Tender Control Start Balance",
      "Tender Control End Balance",
-     "Batch Number",
      "Deposit End Balance"
     ]
    },
@@ -22311,6 +22150,10 @@
     {
      "id": "Batch Code",
      "label": "Batch Code"
+    },
+    {
+     "id": "Batch Number",
+     "label": "Batch Number"
     },
     {
      "id": "Tender Control User ID",
@@ -22511,7 +22354,7 @@
      "type": "text"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The cash drawer session's starting balance, repeated on every tender of the session -- not additive here; sum Start Balance on rpt_tender_control.",
      "group": "cashiering",
      "id": "Tender Control Start Balance",
      "label": "Tender Control Start Balance",
@@ -22519,7 +22362,7 @@
      "type": "numeric(15,2)"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The cash drawer session's ending balance, repeated on every tender of the session -- not additive here; sum End Balance on rpt_tender_control.",
      "group": "cashiering",
      "id": "Tender Control End Balance",
      "label": "Tender Control End Balance",
@@ -22535,11 +22378,11 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The tender control's batch number as entered in C2M. An identifier, not a measure.",
      "group": "cashiering",
      "id": "Batch Number",
      "label": "Batch Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
@@ -22599,7 +22442,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The deposit control's ending balance, repeated on every drawer session (and tender) of the deposit -- not additive here; read one row per deposit control.",
      "group": "cashiering",
      "id": "Deposit End Balance",
      "label": "Deposit End Balance",
@@ -22672,7 +22515,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22682,7 +22524,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22692,17 +22533,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Batch Number",
-     "label": "Batch Number"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22748,11 +22578,10 @@
     "Tender Amount",
     "Tender Control Start Balance",
     "Tender Control End Balance",
-    "Batch Number",
     "Deposit End Balance"
    ],
    "usage_guidance": null,
-   "use_case": "How money arrived: cash, cheque, card or electronic transfer, by tender source and date.",
+   "use_case": "How money arrived: cash, check, card or electronic transfer, by tender source and date.",
    "workstream": "cashiering",
    "workstream_label": "Cashiering & Payments"
   },
@@ -22974,8 +22803,6 @@
      "D1_SP"
     ],
     "trusted_measures": [
-     "Meter Read Route Sequence",
-     "Measurement Cycle Route Sequence",
      "Service Point Count (Premise)",
      "SA Count (Premise)",
      "Billed Segment Count (Premise)",
@@ -23042,12 +22869,20 @@
      "label": "Meter Read Route Code"
     },
     {
+     "id": "Meter Read Route Sequence",
+     "label": "Meter Read Route Sequence"
+    },
+    {
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code"
     },
     {
      "id": "Measurement Cycle Route Code",
      "label": "Measurement Cycle Route Code"
+    },
+    {
+     "id": "Measurement Cycle Route Sequence",
+     "label": "Measurement Cycle Route Sequence"
     },
     {
      "id": "Measurement Cycle Route",
@@ -23292,7 +23127,7 @@
      "group": "meter_ops",
      "id": "Meter Read Route Sequence",
      "label": "Meter Read Route Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(8,0)"
     },
     {
@@ -23316,11 +23151,11 @@
      "group": "meter_ops",
      "id": "Measurement Cycle Route Sequence",
      "label": "Measurement Cycle Route Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(9,0)"
     },
     {
-     "description": "The MDM route the point is read on, as 'cycle / route' (D1_SP.MSRMT_CYC_CD and MSRMT_CYC_RTE_CD): the one to group a reading workload by, because route codes repeat across cycles (College Station: 53 codes on 376 routes, 2026-09-30). Null when the point has no route.",
+     "description": "The MDM route the point is read on, as 'cycle / route' (D1_SP.MSRMT_CYC_CD and MSRMT_CYC_RTE_CD): the one to group a reading workload by, because route codes repeat across cycles (one client reuses 53 codes on 376 routes). Null when the point has no route.",
      "group": "meter_ops",
      "id": "Measurement Cycle Route",
      "label": "Measurement Cycle Route",
@@ -23544,7 +23379,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Service points at this point's premise, repeated on every service point of the premise -- not additive here; count distinct Premise ID or average it.",
      "group": "meter_ops",
      "id": "Service Point Count (Premise)",
      "label": "Service Point Count (Premise)",
@@ -23552,7 +23387,7 @@
      "type": "bigint"
     },
     {
-     "description": "",
+     "description": "Service agreements at this point's premise, repeated on every service point of the premise -- not additive here; count distinct Premise ID or average it.",
      "group": "meter_ops",
      "id": "SA Count (Premise)",
      "label": "SA Count (Premise)",
@@ -23560,7 +23395,7 @@
      "type": "bigint"
     },
     {
-     "description": "",
+     "description": "Billed segments at this point's premise, repeated on every service point of the premise -- not additive here; count distinct Premise ID or average it.",
      "group": "meter_ops",
      "id": "Billed Segment Count (Premise)",
      "label": "Billed Segment Count (Premise)",
@@ -23767,27 +23602,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Meter Read Route Sequence",
-     "label": "Meter Read Route Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Measurement Cycle Route Sequence",
-     "label": "Measurement Cycle Route Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -23797,7 +23611,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -23807,7 +23620,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -23817,7 +23629,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -23932,8 +23743,6 @@
    "summary": "Service point with its premise and installed device.",
    "table_name": "rpt_premise_sp",
    "trusted_measures": [
-    "Meter Read Route Sequence",
-    "Measurement Cycle Route Sequence",
     "Service Point Count (Premise)",
     "SA Count (Premise)",
     "Billed Segment Count (Premise)",
@@ -24049,8 +23858,6 @@
      "CI_RS_L"
     ],
     "trusted_measures": [
-     "Role Sequence",
-     "Execution Sequence",
      "Eligibility Criteria Count"
     ]
    },
@@ -24096,12 +23903,20 @@
      "label": "Group Role"
     },
     {
+     "id": "Role Sequence",
+     "label": "Role Sequence"
+    },
+    {
      "id": "Calculation Group Code",
      "label": "Calculation Group Code"
     },
     {
      "id": "Calculation Group",
      "label": "Calculation Group"
+    },
+    {
+     "id": "Execution Sequence",
+     "label": "Execution Sequence"
     },
     {
      "id": "Calculation Rule Code",
@@ -24242,7 +24057,7 @@
      "group": "billing",
      "id": "Role Sequence",
      "label": "Role Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric"
     },
     {
@@ -24274,7 +24089,7 @@
      "group": "billing",
      "id": "Execution Sequence",
      "label": "Execution Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -24442,26 +24257,6 @@
       "min",
       "max"
      ],
-     "id": "Role Sequence",
-     "label": "Role Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Execution Sequence",
-     "label": "Execution Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
      "id": "Eligibility Criteria Count",
      "label": "Eligibility Criteria Count"
     }
@@ -24494,8 +24289,6 @@
    "summary": "How each rate schedule actually calculates.",
    "table_name": "rpt_rate_configuration",
    "trusted_measures": [
-    "Role Sequence",
-    "Execution Sequence",
     "Eligibility Criteria Count"
    ],
    "usage_guidance": null,
@@ -26425,7 +26218,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt more than 120 days past due as of the run date.",
      "group": "billing",
      "id": "Arrears 120+ Days",
      "label": "Arrears 120+ Days",
@@ -26593,7 +26386,7 @@
      "type": "varchar(60)"
     },
     {
-     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (College Station: 104,826 carry a code, 965 are on budget).",
+     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (at some clients most accounts carry a code and few are on budget).",
      "group": "billing",
      "id": "Is On Budget",
      "label": "Is On Budget",
@@ -26634,7 +26427,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -26744,7 +26536,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -26956,7 +26747,6 @@
      "Start Balance",
      "End Balance",
      "Days Unbalanced",
-     "Batch Number",
      "Deposit End Balance"
     ]
    },
@@ -27024,6 +26814,10 @@
     {
      "id": "Batch Code",
      "label": "Batch Code"
+    },
+    {
+     "id": "Batch Number",
+     "label": "Batch Number"
     },
     {
      "id": "Deposit Control ID",
@@ -27180,11 +26974,11 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The tender control's batch number as entered in C2M. An identifier, not a measure.",
      "group": "cashiering",
      "id": "Batch Number",
      "label": "Batch Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
@@ -27212,7 +27006,7 @@
      "type": "text"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The deposit control's ending balance, repeated on every drawer session (and tender) of the deposit -- not additive here; read one row per deposit control.",
      "group": "cashiering",
      "id": "Deposit End Balance",
      "label": "Deposit End Balance",
@@ -27271,7 +27065,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -27281,17 +27074,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Batch Number",
-     "label": "Batch Number"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -27331,7 +27113,6 @@
     "Start Balance",
     "End Balance",
     "Days Unbalanced",
-    "Batch Number",
     "Deposit End Balance"
    ],
    "usage_guidance": null,
@@ -27580,7 +27361,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -27655,7 +27435,7 @@
     "Drill Key Count"
    ],
    "usage_guidance": null,
-   "use_case": "To-do entries: the work C2M assigns to staff, with its owner, age and completion.",
+   "use_case": "To Do entries: the work C2M assigns to staff, with its owner, age and completion.",
    "workstream": "common",
    "workstream_label": "Operations & Shared Services"
   },
@@ -28187,7 +27967,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28197,7 +27976,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28217,7 +27995,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28435,7 +28212,6 @@
      "D1_USAGE_SCALAR_DTL"
     ],
     "trusted_measures": [
-     "Sequence Number",
      "Quantity",
      "Final Quantity",
      "Start Measurement",
@@ -28466,6 +28242,10 @@
     {
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID"
+    },
+    {
+     "id": "Sequence Number",
+     "label": "Sequence Number"
     },
     {
      "id": "Unit of Measure",
@@ -28574,11 +28354,11 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Ordering sequence within its parent. Part of the grain, not a measure.",
      "group": "meter_ops",
      "id": "Sequence Number",
      "label": "Sequence Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -28598,7 +28378,7 @@
      "type": "numeric"
     },
     {
-     "description": "",
+     "description": "The measurement at the start of the usage period. A reading, not a quantity: do not sum it; Quantity is the additive amount.",
      "group": "meter_ops",
      "id": "Start Measurement",
      "label": "Start Measurement",
@@ -28606,7 +28386,7 @@
      "type": "numeric(16,6)"
     },
     {
-     "description": "",
+     "description": "The measurement at the end of the usage period. A reading, not a quantity: do not sum it; Quantity is the additive amount.",
      "group": "meter_ops",
      "id": "End Measurement",
      "label": "End Measurement",
@@ -28834,16 +28614,6 @@
       "min",
       "max"
      ],
-     "id": "Sequence Number",
-     "label": "Sequence Number"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
      "id": "Quantity",
      "label": "Quantity"
     },
@@ -28859,7 +28629,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28869,7 +28638,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28906,7 +28674,6 @@
    "summary": "Usage transactions at scalar-detail grain.",
    "table_name": "rpt_usage_txn",
    "trusted_measures": [
-    "Sequence Number",
     "Quantity",
     "Final Quantity",
     "Start Measurement",
