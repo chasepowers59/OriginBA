@@ -3295,7 +3295,7 @@
      {
       "alias": "rs",
       "join_type": "left join",
-      "on": "rs.rate_schedule_cd = c.sole_rate_schedule_cd",
+      "on": "rs.rate_schedule_cd = h.sole_rate_schedule_cd",
       "role": "model",
       "table": "dim_rate_schedule"
      },
@@ -10456,6 +10456,7 @@
        "Credit Review Date",
        "Postpone Credit Review Date",
        "Collection Process Count",
+       "Active Collection Process Count",
        "Pay Plan Count",
        "Active Pay Plan Count",
        "Is On Active Pay Plan",
@@ -10629,6 +10630,7 @@
      "Case Count",
      "Open Case Count",
      "Collection Process Count",
+     "Active Collection Process Count",
      "Pay Plan Count",
      "Active Pay Plan Count",
      "Autopay Maximum Withdrawal Amount"
@@ -11380,6 +11382,14 @@
     {
      "description": "Pre-aggregated count, additive at this data set's grain.",
      "group": "customer_ops",
+     "id": "Active Collection Process Count",
+     "label": "Active Collection Process Count",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
+     "description": "Pre-aggregated count, additive at this data set's grain.",
+     "group": "customer_ops",
      "id": "Pay Plan Count",
      "label": "Pay Plan Count",
      "role": "measure",
@@ -11766,6 +11776,16 @@
       "min",
       "max"
      ],
+     "id": "Active Collection Process Count",
+     "label": "Active Collection Process Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Pay Plan Count",
      "label": "Pay Plan Count"
     },
@@ -12058,6 +12078,7 @@
     "Case Count",
     "Open Case Count",
     "Collection Process Count",
+    "Active Collection Process Count",
     "Pay Plan Count",
     "Active Pay Plan Count",
     "Autopay Maximum Withdrawal Amount"
@@ -13224,21 +13245,21 @@
      {
       "alias": "pst",
       "join_type": "left join",
-      "on": "pst.field_name='COLL_STATUS_FLG' and pst.field_value = c.process_status_cd",
+      "on": "pst.field_name = c.status_family and pst.field_value = c.process_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
      },
      {
       "alias": "sds",
       "join_type": "left join",
-      "on": "sds.field_name='COLL_SA_STATUS_FLG' and sds.field_value = c.sa_debt_status_cd",
+      "on": "sds.field_name = c.sa_status_family and sds.field_value = c.sa_debt_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
      },
      {
       "alias": "est",
       "join_type": "left join",
-      "on": "est.field_name='COLL_EVT_STATUS_FLG' and est.field_value = c.event_status_cd",
+      "on": "est.field_name = c.event_status_family and est.field_value = c.event_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
      },
@@ -15943,7 +15964,7 @@
   },
   "rpt_exception": {
    "data_model": {
-    "columns_traced_to_cisadm": 10,
+    "columns_traced_to_cisadm": 16,
     "domain_table": "rpt_exception",
     "driving_table": null,
     "field_groups": [
@@ -15954,6 +15975,7 @@
        "Exception Type Code",
        "Exception Type",
        "Rule Code",
+       "VEE Group",
        "VEE Group Code",
        "VEE Rule",
        "Severity",
@@ -15968,6 +15990,10 @@
        "Device ID",
        "Meter Badge Number",
        "MDM Service Point ID",
+       "MDM Service Point Type",
+       "MDM Service Point Type Code",
+       "MDM Service Point Status",
+       "MDM Service Point Status Code",
        "Service Point ID",
        "Message Number",
        "Review Complete",
@@ -15987,7 +16013,9 @@
        "Main Customer Name",
        "Customer Class",
        "Usage ID",
+       "Usage Group",
        "Usage Group Code",
+       "Measurement Cycle",
        "Measurement Cycle Code"
       ],
       "id": "field_ops",
@@ -16027,16 +16055,23 @@
       "table": "stg_d1_usage"
      },
      {
+      "alias": "bet",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
       "alias": "uet",
       "join_type": "left join",
-      "on": "uet.excp_type_cd = c.exception_type_cd",
+      "on": "c.exception_domain = 'Usage' and uet.excp_type_cd = c.exception_type_cd",
       "role": "model",
       "table": "stg_usage_excp_type_label"
      },
      {
       "alias": "det",
       "join_type": "left join",
-      "on": "det.excp_type_cd = c.exception_type_cd",
+      "on": "c.exception_domain = 'VEE' and det.excp_type_cd = c.exception_type_cd",
       "role": "model",
       "table": "stg_excp_type_label"
      },
@@ -16095,6 +16130,34 @@
       "on": "spdev.d1_sp_id = c.d1_sp_id",
       "role": "model",
       "table": "int_sp_device"
+     },
+     {
+      "alias": "msp",
+      "join_type": "left join",
+      "on": "msp.d1_sp_id = coalesce(c.d1_sp_id, inst.d1_sp_id)",
+      "role": "model",
+      "table": "int_mdm_service_point"
+     },
+     {
+      "alias": "vg",
+      "join_type": "left join",
+      "on": "vg.vee_grp_cd = c.vee_grp_cd",
+      "role": "model",
+      "table": "stg_d1_vee_group_label"
+     },
+     {
+      "alias": "ug",
+      "join_type": "left join",
+      "on": "ug.usg_grp_cd = u.usg_grp_cd",
+      "role": "model",
+      "table": "stg_d1_usage_group_label"
+     },
+     {
+      "alias": "mcy",
+      "join_type": "left join",
+      "on": "mcy.msrmt_cyc_cd = u.msrmt_cyc_cd",
+      "role": "model",
+      "table": "stg_d1_msrmt_cyc_label"
      }
     ],
     "population_filter": null,
@@ -16107,7 +16170,12 @@
      "CI_SA_TYPE",
      "CI_SA_TYPE_L",
      "CI_SVC_TYPE_L",
+     "D1_MSRMT_CYC_L",
+     "D1_SP",
+     "D1_SP_TYPE_L",
      "D1_USAGE",
+     "D1_USG_GRP_L",
+     "D1_VEE_GRP_L",
      "D1_VEE_RULE_L"
     ],
     "trusted_measures": [
@@ -16142,6 +16210,10 @@
     {
      "id": "Rule Code",
      "label": "Rule Code"
+    },
+    {
+     "id": "VEE Group",
+     "label": "VEE Group"
     },
     {
      "id": "VEE Group Code",
@@ -16194,6 +16266,22 @@
     {
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID"
+    },
+    {
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type"
+    },
+    {
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code"
+    },
+    {
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status"
+    },
+    {
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code"
     },
     {
      "id": "Service Point ID",
@@ -16268,8 +16356,16 @@
      "label": "Usage ID"
     },
     {
+     "id": "Usage Group",
+     "label": "Usage Group"
+    },
+    {
      "id": "Usage Group Code",
      "label": "Usage Group Code"
+    },
+    {
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle"
     },
     {
      "id": "Measurement Cycle Code",
@@ -16307,7 +16403,7 @@
      "id": "Exception Type",
      "label": "Exception Type",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -16318,7 +16414,15 @@
      "type": "character varying"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"VEE Group Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "VEE Group",
+     "label": "VEE Group",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"VEE Group\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "VEE Group Code",
      "label": "VEE Group Code",
@@ -16428,6 +16532,38 @@
      "label": "MDM Service Point ID",
      "role": "dimension",
      "type": "character varying"
+    },
+    {
+     "description": "English description of \"MDM Service Point Type Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Type\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Status Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Status\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code",
+     "role": "dimension",
+     "type": "text"
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
@@ -16582,7 +16718,15 @@
      "type": "character varying"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Usage Group Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Usage Group",
+     "label": "Usage Group",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Usage Group\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Usage Group Code",
      "label": "Usage Group Code",
@@ -16590,7 +16734,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measurement Cycle Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code",
@@ -16694,7 +16846,7 @@
   },
   "rpt_field_activity": {
    "data_model": {
-    "columns_traced_to_cisadm": 14,
+    "columns_traced_to_cisadm": 15,
     "domain_table": "rpt_field_activity",
     "driving_table": "D1_ACTIVITY",
     "field_groups": [
@@ -16736,6 +16888,7 @@
        "Activity Comments",
        "Work By Crew",
        "Route Code",
+       "Measurement Cycle",
        "Measurement Cycle Code",
        "Current To Do ID",
        "Priority",
@@ -16826,6 +16979,13 @@
       "on": "",
       "role": "model",
       "table": "stg_ext_lookup_value_label"
+     },
+     {
+      "alias": "mcy",
+      "join_type": "left join",
+      "on": "mcy.msrmt_cyc_cd = f.measurement_cycle_cd",
+      "role": "model",
+      "table": "stg_d1_msrmt_cyc_label"
      }
     ],
     "population_filter": null,
@@ -16837,7 +16997,8 @@
      "D1_ACTIVITY",
      "D1_ACTIVITY_TYPE",
      "D1_ACTIVITY_TYPE_L",
-     "D1_DVC_CFG"
+     "D1_DVC_CFG",
+     "D1_MSRMT_CYC_L"
     ],
     "trusted_measures": []
    },
@@ -16989,6 +17150,10 @@
     {
      "id": "Route Code",
      "label": "Route Code"
+    },
+    {
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle"
     },
     {
      "id": "Measurement Cycle Code",
@@ -17357,7 +17522,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measurement Cycle Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code",
@@ -19699,7 +19872,7 @@
   },
   "rpt_measurement": {
    "data_model": {
-    "columns_traced_to_cisadm": 11,
+    "columns_traced_to_cisadm": 15,
     "domain_table": "rpt_measurement",
     "driving_table": null,
     "field_groups": [
@@ -19715,6 +19888,7 @@
        "Is Estimated Measurement",
        "Is Missing Measurement",
        "Measurement Use Code",
+       "Measuring Component Type",
        "Measuring Component Type Code",
        "Multiplier",
        "Read Sequence",
@@ -19726,6 +19900,10 @@
        "Device Type Code",
        "Service Point ID",
        "MDM Service Point ID",
+       "MDM Service Point Type",
+       "MDM Service Point Type Code",
+       "MDM Service Point Status",
+       "MDM Service Point Status Code",
        "Premise ID",
        "Premise Address",
        "City",
@@ -19739,6 +19917,20 @@
     "grain_description": "One row per measuring component + measurement date/time",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
+     {
+      "alias": "mc",
+      "join_type": "join",
+      "on": "mc.measr_comp_id = m.measr_comp_id",
+      "role": "model",
+      "table": "stg_d1_measuring_component"
+     },
+     {
+      "alias": "ie",
+      "join_type": "join",
+      "on": "",
+      "role": "model",
+      "table": "stg_d1_install_event"
+     },
      {
       "alias": "mc",
       "join_type": "left join",
@@ -19775,16 +19967,23 @@
       "table": "stg_d1_device_type_label"
      },
      {
-      "alias": "inst",
+      "alias": "inf",
       "join_type": "left join",
-      "on": "inst.device_id = cfg.d1_device_id",
-      "role": "model",
-      "table": "int_sp_device"
+      "on": "inf.measr_comp_id = m.measr_comp_id and inf.msrmt_dttm = m.msrmt_dttm and inf.rn = 1",
+      "role": "step",
+      "table": "in_force"
+     },
+     {
+      "alias": "br",
+      "join_type": "left join",
+      "on": "br.d1_sp_id = inf.d1_sp_id",
+      "role": "step",
+      "table": "sp_bridge"
      },
      {
       "alias": "sp",
       "join_type": "left join",
-      "on": "sp.sp_id = inst.sp_id",
+      "on": "sp.sp_id = br.sp_id",
       "role": "model",
       "table": "stg_service_point"
      },
@@ -19794,6 +19993,20 @@
       "on": "pr.prem_id = sp.prem_id",
       "role": "model",
       "table": "dim_premise"
+     },
+     {
+      "alias": "msp",
+      "join_type": "left join",
+      "on": "msp.d1_sp_id = inf.d1_sp_id",
+      "role": "model",
+      "table": "int_mdm_service_point"
+     },
+     {
+      "alias": "mct",
+      "join_type": "left join",
+      "on": "mct.measr_comp_type_cd = mc.measr_comp_type_cd",
+      "role": "model",
+      "table": "stg_d1_measr_comp_type_label"
      }
     ],
     "population_filter": null,
@@ -19804,7 +20017,10 @@
      "CI_SP",
      "D1_DVC_CFG",
      "D1_DVC_TYPE_L",
-     "D1_MEASR_COMP"
+     "D1_MEASR_COMP",
+     "D1_MEASR_COMP_TYPE_L",
+     "D1_SP",
+     "D1_SP_TYPE_L"
     ],
     "trusted_measures": [
      "Measurement Value",
@@ -19854,6 +20070,10 @@
      "label": "Measurement Use Code"
     },
     {
+     "id": "Measuring Component Type",
+     "label": "Measuring Component Type"
+    },
+    {
      "id": "Measuring Component Type Code",
      "label": "Measuring Component Type Code"
     },
@@ -19888,6 +20108,22 @@
     {
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID"
+    },
+    {
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type"
+    },
+    {
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code"
+    },
+    {
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status"
+    },
+    {
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code"
     },
     {
      "id": "Premise ID",
@@ -19988,7 +20224,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measuring Component Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Measuring Component Type",
+     "label": "Measuring Component Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measuring Component Type\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Measuring Component Type Code",
      "label": "Measuring Component Type Code",
@@ -20072,6 +20316,38 @@
      "group": "meter_ops",
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Status Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Status\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code",
      "role": "dimension",
      "type": "text"
     },
@@ -20588,7 +20864,7 @@
   },
   "rpt_pay_plan": {
    "data_model": {
-    "columns_traced_to_cisadm": 7,
+    "columns_traced_to_cisadm": 8,
     "domain_table": "rpt_pay_plan",
     "driving_table": null,
     "field_groups": [
@@ -20617,6 +20893,7 @@
        "Payments Since Plan Start",
        "Paid Total Since Plan Start",
        "Paid vs Elapsed Schedule Variance",
+       "Pay Method",
        "Pay Method Code",
        "Third Party Payor Code",
        "Third Party",
@@ -20671,6 +20948,13 @@
       "on": "pps.field_name='PP_STAT_FLG' and pps.field_value = f.pp_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "pm",
+      "join_type": "left join",
+      "on": "pm.pay_method_cd = f.pay_method_cd",
+      "role": "model",
+      "table": "stg_pay_method_label"
      }
     ],
     "population_filter": null,
@@ -20683,6 +20967,7 @@
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
      "CI_LOOKUP_VAL_L",
+     "CI_PAY_METH_L",
      "CI_PP_TYPE_L"
     ],
     "trusted_measures": [
@@ -20766,6 +21051,10 @@
     {
      "id": "Cancel Reason Code",
      "label": "Cancel Reason Code"
+    },
+    {
+     "id": "Pay Method",
+     "label": "Pay Method"
     },
     {
      "id": "Pay Method Code",
@@ -20998,7 +21287,15 @@
      "type": "numeric"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Pay Method Code\". Group and report on this; filter on the code.",
+     "group": "debt",
+     "id": "Pay Method",
+     "label": "Pay Method",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Pay Method\" for the description: report on the description, filter on the code.",
      "group": "debt",
      "id": "Pay Method Code",
      "label": "Pay Method Code",
@@ -22587,7 +22884,7 @@
   },
   "rpt_premise_sp": {
    "data_model": {
-    "columns_traced_to_cisadm": 41,
+    "columns_traced_to_cisadm": 45,
     "domain_table": "rpt_premise_sp",
     "driving_table": "CI_SP",
     "field_groups": [
@@ -22602,6 +22899,7 @@
        "Meter Read Cycle Code",
        "Meter Read Route Code",
        "Meter Read Route Sequence",
+       "Measurement Cycle",
        "Measurement Cycle Code",
        "Measurement Cycle Route Code",
        "Measurement Cycle Route Sequence",
@@ -22637,6 +22935,10 @@
        "SA Count (Premise)",
        "Billed Segment Count (Premise)",
        "MDM Service Point ID",
+       "MDM Service Point Type",
+       "MDM Service Point Type Code",
+       "MDM Service Point Status",
+       "MDM Service Point Status Code",
        "Device ID",
        "Meter Badge Number",
        "Device Type Code",
@@ -22786,6 +23088,20 @@
       "on": "lvsps.field_name='SP_STATUS_FLG' and lvsps.field_value = sp.sp_status_flg",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "msp",
+      "join_type": "left join",
+      "on": "msp.d1_sp_id = dev.d1_sp_id",
+      "role": "model",
+      "table": "int_mdm_service_point"
+     },
+     {
+      "alias": "mcy",
+      "join_type": "left join",
+      "on": "mcy.msrmt_cyc_cd = d1sp.msrmt_cyc_cd",
+      "role": "model",
+      "table": "stg_d1_msrmt_cyc_label"
      }
     ],
     "population_filter": null,
@@ -22800,7 +23116,9 @@
      "D1_DVC_TYPE_L",
      "D1_MANUFACTURER_L",
      "D1_MODEL_L",
-     "D1_SP"
+     "D1_MSRMT_CYC_L",
+     "D1_SP",
+     "D1_SP_TYPE_L"
     ],
     "trusted_measures": [
      "Service Point Count (Premise)",
@@ -22871,6 +23189,10 @@
     {
      "id": "Meter Read Route Sequence",
      "label": "Meter Read Route Sequence"
+    },
+    {
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle"
     },
     {
      "id": "Measurement Cycle Code",
@@ -22999,6 +23321,22 @@
     {
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID"
+    },
+    {
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type"
+    },
+    {
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code"
+    },
+    {
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status"
+    },
+    {
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code"
     },
     {
      "id": "Device ID",
@@ -23131,7 +23469,15 @@
      "type": "numeric(8,0)"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measurement Cycle Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code",
@@ -23407,6 +23753,38 @@
      "group": "meter_ops",
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Status Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Status\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code",
      "role": "dimension",
      "type": "text"
     },
@@ -24771,7 +25149,7 @@
      "type": "text"
     },
     {
-     "description": "Flag. Filter on it; do not sum it.",
+     "description": "The bill carries a budget-billed segment: its financial transaction posts the budget as the current amount and the actual charges as the payoff (they differ, and the payoff is not zero). Its variance is the budget-vs-actual difference, so the zero-variance gate excludes it. Read from the bill's own money, not the account's budget plan code, which most accounts carry whether or not they are on budget.",
      "group": "finance",
      "id": "Is Budget Billed",
      "label": "Is Budget Billed",
@@ -28073,7 +28451,7 @@
   },
   "rpt_usage_txn": {
    "data_model": {
-    "columns_traced_to_cisadm": 26,
+    "columns_traced_to_cisadm": 39,
     "domain_table": "rpt_usage_txn",
     "driving_table": "D1_USAGE_SCALAR_DTL",
     "field_groups": [
@@ -28081,6 +28459,10 @@
       "fields": [
        "Usage ID",
        "MDM Service Point ID",
+       "MDM Service Point Type",
+       "MDM Service Point Type Code",
+       "MDM Service Point Status",
+       "MDM Service Point Status Code",
        "Sequence Number",
        "Quantity",
        "Final Quantity",
@@ -28103,10 +28485,23 @@
        "Is Used on Bill",
        "Usage Source Code",
        "Usage Subscription ID",
+       "Usage Group",
        "Usage Group Code",
+       "Measurement Cycle",
        "Measurement Cycle Code",
        "Measurement Cycle Route Code",
        "Usage Created Date/Time",
+       "Usage Request ID",
+       "Service Agreement ID",
+       "SA Type",
+       "SA Type Code",
+       "Utility Type",
+       "Account ID",
+       "Main Customer Name",
+       "Customer Class",
+       "Customer Class Code",
+       "Bill Segment ID",
+       "Bill ID",
        "Service Point ID",
        "Premise ID",
        "Premise Address",
@@ -28126,6 +28521,34 @@
       "on": "u.d1_usage_id = r.d1_usage_id",
       "role": "model",
       "table": "stg_d1_usage"
+     },
+     {
+      "alias": "cu",
+      "join_type": "left join",
+      "on": "cu.usage_id = u.usg_ext_id",
+      "role": "model",
+      "table": "stg_c1_usage"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = cu.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "bs",
+      "join_type": "left join",
+      "on": "bs.bseg_id = cu.bseg_id",
+      "role": "model",
+      "table": "dim_bill_segment"
      },
      {
       "alias": "ust",
@@ -28196,20 +28619,50 @@
       "on": "sqi.sqi_cd = r.sqi_cd",
       "role": "model",
       "table": "stg_sqi_label"
+     },
+     {
+      "alias": "msp",
+      "join_type": "left join",
+      "on": "msp.d1_sp_id = r.d1_sp_id",
+      "role": "model",
+      "table": "int_mdm_service_point"
+     },
+     {
+      "alias": "ug",
+      "join_type": "left join",
+      "on": "ug.usg_grp_cd = u.usg_grp_cd",
+      "role": "model",
+      "table": "stg_d1_usage_group_label"
+     },
+     {
+      "alias": "mcy",
+      "join_type": "left join",
+      "on": "mcy.msrmt_cyc_cd = u.msrmt_cyc_cd",
+      "role": "model",
+      "table": "stg_d1_msrmt_cyc_label"
      }
     ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_usage_txn.sql",
     "snapshot_table": "reporting.rpt_usage_txn",
     "source_tables": [
+     "C1_USAGE",
+     "CI_ACCT",
+     "CI_CUST_CL_L",
      "CI_PREM",
+     "CI_SA",
+     "CI_SA_TYPE_L",
      "CI_SP",
      "CI_SQI_L",
      "CI_TOU_L",
      "CI_UOM_L",
      "D1_DVC_CFG",
+     "D1_MSRMT_CYC_L",
+     "D1_SP",
+     "D1_SP_TYPE_L",
      "D1_USAGE",
-     "D1_USAGE_SCALAR_DTL"
+     "D1_USAGE_SCALAR_DTL",
+     "D1_USG_GRP_L"
     ],
     "trusted_measures": [
      "Quantity",
@@ -28242,6 +28695,22 @@
     {
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID"
+    },
+    {
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type"
+    },
+    {
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code"
+    },
+    {
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status"
+    },
+    {
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code"
     },
     {
      "id": "Sequence Number",
@@ -28308,8 +28777,16 @@
      "label": "Usage Subscription ID"
     },
     {
+     "id": "Usage Group",
+     "label": "Usage Group"
+    },
+    {
      "id": "Usage Group Code",
      "label": "Usage Group Code"
+    },
+    {
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle"
     },
     {
      "id": "Measurement Cycle Code",
@@ -28318,6 +28795,50 @@
     {
      "id": "Measurement Cycle Route Code",
      "label": "Measurement Cycle Route Code"
+    },
+    {
+     "id": "Usage Request ID",
+     "label": "Usage Request ID"
+    },
+    {
+     "id": "Service Agreement ID",
+     "label": "Service Agreement ID"
+    },
+    {
+     "id": "SA Type",
+     "label": "SA Type"
+    },
+    {
+     "id": "SA Type Code",
+     "label": "SA Type Code"
+    },
+    {
+     "id": "Utility Type",
+     "label": "Utility Type"
+    },
+    {
+     "id": "Account ID",
+     "label": "Account ID"
+    },
+    {
+     "id": "Main Customer Name",
+     "label": "Main Customer Name"
+    },
+    {
+     "id": "Customer Class",
+     "label": "Customer Class"
+    },
+    {
+     "id": "Customer Class Code",
+     "label": "Customer Class Code"
+    },
+    {
+     "id": "Bill Segment ID",
+     "label": "Bill Segment ID"
+    },
+    {
+     "id": "Bill ID",
+     "label": "Bill ID"
     },
     {
      "id": "Service Point ID",
@@ -28350,6 +28871,38 @@
      "group": "meter_ops",
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Status Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Status\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code",
      "role": "dimension",
      "type": "text"
     },
@@ -28530,7 +29083,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Usage Group Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Usage Group",
+     "label": "Usage Group",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Usage Group\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Usage Group Code",
      "label": "Usage Group Code",
@@ -28538,7 +29099,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measurement Cycle Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code",
@@ -28560,6 +29129,94 @@
      "label": "Usage Created Date/Time",
      "role": "date",
      "type": "timestamp"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "meter_ops",
+     "id": "Usage Request ID",
+     "label": "Usage Request ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "meter_ops",
+     "id": "Service Agreement ID",
+     "label": "Service Agreement ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"SA Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "SA Type",
+     "label": "SA Type",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"SA Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "SA Type Code",
+     "label": "SA Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Which utility this service agreement is for, from C2M's own service type (CI_SA_TYPE.SVC_TYPE_CD). Payment arrangements, deposits, fees and write-offs are service type M and group under Other / Non-Utility. Was previously inferred from the SA type's English description, which read correctly at one client and misfiled sewer and stormwater at the others.",
+     "group": "meter_ops",
+     "id": "Utility Type",
+     "label": "Utility Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "meter_ops",
+     "id": "Account ID",
+     "label": "Account ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "meter_ops",
+     "id": "Main Customer Name",
+     "label": "Main Customer Name",
+     "role": "dimension",
+     "type": "varchar(254)"
+    },
+    {
+     "description": "English description of \"Customer Class Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Customer Class",
+     "label": "Customer Class",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Customer Class\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "Customer Class Code",
+     "label": "Customer Class Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "meter_ops",
+     "id": "Bill Segment ID",
+     "label": "Bill Segment ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "The bill this row was processed on. For revenue attribution on cancellations use \"Owning Bill ID\" where the data set offers it.",
+     "group": "meter_ops",
+     "id": "Bill ID",
+     "label": "Bill ID",
+     "role": "dimension",
+     "type": "text"
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
