@@ -24,8 +24,8 @@ from api import public_errors as pe  # noqa: E402
 class Scrub(unittest.TestCase):
     def test_hosts_addresses_and_connection_strings_are_removed(self):
         cases = {
-            "connection to server at \"10.13.4.91\", port 5432 failed": "10.13.4.91",
-            "DPY-6005: cannot connect to database (CONNECTION_ID=abc). smartcity-db-test-v1-2.originsmartops.com:1521/PTESTDB_ELLENSBURG.testprivatesn.testvcn.oraclevcn.com": "originsmartops",
+            "connection to server at \"10.20.30.40\", port 5432 failed": "10.20.30.40",
+            "DPY-6005: cannot connect to database (CONNECTION_ID=abc). db-test-01.example-utility.net:1521/PDB_SAMPLE.subnet.vcn.example.com": "example-utility",
             "could not connect postgresql://chase:secret@db.internal:5432/originba_v2": "secret",
             "SMTP error from smtp.office365.com:587 (535 auth failed)": "office365",
             "listener refused host=192.168.1.20 port=1521": "192.168.1.20",
