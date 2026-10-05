@@ -1,6 +1,6 @@
 "use client";
 
-import { categoryLabel } from "@/lib/chartLabels";
+import { tickText, categoryLabel } from "@/lib/chartLabels";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   Area,
@@ -248,7 +248,7 @@ export function BuilderChart({
 
   const xTickLabel = (v: string) => {
     const label = ticks.get(String(v))?.title ?? String(v);
-    return label.length > 16 ? `${label.slice(0, 15)}…` : label;
+    return tickText(label, { whole: partial != null && String(v) === partial.bucket });
   };
 
   const grid = <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border-subtle)" />;
