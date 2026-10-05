@@ -22,6 +22,7 @@ from api.data_source_store import (
 )
 from api.demo_db import env_configured, test_oracle_connection
 from api.organizations import is_valid_org_id
+from api.public_errors import public_error
 
 
 logger = logging.getLogger(__name__)
@@ -151,7 +152,7 @@ def save_data_source(
     try:
         test_oracle_connection(config)
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Connection test failed: {exc}") from exc
+        raise HTTPException(status_code=400, detail=public_error("Connection test failed", exc)) from exc
     meta = save_config(config, organization_id=org_id)
     status = public_status(organization_id=org_id, env_configured=env_configured(org_id))
     return {"saved": True, "storage": meta, "status": status}

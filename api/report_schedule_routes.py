@@ -19,6 +19,7 @@ from api.auth.workstream_access import assert_snapshot_access
 from api.ownership import visible
 from api.saved_views import list_saved_views
 from api import report_schedules as rs
+from api.public_errors import public_error
 
 router = APIRouter(prefix="/report-schedules", tags=["report-schedules"])
 
@@ -114,5 +115,5 @@ def run_now(
     try:
         count = rs.deliver(schedule, view, datetime.now(timezone.utc), send_message, trigger="send now")
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=502, detail=f"Delivery failed: {exc}") from exc
+        raise HTTPException(status_code=502, detail=public_error("Delivery failed", exc)) from exc
     return {"status": "sent", "row_count": count, "recipients": schedule["recipients"]}

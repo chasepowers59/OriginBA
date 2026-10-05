@@ -24,6 +24,7 @@ from typing import Any, Callable
 from api.executive_dashboard import EXECUTIVE_KPIS
 from api.notifications import build_message, clean_recipients, send_message
 from api.org_store import OrgRecordStore
+from api.public_errors import scrub
 
 ROOT = Path(__file__).resolve().parent.parent
 ALERTS_PATH = ROOT / "data" / "analytics_portal" / "kpi_alerts.json"
@@ -276,8 +277,8 @@ def run_kpi_alerts(*, now: datetime | None = None,
                 alert["last_status"] = f"ok at {at}"
             _store.update(alert)
         except Exception as exc:  # noqa: BLE001 — one failure never blocks the rest
-            result["status"] = f"error: {exc}"
-            alert["last_status"] = f"error: {exc}"
+            result["status"] = f"error: {scrub(exc)}"
+            alert["last_status"] = f"error: {scrub(exc)}"
             _store.update(alert)
         results.append(result)
     return results

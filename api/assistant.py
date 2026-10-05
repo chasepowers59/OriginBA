@@ -33,6 +33,7 @@ from typing import Any, Callable
 from api.integrity import canvas_summary, for_query
 from api.snapshot_catalog import load_catalog, org_backend
 from api.sql_workspace_validator import SqlWorkspaceValidationError, strip_sql_noise
+from api.public_errors import scrub
 
 KNOWLEDGE = Path(__file__).resolve().parent / "assistant_knowledge"
 DEFAULT_MODEL = "claude-sonnet-5"
@@ -387,7 +388,7 @@ def _checked_view_spec(org_id: str, spec: dict[str, Any], sql_rows: list) -> tup
                                    limit=MAX_ROWS + 1, dialect=dialect, schema=schema)
         _, spec_rows = run_canvas(entry, built, binds, organization_id=org_id, max_rows=MAX_ROWS + 1)
     except Exception as exc:  # noqa: BLE001 -- any refusal just means no save button
-        return None, f"is not a valid view ({str(exc)[:120]})"
+        return None, f"is not a valid view ({scrub(exc)[:120]})"
     if not _same_result(sql_rows, spec_rows):
         return None, "did not reproduce the query's result"
     return {"canvas_id": canvas_id, "canvas_label": entry.get("label") or canvas_id,

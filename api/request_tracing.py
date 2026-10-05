@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from api.public_errors import current_reference
 
 log = logging.getLogger("originba.api")
 _SANE_ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
@@ -80,6 +81,7 @@ def install(app: FastAPI) -> None:
     async def trace(request: Request, call_next):
         given = request.headers.get("X-Request-ID", "")
         rid = given if _SANE_ID.match(given) else uuid.uuid4().hex[:12]
+        current_reference.set(rid)   # api/public_errors.py quotes it in a failure a person sees
         org = request.headers.get("X-Organization-Id") or "-"
         started = time.perf_counter()
         path = _TOKEN_PATH.sub("/embed/<token>", request.url.path)
