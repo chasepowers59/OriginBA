@@ -46,11 +46,21 @@ def _dependency_names(dependant) -> set[str]:
     return names
 
 
+def _endpoints(routes):
+    # FastAPI >= 0.140 keeps an included router as one lazy _IncludedRouter whose effective
+    # candidates carry the prefixed path, methods and dependant; walking only APIRoute saw
+    # /health alone there, and every guard test passed vacuously in CI (2026-10-05).
+    for r in routes:
+        if hasattr(r, "effective_candidates"):
+            yield from _endpoints(r.effective_candidates())
+        elif isinstance(r, APIRoute) or (hasattr(r, "dependant") and hasattr(r, "methods")):
+            yield r
+
+
 def _routes(application=app):
-    for r in application.routes:
-        if isinstance(r, APIRoute):
-            for m in sorted(r.methods - {"HEAD", "OPTIONS"}):
-                yield (m, r.path), r
+    for r in _endpoints(application.routes):
+        for m in sorted(r.methods - {"HEAD", "OPTIONS"}):
+            yield (m, r.path), r
 
 
 def unguarded_routes(application=app) -> list[str]:
@@ -94,6 +104,10 @@ class RouteGuards(unittest.TestCase):
 
         found = unguarded_routes(planted)
         self.assertEqual(len(found), 2, found)
+
+    def test_the_walk_sees_the_whole_route_table(self):
+        # a walk that sees nothing passes every other test here
+        self.assertGreaterEqual(len(list(_routes())), 80)
 
     def test_the_public_list_names_only_real_routes(self):
         real = {key for key, _ in _routes()}
