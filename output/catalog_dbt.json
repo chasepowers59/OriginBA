@@ -3111,7 +3111,7 @@
   },
   "rpt_bill_segment": {
    "data_model": {
-    "columns_traced_to_cisadm": 34,
+    "columns_traced_to_cisadm": 35,
     "domain_table": "rpt_bill_segment",
     "driving_table": null,
     "field_groups": [
@@ -3226,6 +3226,7 @@
        "SA End Date",
        "SA Start Reason Code",
        "SA Stop Reason Code",
+       "Distribution Code Description",
        "Distribution Code"
       ],
       "id": "billing",
@@ -3382,6 +3383,13 @@
       "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = b.bseg_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = sa.distribution_cd",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -3393,6 +3401,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_PREM_TYPE_L",
@@ -3753,6 +3762,10 @@
     {
      "id": "SA Stop Reason Code",
      "label": "SA Stop Reason Code"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -4629,6 +4642,14 @@
      "group": "billing",
      "id": "SA Stop Reason Code",
      "label": "SA Stop Reason Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
      "role": "dimension",
      "type": "text"
     },
@@ -6258,7 +6279,7 @@
   },
   "rpt_billable_charge": {
    "data_model": {
-    "columns_traced_to_cisadm": 40,
+    "columns_traced_to_cisadm": 41,
     "domain_table": "rpt_billable_charge",
     "driving_table": "CI_B_CHG_LINE",
     "field_groups": [
@@ -6274,6 +6295,7 @@
        "Charge Status Code",
        "Is Cancelled",
        "Charge Template Code",
+       "Distribution Code Description",
        "Distribution Code",
        "Is Memo Only",
        "Charge Period Start",
@@ -6369,6 +6391,13 @@
       "on": "bst.field_name='BILL_STAT_FLG' and bst.field_value = bl.bill_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = f.distribution_code",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -6382,6 +6411,7 @@
      "CI_B_CHG_LINE",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_REV_CL_L",
@@ -6447,6 +6477,10 @@
     {
      "id": "Charge Template Code",
      "label": "Charge Template Code"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -6663,6 +6697,14 @@
      "group": "billing",
      "id": "Charge Template Code",
      "label": "Charge Template Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
      "role": "dimension",
      "type": "text"
     },
@@ -7065,7 +7107,7 @@
     "table": "agg_billed_charge_daily"
    },
    "data_model": {
-    "columns_traced_to_cisadm": 53,
+    "columns_traced_to_cisadm": 54,
     "domain_table": "rpt_billed_charge",
     "driving_table": "CI_BSEG_CALC_LN",
     "field_groups": [
@@ -7129,6 +7171,7 @@
        "Rate Schedule Code",
        "Rate Schedule",
        "Calc Rule Code",
+       "Distribution Code Description",
        "Distribution Code",
        "Charge Description",
        "Charge Basis",
@@ -7243,6 +7286,13 @@
       "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = f.bseg_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = f.dst_id",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -7258,6 +7308,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_PREM_TYPE_L",
@@ -7512,6 +7563,10 @@
     {
      "id": "Calc Rule Code",
      "label": "Calc Rule Code"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -8020,6 +8075,14 @@
      "type": "text"
     },
     {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "billing",
      "id": "Distribution Code",
@@ -8267,7 +8330,7 @@
     "table": "agg_billed_usage_daily"
    },
    "data_model": {
-    "columns_traced_to_cisadm": 30,
+    "columns_traced_to_cisadm": 31,
     "domain_table": "rpt_billed_usage",
     "driving_table": "CI_BSEG_SQ",
     "field_groups": [
@@ -8317,6 +8380,7 @@
        "Service Type Code",
        "Revenue Class",
        "Revenue Class Code",
+       "Distribution Code Description",
        "Distribution Code",
        "Premise ID",
        "Premise Address",
@@ -8409,6 +8473,13 @@
       "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = b.bseg_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = sa.distribution_cd",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -8421,6 +8492,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_PREM_TYPE_L",
@@ -8615,6 +8687,10 @@
     {
      "id": "Revenue Class Code",
      "label": "Revenue Class Code"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -9015,6 +9091,14 @@
      "group": "billing",
      "id": "Revenue Class Code",
      "label": "Revenue Class Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
      "role": "dimension",
      "type": "text"
     },
@@ -19208,7 +19292,7 @@
     "table": "agg_gl_daily"
    },
    "data_model": {
-    "columns_traced_to_cisadm": 31,
+    "columns_traced_to_cisadm": 32,
     "domain_table": "rpt_gl",
     "driving_table": null,
     "field_groups": [
@@ -19221,6 +19305,7 @@
        "Is Debit",
        "Statistic Amount",
        "Is Total Amount Line",
+       "Distribution Code Description",
        "Distribution Code",
        "FT Type",
        "FT Type Code",
@@ -19301,6 +19386,13 @@
       "on": "gd.field_name='GL_DISTRIB_STATUS' and gd.field_value = f.gl_distrib_status",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = g.dst_id",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -19311,6 +19403,7 @@
      "CI_BILL_CYC_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_FT",
      "CI_FT_PROC",
      "CI_LOOKUP_VAL_L",
@@ -19367,6 +19460,10 @@
     {
      "id": "Is Total Amount Line",
      "label": "Is Total Amount Line"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -19549,6 +19646,14 @@
      "label": "Is Total Amount Line",
      "role": "dimension",
      "type": "boolean"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "finance",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -24231,7 +24336,7 @@
   },
   "rpt_rate_configuration": {
    "data_model": {
-    "columns_traced_to_cisadm": 24,
+    "columns_traced_to_cisadm": 25,
     "domain_table": "rpt_rate_configuration",
     "driving_table": null,
     "field_groups": [
@@ -24263,6 +24368,7 @@
        "Bill Factor Value Type Code",
        "Bill Factor Varies By Char Type",
        "Bill Factor Allows Proration",
+       "Distribution Code Description",
        "Distribution Code",
        "Nested Calculation Group Code",
        "Has Nested Group",
@@ -24318,6 +24424,13 @@
       "on": "bf.bill_factor_cd = r.bill_factor_cd",
       "role": "model",
       "table": "stg_bill_factor"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = r.distribution_cd",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -24328,6 +24441,7 @@
      "C1_CALC_RULE",
      "C1_CALC_RULE_L",
      "CI_BF",
+     "CI_DST_CODE_L",
      "CI_RS",
      "CI_RS_L"
     ],
@@ -24443,6 +24557,10 @@
     {
      "id": "Bill Factor Allows Proration",
      "label": "Bill Factor Allows Proration"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -24669,6 +24787,14 @@
      "label": "Bill Factor Allows Proration",
      "role": "dimension",
      "type": "boolean"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -26065,7 +26191,7 @@
   },
   "rpt_service_agreement": {
    "data_model": {
-    "columns_traced_to_cisadm": 28,
+    "columns_traced_to_cisadm": 29,
     "domain_table": "rpt_service_agreement",
     "driving_table": "CI_SA",
     "field_groups": [
@@ -26086,6 +26212,7 @@
        "Service Type Code",
        "Revenue Class",
        "Revenue Class Code",
+       "Distribution Code Description",
        "Distribution Code",
        "SA Start Date",
        "SA End Date",
@@ -26099,6 +26226,7 @@
        "Start Reason",
        "Stop Reason",
        "Characteristic Premise ID",
+       "MDM Next Scheduled Read Date",
        "Premise Characteristics",
        "Premise Characteristic Count",
        "Snapshot Date",
@@ -26211,6 +26339,20 @@
       "on": "pch.prem_id = sa.characteristic_prem_id",
       "role": "step",
       "table": "premise_characteristics"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = sa.distribution_cd",
+      "role": "model",
+      "table": "stg_dst_code_label"
+     },
+     {
+      "alias": "nr",
+      "join_type": "left join",
+      "on": "nr.sa_id = sa.sa_id",
+      "role": "step",
+      "table": "next_read"
      }
     ],
     "population_filter": null,
@@ -26222,6 +26364,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_REV_CL_L",
      "CI_SA",
@@ -26264,6 +26407,10 @@
     {
      "id": "SA Renewal Date",
      "label": "SA Renewal Date"
+    },
+    {
+     "id": "MDM Next Scheduled Read Date",
+     "label": "MDM Next Scheduled Read Date"
     },
     {
      "id": "Snapshot Date",
@@ -26340,6 +26487,10 @@
     {
      "id": "Revenue Class Code",
      "label": "Revenue Class Code"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -26560,6 +26711,14 @@
      "type": "text"
     },
     {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "billing",
      "id": "Distribution Code",
@@ -26662,6 +26821,14 @@
      "label": "Characteristic Premise ID",
      "role": "dimension",
      "type": "text"
+    },
+    {
+     "description": "When MDM next expects to read this service agreement's meters: C2M's own C1-NSRD service agreement characteristic (base product, kept by the MDM sync), its current version as of the as-of date. Blank where MDM has not set it.",
+     "group": "billing",
+     "id": "MDM Next Scheduled Read Date",
+     "label": "MDM Next Scheduled Read Date",
+     "role": "date",
+     "type": "date"
     },
     {
      "description": "",
