@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { safeNext } from "@/lib/safeNext";
 import { fetchAuthStatus, login, resolveTenant } from "@/lib/authApi";
 import { storeAccessToken } from "@/lib/auth";
 import { useAuth } from "@/components/AuthProvider";
@@ -63,7 +64,7 @@ export default function LoginPage() {
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
     void storeAccessToken(decodeURIComponent(m[1]), 8 * 60 * 60)
       .then(() => refresh())
-      .then(() => router.replace(searchParams.get("next") || "/"));
+      .then(() => router.replace(safeNext(searchParams.get("next"))));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -79,8 +80,7 @@ export default function LoginPage() {
         router.replace("/change-password");
         return;
       }
-      const next = searchParams.get("next") || "/";
-      router.replace(next);
+      router.replace(safeNext(searchParams.get("next")));
     } catch (err) {
       setError(
         err instanceof Error && err.message

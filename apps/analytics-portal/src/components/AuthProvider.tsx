@@ -15,6 +15,7 @@ import { authDisabled, getAccessToken, hasPermission } from "@/lib/auth";
 import { fetchAuthStatus, fetchCurrentUser, logout as clearAuth } from "@/lib/authApi";
 import { isPublicPath } from "@/lib/publicPaths";
 import { loadSession } from "@/lib/sessionBootstrap";
+import { safeNext } from "@/lib/safeNext";
 
 type AuthContextValue = {
   loading: boolean;
@@ -72,7 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     if (user && !user.must_change_password && pathname === "/login") {
-      router.replace("/");
+      // the same destination the login page chose; "/" here raced it and lost the page asked for
+      router.replace(safeNext(new URLSearchParams(window.location.search).get("next")));
     }
     if (user && !user.must_change_password && pathname === "/change-password") {
       router.replace("/");

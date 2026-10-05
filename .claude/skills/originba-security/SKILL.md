@@ -92,6 +92,10 @@ Evidence: `tests/test_client_admin.py`, and live `scripts/check_tenant_isolation
    under another organization. Any new client-held state (drafts, pins, threads) gets the
    same two halves: a per-org key, and a server that checks the stamp.
 
+5. **A redirect target is checked, never trusted.** `?next=` after sign-in went to whatever it
+   held (an open redirect, 2026-10-05). `lib/safeNext` admits only a same-site path; any new
+   "return to" parameter, in the UI or the API, goes through it or its server-side twin.
+
 ## What the fences must block (test these, not just the happy path)
 
 Postgres: internal schemas qualified AND unqualified (`pg_catalog`, `pg_class`,
