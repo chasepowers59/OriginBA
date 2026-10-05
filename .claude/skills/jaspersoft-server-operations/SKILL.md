@@ -586,3 +586,10 @@ the Origin_DEV set is generated `--target ellensburg --datasource Origin_DEV_DS`
 warnings, every domain answers, SA aged balance through the domain = Oracle to the cent.
 Snapshot first: `jrs_inventory.py snapshot --env test --org Origin_DEV` (the org-scoped `--orgs` form
 failed server-side with "Export failed." that day; the root form worked).
+
+## Standardized Reports moved into Origin BA 2.0 (2026-10-05)
+On Chase's word the whole folder moved on Origin_DEV: `Standard_Offering/Standardized_Reports` ->
+`/SmartCity/Report/Origin_BA_2_0/Standardized_Reports` (`jrs_repository.py --env test --org Origin_DEV
+--confirm Origin_DEV move <folder> /SmartCity/Report/Origin_BA_2_0`). Checked first: no scheduled jobs on
+any of the seven units and nothing else on the org referencing their paths. All seven ran as PDF from the new
+folder. `generate_sql_report_pack.py` FOLDER now deploys there. Client orgs were not touched.

@@ -1,6 +1,9 @@
 # Standardized Reports: the catalog and the build rules (2026-09-25)
 
-Chase's brief: one `Standard_Offering/Standardized_Reports` folder a client schedules from; every
+**Moved 2026-10-05:** the folder is now `/SmartCity/Report/Origin_BA_2_0/Standardized_Reports` on Origin_DEV, part of the
+Origin BA 2.0 release beside the generated domains (`Origin_BA_2_0/Domains`). All seven units ran from there.
+
+Chase's brief: one `Standard_Offering/Standardized_Reports` folder a client schedules from (now `Origin_BA_2_0/Standardized_Reports`); every
 report easy to read, with an as-of date or window and the input controls that let a client SAVE a
 filtered copy as their own report (JasperServer's "save as" on a report with controls); summary
 totals with detail rows underneath; built from what clients already use (the legacy `SC_*` list
