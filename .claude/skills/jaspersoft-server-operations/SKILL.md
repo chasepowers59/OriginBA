@@ -587,6 +587,14 @@ warnings, every domain answers, SA aged balance through the domain = Oracle to t
 Snapshot first: `jrs_inventory.py snapshot --env test --org Origin_DEV` (the org-scoped `--orgs` form
 failed server-side with "Export failed." that day; the root form worked).
 
+**Then prove it**: `ORIGINBA_ENV_FILE=<.env> scripts/jaspersoft/jrs_validate_domain_set.py --env test --org Origin_DEV
+--set-dir <set> --client ellensburg` checks every domain three ways, read-only: the server's fields equal the
+generated XML (none missing, extra or relabelled, same folders); CountAll on the GRAIN KEY equals count(*) on the
+canvas's BI view in the warehouse (CountAll skips blanks, so counting any other field under-counts: the Exception
+domain's first field read 9,918 against 2,646,723 rows); every field executes, 40 per query. Phase 2 re-import
+(45 domains, 2,073 fields): 45/45 match and count, 0 failing fields. Note the multiLevelQuery aggregation result is
+`dataset.rows[0][0]`, and an extended domain's data island is a join tree (`JOINTREE_1`), not the view.
+
 ## Standardized Reports moved into Origin BA 2.0 (2026-10-05)
 On Chase's word the whole folder moved on Origin_DEV: `Standard_Offering/Standardized_Reports` ->
 `/SmartCity/Report/Origin_BA_2_0/Standardized_Reports` (`jrs_repository.py --env test --org Origin_DEV
