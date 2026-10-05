@@ -32,6 +32,7 @@ from api.warehouse_db import execute_query as execute_warehouse_query
 from api.warehouse_db import warehouse_configured
 from api.row_security import require_unrestricted
 from api.public_errors import public_error
+from api.request_limits import limited
 
 
 router = APIRouter(prefix="/database", tags=["database"])
@@ -275,7 +276,7 @@ def list_tables(
     }
 
 
-@router.post("/sql/execute")
+@router.post("/sql/execute", dependencies=[Depends(limited("sql_execute", 30))])
 def execute_sql(
     body: SqlExecuteRequest,
     ctx: AuthContext = Depends(require_permission("database:sql")),
@@ -352,7 +353,7 @@ def execute_sql(
     }
 
 
-@router.post("/sql/count")
+@router.post("/sql/count", dependencies=[Depends(limited("sql_count", 60))])
 def count_sql(
     body: SqlExecuteRequest,
     ctx: AuthContext = Depends(require_permission("database:sql")),

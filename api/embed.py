@@ -27,6 +27,7 @@ from api.row_security import RowAccessDenied, creator_can_read, creator_rules, r
 from api.saved_views import list_saved_views
 from api.data_version import data_version
 from api.summary_cache import cached
+from api.request_limits import client_address, limited
 
 router = APIRouter(tags=["embed"])
 
@@ -92,7 +93,7 @@ def _claims(token: str) -> dict[str, Any]:
     return claims
 
 
-@router.get("/embed/{token}/data")
+@router.get("/embed/{token}/data", dependencies=[Depends(limited("embed_data", 120, key=client_address))])
 def embed_data(token: str) -> dict[str, Any]:
     from api.query_builder import build_query
     from api.snapshot_catalog import allowed_fields, boolean_fields, get_snapshot, snapshot_backend

@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, model_validator
 from api.auth.dependencies import AuthContext, get_auth_context
 from api.portal_config import pdf_logo_path
 from api.report_schedules import rows_to_pdf, sections_to_pdf
+from api.request_limits import limited
 
 router = APIRouter(prefix="/portal/export", tags=["export"])
 
@@ -33,7 +34,7 @@ class PdfExportRequest(BaseModel):
     chart: bool = True
 
 
-@router.post("/pdf")
+@router.post("/pdf", dependencies=[Depends(limited("pdf_export", 10))])
 def export_pdf(body: PdfExportRequest, ctx: AuthContext = Depends(get_auth_context)) -> Response:
     ctx.require_permission("portal:read")
     now = datetime.now(timezone.utc)
@@ -70,7 +71,7 @@ def _pdf_response(title: str, data: bytes, now: datetime) -> Response:
                     headers={"Content-Disposition": f'attachment; filename="{name}_{now:%Y-%m-%d}.pdf"'})
 
 
-@router.post("/dashboard-pdf")
+@router.post("/dashboard-pdf", dependencies=[Depends(limited("pdf_export", 10))])
 def export_dashboard_pdf(body: DashboardPdfRequest, ctx: AuthContext = Depends(get_auth_context)) -> Response:
     ctx.require_permission("portal:read")
     now = datetime.now(timezone.utc)

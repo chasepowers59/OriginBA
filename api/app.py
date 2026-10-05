@@ -31,6 +31,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.auth import auth_router, init_auth_database
 from api.security import is_development
 from api.request_tracing import install as install_request_tracing
+from api.request_limits import BodySizeLimit
 from api.snapshot_explorer import router as snapshot_router
 from api.portal_routes import router as portal_router
 from api.data_source_routes import router as data_source_router
@@ -89,6 +90,10 @@ def _cors_origins() -> list[str]:
         origins.append(origin)
     return origins
 
+
+# Innermost: an oversized body is refused before any route parses it, and the refusal still
+# passes through tracing, the security headers and CORS on its way out.
+app.add_middleware(BodySizeLimit)
 
 # Installed BEFORE CORS: the middleware added last runs outermost, so CORS wraps this one
 # and a 500 answered here still carries CORS headers (else the browser shows a CORS error).

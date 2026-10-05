@@ -18,6 +18,7 @@ from api.assistant import (Assistant, assistant_configured, model_name, question
 from api.auth.dependencies import AuthContext, get_auth_context
 from api.org_db import require_org_for_data
 from api.row_security import require_unrestricted
+from api.request_limits import limited
 
 router = APIRouter(prefix="/portal/assistant", tags=["assistant"])
 
@@ -76,7 +77,7 @@ def scoped_thread(thread: list[dict[str, Any]], stamped: str | None, org_id: str
     return thread if thread and stamped == org_id else []
 
 
-@router.post("")
+@router.post("", dependencies=[Depends(limited("ori", 20))])
 def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[str, Any]:
     assistant = _assistant_for(ctx)
     org_id = require_org_for_data(ctx)
@@ -90,7 +91,7 @@ def ask(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> dict[
         raise
 
 
-@router.post("/stream")
+@router.post("/stream", dependencies=[Depends(limited("ori", 20))])
 def ask_streaming(body: AskRequest, ctx: AuthContext = Depends(get_auth_context)) -> StreamingResponse:
     """The same question as POST, as server-sent events: a `step` and `step_done` per tool
     call while the model works, then one `answer` (the POST body) or one `error`."""
