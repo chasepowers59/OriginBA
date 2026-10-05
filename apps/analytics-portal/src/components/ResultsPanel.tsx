@@ -20,7 +20,7 @@ import {
   prettifyFieldName,
 } from "@/lib/businessLabels";
 import { BuilderChart } from "./builder/BuilderChart";
-import { downloadWorkbook } from "@/lib/exportXlsx";
+import { ABOUT_SHEET, downloadWorkbook } from "@/lib/exportXlsx";
 import { printCouncilPack } from "@/lib/councilPack";
 import { useBrand } from "@/components/PortalThemeProvider";
 import { AppliedWindowNote } from "@/components/AppliedWindowNote";
@@ -206,7 +206,7 @@ export function ResultsPanel({
     downloadWorkbook(
       [{ name: reportTitle ?? snapshotLabel ?? snapshotId, columns: friendlyHeaders, rows: labeledRows },
        // what the rows are: report, filters, and whether the list is cut (lib/exportAbout)
-       { name: "About this export", columns: ["Field", "Value"], rows: exportAbout(exportContext()) }],
+       { name: ABOUT_SHEET, columns: ["Field", "Value"], rows: exportAbout(exportContext()) }],
       `${snapshotId}_analysis.xlsx`,
     );
   };

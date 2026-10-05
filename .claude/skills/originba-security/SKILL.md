@@ -106,7 +106,13 @@ Evidence: `tests/test_client_admin.py`, and live `scripts/check_tenant_isolation
    secret-shaped keys; never assert on a value that could be a credential in a way that prints it.
 9. **A password change retires the tokens before it** (`password_fingerprint` in every token,
    checked per request). Any new way of issuing a token passes `pwv=`; the test checks every issuer.
-10. **The open production items are listed** at the end of `docs/SECURITY_AUDIT_2026-09-01.md`
+10. **Sign-out and links end on the server.** A token's `jti` in `portal_revoked_tokens` never opens a
+   session; an embed link serves only while its record in `embed_links` stands, and is signed with
+   `embed_key()`, never the session secret. A new kind of token gets an id and a way to withdraw it.
+11. **Expensive routes carry a limit, and audit rows carry no values.** A new route that queries the
+   warehouse or calls the model adds `Depends(limited(...))` and joins the list in
+   `tests/test_request_limits.py`; SQL goes into the audit trail only through `sql_for_audit`.
+12. **The open production items are listed** at the end of `docs/SECURITY_AUDIT_2026-09-01.md`
    ("Remaining, in order of risk"). Read them before claiming the portal production-ready.
 
 ## What the fences must block (test these, not just the happy path)

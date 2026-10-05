@@ -41,6 +41,12 @@ def _route(request: Request) -> str:
     return f"{request.method} {getattr(matched, 'path', None) or '(no such route)'}"
 
 
+def _served(request: Request) -> str:
+    """The organization the request was served for (set by get_auth_context); "-" when it
+    never signed in, such as a refused or public request."""
+    return getattr(request.state, "served_organization", None) or "-"
+
+
 def _record(request: Request, rid: str, status: int, ms: int, org: str, error: str | None = None) -> None:
     route = _route(request)
     when = datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -82,18 +88,19 @@ def install(app: FastAPI) -> None:
         given = request.headers.get("X-Request-ID", "")
         rid = given if _SANE_ID.match(given) else uuid.uuid4().hex[:12]
         current_reference.set(rid)   # api/public_errors.py quotes it in a failure a person sees
-        org = request.headers.get("X-Organization-Id") or "-"
         started = time.perf_counter()
         path = _TOKEN_PATH.sub("/embed/<token>", request.url.path)
         try:
             response = await call_next(request)
         except Exception as exc:  # noqa: BLE001 -- the one place an unhandled error is caught
+            org = _served(request)
             ms = int((time.perf_counter() - started) * 1000)
             log.exception("rid=%s %s %s 500 %dms org=%s", rid, request.method, path, ms, org)
             _record(request, rid, 500, ms, org, f"{type(exc).__name__}: {str(exc)[:300]}")
             response = JSONResponse(status_code=500, content={
                 "detail": f"Something went wrong on the server. Reference: {rid}"})
         else:
+            org = _served(request)
             ms = int((time.perf_counter() - started) * 1000)
             log.info("rid=%s %s %s %d %dms org=%s", rid, request.method, path, response.status_code, ms, org)
             _record(request, rid, response.status_code, ms, org)

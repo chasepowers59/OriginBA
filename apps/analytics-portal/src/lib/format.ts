@@ -1,3 +1,5 @@
+import { noteExport } from "./exportAudit";
+
 /**
  * UI-16 (issues log, Decisions): ONE format set, used everywhere. The locale is fixed
  * because the decision fixes the format -- "Sep 1, 2026", "$1,234.56" -- not the browser.
@@ -330,6 +332,7 @@ export function toCsv(columns: string[], rows: Record<string, unknown>[]): strin
 export function exportRowsCsv(columns: string[], rows: Record<string, unknown>[], filename: string) {
   // A byte-order mark so Excel reads the file as UTF-8 (names with accents stay intact).
   saveBlob(new Blob(["\ufeff" + toCsv(columns, rows)], { type: "text/csv;charset=utf-8;" }), filename);
+  noteExport("csv", filename, rows.length);
 }
 
 /** Hand a file built in the browser (or fetched) to the reader as a download. */

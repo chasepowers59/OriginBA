@@ -34,6 +34,7 @@ from api.summary_cache import cached
 from api.row_security import enforce as enforce_row_rules, readable, require_unrestricted, row_filters
 from api.workstream_dashboard import build_workstream_about, build_workstream_summary
 from api.public_errors import public_error
+from api.request_limits import limited
 from api.snapshot_catalog import (CatalogError, allowed_fields, boolean_fields, get_snapshot,
                                   list_snapshots, list_workstreams,
                                   load_catalog, snapshot_backend)
@@ -707,7 +708,7 @@ def _result_labels(snapshot: dict, columns: list[str], dimensions: list[str],
     return {c: labels.get(c, field_labels.get(c, c)) for c in columns}
 
 
-@router.post("/{snapshot_id}/raw-sql")
+@router.post("/{snapshot_id}/raw-sql", dependencies=[Depends(limited("raw_sql", 30))])
 def snapshot_raw_sql(
     snapshot_id: str,
     body: RawSqlRequest,
@@ -733,11 +734,11 @@ def snapshot_raw_sql(
         {columns[i]: _serialize_value(row[i]) for i in range(len(columns))}
         for row in rows
     ]
-    from api.access_audit import record_access_event
+    from api.access_audit import record_access_event, sql_for_audit
     record_access_event(
         actor_email=ctx.email, actor_id=ctx.id, action="raw_sql_run",
         target_type="snapshot", target_id=snapshot_id,
-        detail=f"rows={len(serialized_rows)}; sql: {body.sql[:300]}")
+        detail=f"rows={len(serialized_rows)}; sql: {sql_for_audit(body.sql)}")
     return {
         "client": org_id,
         "organization_id": org_id,
@@ -801,7 +802,7 @@ def cached_query(org_id: str, snapshot: dict[str, Any], body: QueryRequest,
                   run, keep=lambda _: True, version=data_version(org_id))
 
 
-@router.post("/{snapshot_id}/query")
+@router.post("/{snapshot_id}/query", dependencies=[Depends(limited("explorer_query", 300))])
 def snapshot_query(
     snapshot_id: str,
     body: QueryRequest,

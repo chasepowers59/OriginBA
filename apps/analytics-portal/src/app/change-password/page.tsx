@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { PASSWORD_MIN_LENGTH } from "@/lib/auth";
 import { changePassword } from "@/lib/authApi";
 import { DEFAULT_BRAND } from "@/lib/brand";
 
@@ -68,9 +69,13 @@ export default function ChangePasswordPage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className="input-modern mt-1"
-              minLength={8}
+              minLength={PASSWORD_MIN_LENGTH}
+              aria-describedby="password-rule"
               required
             />
+            <span id="password-rule" className="mt-1 block text-xs portal-text-subtle">
+              At least {PASSWORD_MIN_LENGTH} characters, not your email address. A few unrelated words work well.
+            </span>
           </label>
           <label className="block text-sm portal-text-muted">
             Confirm new password
@@ -80,7 +85,7 @@ export default function ChangePasswordPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="input-modern mt-1"
-              minLength={8}
+              minLength={PASSWORD_MIN_LENGTH}
               required
             />
           </label>

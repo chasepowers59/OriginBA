@@ -6,10 +6,11 @@ from dataclasses import dataclass, replace
 from typing import Annotated, Callable
 
 import jwt
-from fastapi import Depends, Header, HTTPException
+from fastapi import Request, Depends, Header, HTTPException
 
 from api.auth.config import auth_disabled
 from api.auth.database import get_session_factory
+from api.auth.models import RevokedToken
 from api.auth.permissions import role_at_least
 from api.auth.security import token_password_current, decode_access_token
 from api.auth.service import get_user, user_to_public, workstreams_allowed
@@ -157,6 +158,8 @@ def _resolve_auth_context(
             raise HTTPException(status_code=401, detail="User inactive or not found")
         if not token_password_current(payload, user.password_hash):
             raise HTTPException(status_code=401, detail="Your password was changed. Sign in again.")
+        if payload.get("jti") and session.get(RevokedToken, payload["jti"]):
+            raise HTTPException(status_code=401, detail="You signed out of this session. Sign in again.")
         public = user_to_public(user)
 
     if public["must_change_password"] and not allow_password_change_pending:
@@ -180,14 +183,19 @@ def _resolve_auth_context(
 
 
 def get_auth_context(
+    request: Request,
     authorization: str | None = Header(None),
     x_organization_id: str | None = Header(None),
 ) -> AuthContext:
-    return _resolve_auth_context(
+    ctx = _resolve_auth_context(
         authorization,
         allow_password_change_pending=False,
         active_organization=x_organization_id,
     )
+    # the request log names the client actually served, not the header as sent
+    # (api/request_tracing.py), which a non-admin may forge and is then ignored
+    request.state.served_organization = ctx.effective_organization_id()
+    return ctx
 
 
 def get_session_auth_context(authorization: str | None = Header(None)) -> AuthContext:

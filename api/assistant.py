@@ -323,14 +323,14 @@ def tool_search_knowledge(org_id: str, query: str, limit: int = 8) -> list[dict[
 
 def tool_run_sql(org_id: str, engine: str, sql: str, *, actor_email: str, actor_id: str | None,
                  purpose: str, view_spec: dict[str, Any] | None = None) -> dict[str, Any]:
-    from api.access_audit import record_access_event
+    from api.access_audit import record_access_event, sql_for_audit
     from api.database_routes import _run, _validate
     try:
         validated = _validate(engine, sql)
         enforce_canvases_only(validated)
     except SqlWorkspaceValidationError as exc:
         record_access_event(actor_email=actor_email, actor_id=actor_id, action="assistant_sql_refused",
-                            target_type="sql", target_id=org_id, detail=f"{exc} | sql: {sql[:300]}")
+                            target_type="sql", target_id=org_id, detail=f"{exc} | sql: {sql_for_audit(sql)}")
         return {"error": str(exc)}
     started = time.perf_counter()
     try:
@@ -338,14 +338,14 @@ def tool_run_sql(org_id: str, engine: str, sql: str, *, actor_email: str, actor_
     except Exception as exc:   # the database's own error (ORA-00935 and the like) is the model's to fix
         message = str(exc).split("\nHelp:")[0][:400]
         record_access_event(actor_email=actor_email, actor_id=actor_id, action="assistant_sql_failed",
-                            target_type="sql", target_id=org_id, detail=f"{message} | sql: {validated[:300]}")
+                            target_type="sql", target_id=org_id, detail=f"{message} | sql: {sql_for_audit(validated)}")
         return {"error": f"The database rejected the statement: {message}. Fix the SQL and run it again."}
     truncated = len(rows) > MAX_ROWS
     rows = rows[:MAX_ROWS]
     ms = int((time.perf_counter() - started) * 1000)
     record_access_event(actor_email=actor_email, actor_id=actor_id, action="assistant_sql",
                         target_type="sql", target_id=org_id,
-                        detail=f"rows={len(rows)}; ms={ms}; purpose: {purpose[:120]}; sql: {validated[:300]}")
+                        detail=f"rows={len(rows)}; ms={ms}; purpose: {purpose[:120]}; sql: {sql_for_audit(validated)}")
     out: dict[str, Any] = {"columns": columns, "rows": [[_cell(v) for v in r] for r in rows],
                            "row_count": len(rows), "truncated": truncated, "ms": ms, "sql": validated,
                            "integrity": for_query(org_id, validated)}

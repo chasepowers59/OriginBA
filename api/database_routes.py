@@ -32,6 +32,7 @@ from api.warehouse_db import execute_query as execute_warehouse_query
 from api.warehouse_db import warehouse_configured
 from api.row_security import require_unrestricted
 from api.public_errors import public_error
+from api.request_limits import limited
 
 
 router = APIRouter(prefix="/database", tags=["database"])
@@ -275,7 +276,7 @@ def list_tables(
     }
 
 
-@router.post("/sql/execute")
+@router.post("/sql/execute", dependencies=[Depends(limited("sql_execute", 30))])
 def execute_sql(
     body: SqlExecuteRequest,
     ctx: AuthContext = Depends(require_permission("database:sql")),
@@ -293,11 +294,11 @@ def execute_sql(
     try:
         validated = _validate(engine, body.sql)
     except SqlWorkspaceValidationError as exc:
-        from api.access_audit import record_access_event
+        from api.access_audit import record_access_event, sql_for_audit
         record_access_event(
             actor_email=ctx.email, actor_id=ctx.id, action="sql_refused",
             target_type="sql", target_id=org_id,
-            detail=f"{exc} | sql: {body.sql[:300]}")
+            detail=f"{exc} | sql: {sql_for_audit(body.sql)}")
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     page_size = max(1, min(body.page_size, MAX_PAGE_SIZE))
@@ -330,11 +331,11 @@ def execute_sql(
 
     fetched_total = body.offset + len(page_rows)
 
-    from api.access_audit import record_access_event
+    from api.access_audit import record_access_event, sql_for_audit
     record_access_event(
         actor_email=ctx.email, actor_id=ctx.id, action="sql_execute",
         target_type="sql", target_id=org_id,
-        detail=f"rows={len(serialized)}; ms={elapsed_ms}; sql: {validated[:300]}")
+        detail=f"rows={len(serialized)}; ms={elapsed_ms}; sql: {sql_for_audit(validated)}")
 
     return {
         "organization_id": org_id,
@@ -352,7 +353,7 @@ def execute_sql(
     }
 
 
-@router.post("/sql/count")
+@router.post("/sql/count", dependencies=[Depends(limited("sql_count", 60))])
 def count_sql(
     body: SqlExecuteRequest,
     ctx: AuthContext = Depends(require_permission("database:sql")),

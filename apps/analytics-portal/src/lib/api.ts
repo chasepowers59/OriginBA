@@ -605,8 +605,19 @@ export async function fetchEmbed(token: string): Promise<EmbedData> {
 }
 
 /** A signed link that embeds one organization-visible saved view (owner or admin). */
-export function createEmbedToken(viewId: string, ttlMinutes = 24 * 60): Promise<{ token: string; expires_at: string }> {
+export function createEmbedToken(viewId: string, ttlMinutes = 24 * 60): Promise<{ token: string; id: string; expires_at: string }> {
   return fetchJson("/portal/embed-tokens", { method: "POST", body: JSON.stringify({ view_id: viewId, ttl_minutes: ttlMinutes }) });
+}
+
+/** A shared link as its owner sees it: who made it and until when, never the link itself. */
+export type EmbedLinkRecord = { id: string; created_by: string; created_at: string; expires_at: string; revoked_at: string | null };
+
+export function listEmbedLinks(viewId: string): Promise<{ links: EmbedLinkRecord[] }> {
+  return fetchJson(`/portal/embed-tokens?view_id=${encodeURIComponent(viewId)}`);
+}
+
+export function turnOffEmbedLink(linkId: string): Promise<{ id: string; turned_off: boolean }> {
+  return fetchJson(`/portal/embed-tokens/${encodeURIComponent(linkId)}`, { method: "DELETE" });
 }
 
 export function askAssistant(

@@ -81,10 +81,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [loading, enabled, user, pathname, router]);
 
+  // the server retires the session before the browser forgets it, so /login never sees a
+  // half-cleared token and sends the visitor back to Home
   const logout = useCallback(() => {
-    clearAuth();
-    setUser(null);
-    router.replace("/login");
+    void clearAuth().finally(() => {
+      setUser(null);
+      router.replace("/login");
+    });
   }, [router]);
 
   const value = useMemo<AuthContextValue>(

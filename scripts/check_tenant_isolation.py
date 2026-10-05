@@ -247,6 +247,16 @@ def main() -> int:
         check(call("POST", "/portal/embed-tokens", ce, {"view_id": vid}, org=HOME)[0] in (403, 404),
               "CityCorp cannot make an embed link to the Ellensburg view")
         check(call("POST", "/portal/embed-tokens", cu, {"view_id": vid})[0] == 403, "a CityCorp user cannot make embed links")
+        status, link = call("POST", "/portal/embed-tokens", e, {"view_id": vid, "ttl_minutes": 60})
+        check(status == 200 and link.get("id"), "an Ellensburg editor shares the view by embed link")
+        lid, ltoken = link.get("id"), link.get("token", "")
+        check(call("GET", f"/portal/embed-tokens?view_id={vid}", ce, org=HOME)[0] in (403, 404),
+              "CityCorp cannot list the Ellensburg view's links, header forged")
+        check(call("DELETE", f"/portal/embed-tokens/{lid}", ce, org=HOME)[0] in (403, 404),
+              "CityCorp cannot turn off the Ellensburg link, header forged")
+        check(call("GET", f"/embed/{ltoken}/data", None)[0] != 401, "the link still works afterwards")
+        check(call("DELETE", f"/portal/embed-tokens/{lid}", e)[0] == 200, "its owner turns it off")
+        check(call("GET", f"/embed/{ltoken}/data", None)[0] == 401, "and then it no longer opens")
         # letters and admin surfaces
         status, runs = call("GET", "/portal/letters/runs", ce, org=HOME)
         check(status in (200, 403) and runs.get("organization_id", THIRD) == THIRD,
@@ -273,6 +283,12 @@ def main() -> int:
         check(status == 200 and bool(changed.get("access_token")), "a password change returns a fresh token")
         check(call("GET", "/auth/me", stale)[0] == 401, "the token from before the change no longer opens a session")
         check(call("GET", "/auth/me", changed.get("access_token"))[0] == 200, "the fresh token does")
+        fresh = changed.get("access_token")
+        check(call("POST", "/auth/logout", fresh)[0] == 200, "signing out is accepted")
+        check(call("GET", "/auth/me", fresh)[0] == 401, "a signed-out token no longer opens a session")
+        status, weak = call("POST", "/auth/users", admin, {"email": "weak@isolation.test", "display_name": "weak one",
+                                                           "password": "password1234", "role": "user", "organization_id": THIRD})
+        check(status == 400, "a common password is refused for a new account")
         status, _ = call("POST", "/auth/login", body={"email": "nobody@isolation.test", "password": "wrong-password-1"})
         check(status == 401, "an unknown email is refused like a wrong password")
         _, trail = call("GET", "/auth/audit-log", admin)

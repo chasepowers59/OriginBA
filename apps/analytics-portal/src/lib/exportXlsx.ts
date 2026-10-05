@@ -1,5 +1,9 @@
 import * as XLSX from "xlsx";
+import { noteExport } from "./exportAudit";
 import { formatBoolean, saveBlob } from "./format";
+
+/** The sheet that describes an export (lib/exportAbout), not part of its rows. */
+export const ABOUT_SHEET = "About this export";
 
 export type WorkbookSection = {
   name: string;
@@ -55,5 +59,8 @@ export function downloadWorkbook(sections: WorkbookSection[], filename: string):
   const blob = new Blob([buf], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
-  saveBlob(blob, filename.endsWith(".xlsx") ? filename : `${filename}.xlsx`);
+  const name = filename.endsWith(".xlsx") ? filename : `${filename}.xlsx`;
+  saveBlob(blob, name);
+  // the rows that left, not the "About this export" sheet describing them
+  noteExport("xlsx", name, sections.filter((s) => s.name !== ABOUT_SHEET).reduce((n, s) => n + s.rows.length, 0));
 }

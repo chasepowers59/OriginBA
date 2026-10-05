@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from api.auth.models import AccessGroup, AuditLog, User, UserAccessGroup
 from api.auth.permissions import ROLES, can_assign_role, permissions_for_role
-from api.auth.security import dummy_password_check, hash_password, verify_password
+from api.auth.security import dummy_password_check, hash_password, needs_rehash, verify_password
 from api.organizations import get_organization, is_valid_org_id
 from api.portal_config import load_portal_config
 from api.row_security import clean_rules
@@ -177,6 +177,8 @@ def authenticate_user(session: Session, email: str, password: str) -> User:
         raise AuthError("Invalid email or password")
     if not verify_password(password, user.password_hash):
         raise AuthError("Invalid email or password")
+    if needs_rehash(user.password_hash):
+        user.password_hash = hash_password(password)
     user.last_login_at = datetime.now(timezone.utc)
     session.add(user)
     return user
