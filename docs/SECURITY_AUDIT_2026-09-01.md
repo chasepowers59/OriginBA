@@ -269,11 +269,23 @@ the portal with sign-in ON as a reader and an editor. Branch `portal/round-10`.
 
 ### Remaining, in order of risk (not done in this round, with the reason)
 
-1. **Login rate limit is per process and keyed on the proxy's address.** Needs a shared store (the state Postgres) and the deployment's trusted-proxy setting (`--forwarded-allow-ips`), both deployment decisions.
-2. **No `script-src` CSP.** A nonce-based policy needs the color-mode inline script and Next's own scripts nonced; worth doing deliberately with a full regression, not inside this round.
+Items 4 to 8 of the original list were closed on 2026-10-05 in round 11 (next section). Still open:
+
+1. **Login and route rate limits are per process and keyed on the proxy's address.** Needs a shared store (the state Postgres) and the deployment's trusted-proxy setting (`--forwarded-allow-ips`), both deployment decisions.
+2. **No `script-src` CSP.** A nonce-based policy needs the color-mode inline script and Next's own scripts nonced; worth doing deliberately with a full regression, not inside a round.
 3. **Session token in sessionStorage** (readable by script) alongside the HttpOnly copy. Moving the browser to cookie-only auth changes every request path.
-4. **Logout does not revoke a token server-side** (a password change now does). Needs a revocation list or a per-user session version column (no migration mechanism yet, M4).
-5. **Embed links cannot be revoked one by one and share the session secret.** Needs a `jti` list and a separate key.
-6. **Password policy:** minimum 8, no breached-password check, PBKDF2 at 260k (OWASP: 600k). Raising the floor affects existing users at their next change.
-7. **No body-size cap** on content-pack import; **no audit of exports**; audit rows keep up to 300 characters of SQL, which can include customer literals; the request log's organization is the raw header, not the resolved one.
-8. **No rate limits** on the SQL workspace, queries, exports and the public embed data route; Ori's spend caps are opt-in.
+4. **No breached-password check** (the policy refuses a short list of common passwords offline); Ori's spend caps are opt-in.
+
+## Round 11 — 2026-10-05: the ledger items that needed no deployment decision
+
+| Was | Now | Proof |
+| --- | --- | --- |
+| Sign-out cleared only the browser; a copied token kept the session until it expired | Tokens carry an id; `POST /auth/logout` records it (`portal_revoked_tokens`, pruned at expiry) and it never opens a session again. Other sessions continue. The app calls it before clearing the browser | `tests/test_sessions_and_passwords.py`, `src/lib/logout.test.ts`, harness; live: the old token answers "You signed out of this session" |
+| New passwords needed 8 characters; PBKDF2 at 260k | 12 characters, not the email, not a common one, wherever a password is SET (change, admin create, admin reset); 600k iterations, older hashes upgraded at sign-in | `tests/test_sessions_and_passwords.py`, harness |
+| Embed links could not be withdrawn and were signed with the session secret | `embed_key()` (own secret or derived, never the session one); every link recorded per organization and served only while its record stands; the owner or an admin lists and turns off links in the embed dialog | `tests/test_embed.py`, harness (CityCorp cannot list or turn off an Ellensburg link, header forged); live |
+| No request size cap | `BodySizeLimit` 2 MB (`PORTAL_MAX_BODY_BYTES`), declared or chunked, 413 before any route runs | `tests/test_request_limits.py` |
+| No rate limits on the SQL workspace, explorer queries, Ori, PDF exports, the public embed route | Per-person sliding windows (per address on the embed route), 429 with a sentence and Retry-After; a test fails if one of those routes loses its limit | `tests/test_request_limits.py` |
+| Exports were not audited | PDFs recorded by the API; CSV and Excel reported by the browser's download helpers; action `export` under the organization being viewed | `tests/test_export_audit.py`; live |
+| Audit rows kept SQL literals (customer names, account numbers) | `sql_for_audit` keeps the statement's shape, values as ? | `tests/test_audit_hygiene.py` |
+| The request log's org= was the header as sent | The organization actually served | `tests/test_audit_hygiene.py` |
+| The route-guard test saw only /health under FastAPI 0.140+ (lazy included routers), so it passed without checking | The walk follows included routers on both versions; a floor test stops an empty walk passing | `tests/test_route_guards.py` |
