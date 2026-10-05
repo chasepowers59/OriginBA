@@ -18,7 +18,10 @@ sys.path.insert(0, str(ROOT))
 
 from dotenv import load_dotenv
 
-load_dotenv(ROOT / ".env")
+# Never under tests: the real .env holds every client's credentials, and once loaded into the
+# process every later test could resolve them (2026-10-05: a credential test printed one).
+if os.environ.get("ENVIRONMENT") != "test":
+    load_dotenv(ROOT / ".env")
 
 from contextlib import asynccontextmanager
 

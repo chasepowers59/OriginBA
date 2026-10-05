@@ -63,8 +63,12 @@ class EnvCredentialFallbackTests(unittest.TestCase):
         # Only the shared/global keys exist here — no CITYCORP_* — so the demo
         # credentials must not stand in for the client's own. `_load_env` is the
         # single seam that reads both the .env file and the process environment.
-        with mock.patch.object(organizations, "_load_env", return_value=dict(self.GLOBALS)):
-            self.assertIsNone(organizations.org_env_connection_config("citycorp"))
+        clean = {k: v for k, v in os.environ.items() if not k.upper().startswith(("CITYCORP_", "DEMO_", "DB_", "ORACLE_"))}
+        with mock.patch.object(organizations, "_load_env", return_value=dict(self.GLOBALS)), \
+             mock.patch.dict(os.environ, clean, clear=True):
+            # asserted without printing: a failure here would otherwise show the credentials it found
+            self.assertTrue(organizations.org_env_connection_config("citycorp") is None,
+                            "a client without its own keys resolved credentials")
 
     def test_org_with_its_own_keys_still_resolves(self):
         env = dict(self.GLOBALS)
