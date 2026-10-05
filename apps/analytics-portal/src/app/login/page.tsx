@@ -108,6 +108,11 @@ export default function LoginPage() {
               ? `${DEFAULT_BRAND.name} ${DEFAULT_BRAND.product} for ${tenantName}`
               : `Sign in to ${DEFAULT_BRAND.name} ${DEFAULT_BRAND.product}`}
           </p>
+          {searchParams.get("expired") ? (
+            <p role="status" className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Your session ended. Sign in again to pick up where you left off.
+            </p>
+          ) : null}
           <form onSubmit={onSubmit} className="mt-8 space-y-5">
             {boundToTenant ? (
               <div
