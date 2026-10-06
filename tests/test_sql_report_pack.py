@@ -327,4 +327,4 @@ class TopUsage(unittest.TestCase):
         main = g.main_jrxml(self.s)
         self.assertIn("minusYears(1).withDayOfYear(1)", main)
         self.assertIn("withDayOfYear(1).minusDays(1)", main)
-        self.assertEqual(g.FOLDERS[self.s.name], "/SmartCity/Report/Standard_Offering/Standardized_Reports")
+        self.assertEqual(g.FOLDERS[self.s.name], "/SmartCity/Report/Origin_BA_2_0/Standardized_Reports")

@@ -1489,11 +1489,7 @@
      "W1_NODE",
      "W1_NODE_TYPE_L"
     ],
-    "trusted_measures": [
-     "Hierarchy Depth",
-     "Geo Latitude",
-     "Geo Longitude"
-    ]
+    "trusted_measures": []
    },
    "date_fields": [],
    "default_date_field": null,
@@ -1542,6 +1538,10 @@
     {
      "id": "Root Location ID",
      "label": "Root Location ID"
+    },
+    {
+     "id": "Hierarchy Depth",
+     "label": "Hierarchy Depth"
     },
     {
      "id": "Hierarchy Path",
@@ -1602,6 +1602,14 @@
     {
      "id": "Position",
      "label": "Position"
+    },
+    {
+     "id": "Geo Latitude",
+     "label": "Geo Latitude"
+    },
+    {
+     "id": "Geo Longitude",
+     "label": "Geo Longitude"
     },
     {
      "id": "Time Zone Code",
@@ -1698,11 +1706,11 @@
      "type": "text"
     },
     {
-     "description": "How many levels down from the root this node sits, from the recursive walk of W1_NODE. Root nodes are depth 1.",
+     "description": "How many levels down from the root this node sits, from the recursive walk of W1_NODE. Root nodes are depth 1. A level to group or filter by, not a measure.",
      "group": "assets",
      "id": "Hierarchy Depth",
      "label": "Hierarchy Depth",
-     "role": "measure",
+     "role": "dimension",
      "type": "integer"
     },
     {
@@ -1826,19 +1834,19 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The location node's latitude as recorded in Work and Asset. A coordinate, not a measure.",
      "group": "assets",
      "id": "Geo Latitude",
      "label": "Geo Latitude",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(15,6)"
     },
     {
-     "description": "",
+     "description": "The location node's longitude as recorded in Work and Asset. A coordinate, not a measure.",
      "group": "assets",
      "id": "Geo Longitude",
      "label": "Geo Longitude",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(15,6)"
     },
     {
@@ -1862,36 +1870,6 @@
      ],
      "id": "*",
      "label": "Number of records"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Hierarchy Depth",
-     "label": "Hierarchy Depth"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Geo Latitude",
-     "label": "Geo Latitude"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Geo Longitude",
-     "label": "Geo Longitude"
     }
    ],
    "poc_enabled": true,
@@ -1924,8 +1902,8 @@
      "id": "deepest_location_trees",
      "measures": [
       {
-       "agg": "max",
-       "field": "Hierarchy Depth"
+       "agg": "count",
+       "field": "*"
       }
      ],
      "title": "Which location trees run deepest?",
@@ -1938,11 +1916,7 @@
    "skip_sample_rows": false,
    "summary": "Asset locations with their hierarchy.",
    "table_name": "rpt_asset_location",
-   "trusted_measures": [
-    "Hierarchy Depth",
-    "Geo Latitude",
-    "Geo Longitude"
-   ],
+   "trusted_measures": [],
    "usage_guidance": null,
    "use_case": "Where assets sit in the location hierarchy, flattened into levels so you can count and filter assets by site, area or region.",
    "workstream": "assets",
@@ -1993,8 +1967,6 @@
      "CI_LOOKUP_VAL_L"
     ],
     "trusted_measures": [
-     "Run Number",
-     "Rerun Number",
      "Duration (min)"
     ]
    },
@@ -2018,6 +1990,14 @@
     {
      "id": "Program",
      "label": "Program"
+    },
+    {
+     "id": "Run Number",
+     "label": "Run Number"
+    },
+    {
+     "id": "Rerun Number",
+     "label": "Rerun Number"
     },
     {
      "id": "Run Status",
@@ -2054,19 +2034,19 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Which run of the batch process this is (CI_BATCH_RUN). An identifier, not a measure.",
      "group": "common",
      "id": "Run Number",
      "label": "Run Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
-     "description": "",
+     "description": "Which rerun of the batch run this is; 0 for the first attempt. An identifier, not a measure.",
      "group": "common",
      "id": "Rerun Number",
      "label": "Rerun Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
@@ -2141,27 +2121,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Run Number",
-     "label": "Run Number"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Rerun Number",
-     "label": "Rerun Number"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -2215,8 +2174,6 @@
    "summary": "Batch run monitoring.",
    "table_name": "rpt_batch",
    "trusted_measures": [
-    "Run Number",
-    "Rerun Number",
     "Duration (min)"
    ],
    "usage_guidance": null,
@@ -2688,7 +2645,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -2698,7 +2654,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -3029,7 +2984,7 @@
      "type": "timestamp"
     },
     {
-     "description": "The resolved characteristic value, whichever storage the characteristic type uses. This is the column to report on.",
+     "description": "The resolved characteristic value, whichever storage the characteristic type uses. This is the column to report on. A price or factor: do not sum it.",
      "group": "billing",
      "id": "Value",
      "label": "Value",
@@ -3092,7 +3047,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -3132,7 +3086,7 @@
      "id": "bill_factor_prices",
      "measures": [
       {
-       "agg": "sum",
+       "agg": "avg",
        "field": "Value"
       }
      ],
@@ -3157,7 +3111,7 @@
   },
   "rpt_bill_segment": {
    "data_model": {
-    "columns_traced_to_cisadm": 34,
+    "columns_traced_to_cisadm": 35,
     "domain_table": "rpt_bill_segment",
     "driving_table": null,
     "field_groups": [
@@ -3272,6 +3226,7 @@
        "SA End Date",
        "SA Start Reason Code",
        "SA Stop Reason Code",
+       "Distribution Code Description",
        "Distribution Code"
       ],
       "id": "billing",
@@ -3341,7 +3296,7 @@
      {
       "alias": "rs",
       "join_type": "left join",
-      "on": "rs.rate_schedule_cd = c.sole_rate_schedule_cd",
+      "on": "rs.rate_schedule_cd = h.sole_rate_schedule_cd",
       "role": "model",
       "table": "dim_rate_schedule"
      },
@@ -3428,6 +3383,13 @@
       "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = b.bseg_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = sa.distribution_cd",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -3439,6 +3401,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_PREM_TYPE_L",
@@ -3801,6 +3764,10 @@
      "label": "SA Stop Reason Code"
     },
     {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
+    },
+    {
      "id": "Distribution Code",
      "label": "Distribution Code"
     }
@@ -4039,7 +4006,7 @@
      "type": "timestamp"
     },
     {
-     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemise selectively (Newark: most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
+     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemize selectively (most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
      "group": "billing",
      "id": "Billed Amount",
      "label": "Billed Amount",
@@ -4047,7 +4014,7 @@
      "type": "numeric"
     },
     {
-     "description": "The part of \"Billed Amount\" the calc LINES itemise. Equals \"Billed Amount\" at a fully-itemising client (Ellensburg); partial where itemisation is selective (Newark). The charge-basis split columns partition THIS figure, to the cent.",
+     "description": "The part of \"Billed Amount\" the calc LINES itemize. Equals \"Billed Amount\" at a client that itemizes every charge; partial where itemization is selective. The charge-basis split columns partition THIS figure, to the cent.",
      "group": "billing",
      "id": "Itemized Charge Amount",
      "label": "Itemized Charge Amount",
@@ -4055,7 +4022,7 @@
      "type": "numeric"
     },
     {
-     "description": "The part of \"Billed Amount\" priced on metered consumption (calc lines with a consumption-class unit and no SQI). THIS is the amount that pairs with \"Billed Usage\". Caveat: clients that tier consumption through SQI multipliers (ellensburg water) price that revenue as Service Quantity instead.",
+     "description": "The part of \"Billed Amount\" priced on metered consumption (calc lines with a consumption-class unit and no SQI). THIS is the amount that pairs with \"Billed Usage\". Caveat: clients that tier consumption through SQI multipliers price that revenue as Service Quantity instead.",
      "group": "billing",
      "id": "Consumption Charge Amount",
      "label": "Consumption Charge Amount",
@@ -4071,7 +4038,7 @@
      "type": "numeric"
     },
     {
-     "description": "The part of \"Billed Amount\" priced on a DERIVED service quantity -- daily charges (SQI=DAYS averaging ~29 days), tier multipliers, ERU-based charges. 60% of ellensburg revenue. Not a usage charge even though tiered consumption can sit here.",
+     "description": "The part of \"Billed Amount\" priced on a DERIVED service quantity -- daily charges (SQI=DAYS averaging ~29 days), tier multipliers, ERU-based charges. Often the larger share of revenue. Not a usage charge even though tiered consumption can sit here.",
      "group": "billing",
      "id": "Service Quantity Charge Amount",
      "label": "Service Quantity Charge Amount",
@@ -4111,7 +4078,7 @@
      "type": "numeric"
     },
     {
-     "description": "The CONSUMPTION total for the segment, in the unit named by \"Billed Usage unit of measure\". When the segment measures several consumption units, it is the one the charge lines priced on (CityCorp measures water in GAL and TGAL and prices in TGAL); NULL when no single unit resolves, because a figure that could be kilowatt-hours or gallons depending on the row is worse than none. Excludes demand, tiered breakdowns (which repeat the same quantity split into tiers) and derived identifiers like days and equivalent residential units. Additive across segments only within one unit.",
+     "description": "The CONSUMPTION total for the segment, in the unit named by \"Billed Usage unit of measure\". When the segment measures several consumption units, it is the one the charge lines priced on (a client may measure water in gallons and thousands of gallons and price in thousands); NULL when no single unit resolves, because a figure that could be kilowatt-hours or gallons depending on the row is worse than none. Excludes demand, tiered breakdowns (which repeat the same quantity split into tiers) and derived identifiers like days and equivalent residential units. Additive across segments only within one unit.",
      "group": "billing",
      "id": "Billed Usage",
      "label": "Billed Usage",
@@ -4239,7 +4206,7 @@
      "type": "bigint"
     },
     {
-     "description": "On rpt_bill_segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (60% of ellensburg revenue). On rpt_billed_charge: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
+     "description": "On a bill segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (often the larger share of revenue). On a billed charge line: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
      "group": "billing",
      "id": "Average Price Per Unit",
      "label": "Average Price Per Unit",
@@ -4407,7 +4374,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "description": "The usage request C2M billing raised (C1_USAGE), which this usage transaction answers. It names the service agreement and bill segment the usage is billed on; blank while billing has not asked for it.",
      "group": "billing",
      "id": "Usage Request ID",
      "label": "Usage Request ID",
@@ -4675,6 +4642,14 @@
      "group": "billing",
      "id": "SA Stop Reason Code",
      "label": "SA Stop Reason Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
      "role": "dimension",
      "type": "text"
     },
@@ -5527,7 +5502,6 @@
      "D1_DVC_TYPE_L"
     ],
     "trusted_measures": [
-     "Sequence Number",
      "Start Register Reading",
      "End Register Reading",
      "Register Constant (Multiplier)",
@@ -5570,6 +5544,10 @@
     {
      "id": "Service Point ID",
      "label": "Service Point ID"
+    },
+    {
+     "id": "Sequence Number",
+     "label": "Sequence Number"
     },
     {
      "id": "Is Segment Level",
@@ -5718,11 +5696,11 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Ordering sequence within its parent. Part of the grain, not a measure.",
      "group": "billing",
      "id": "Sequence Number",
      "label": "Sequence Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -5790,7 +5768,7 @@
      "type": "timestamp"
     },
     {
-     "description": "",
+     "description": "The register reading at the start of the billed period. A reading, not a quantity: do not sum it; Raw Meter Movement is the additive difference.",
      "group": "billing",
      "id": "Start Register Reading",
      "label": "Start Register Reading",
@@ -5798,7 +5776,7 @@
      "type": "numeric"
     },
     {
-     "description": "",
+     "description": "The register reading at the end of the billed period. A reading, not a quantity: do not sum it; Raw Meter Movement is the additive difference.",
      "group": "billing",
      "id": "End Register Reading",
      "label": "End Register Reading",
@@ -5806,7 +5784,7 @@
      "type": "numeric"
     },
     {
-     "description": "The register multiplier applied to dial movement to get usage. Null is treated as 1 in the derived columns.",
+     "description": "The register multiplier applied to dial movement to get usage. Null is treated as 1 in the derived columns. A factor: do not sum it.",
      "group": "billing",
      "id": "Register Constant (Multiplier)",
      "label": "Register Constant (Multiplier)",
@@ -5830,7 +5808,7 @@
      "type": "numeric"
     },
     {
-     "description": "The register quantity on this copy of the read. One reading is carried at segment level, per service point and as an audit copy (Usage Flag 'X'), beside tier breakdowns and unit-less derived rows, and a cancelled segment keeps its reads: total it only with Is Frozen = true, Is Cancelled = false, Is Segment Level = true, Usage Flag = 'S' and Read Row Kind = 'measured', and never across units. That copy ties rpt_billed_usage's usage per unit exactly (Ellensburg 2026-09-30).",
+     "description": "The register quantity on this copy of the read. One reading is carried at segment level, per service point and as an audit copy (Usage Flag 'X'), beside tier breakdowns and unit-less derived rows, and a cancelled segment keeps its reads: total it only with Is Frozen = true, Is Cancelled = false, Is Segment Level = true, Usage Flag = 'S' and Read Row Kind = 'measured', and never across units. That copy ties the Billed Usage data set's usage per unit exactly.",
      "group": "billing",
      "id": "Measured Quantity",
      "label": "Measured Quantity",
@@ -6109,16 +6087,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Sequence Number",
-     "label": "Sequence Number"
-    },
-    {
-     "aggs": [
       "min",
       "max"
      ],
@@ -6127,7 +6095,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -6137,7 +6104,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -6147,7 +6113,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -6298,7 +6263,6 @@
    "summary": "The meter reads a bill segment was calculated from.",
    "table_name": "rpt_bill_segment_read",
    "trusted_measures": [
-    "Sequence Number",
     "Start Register Reading",
     "End Register Reading",
     "Register Constant (Multiplier)",
@@ -6315,7 +6279,7 @@
   },
   "rpt_billable_charge": {
    "data_model": {
-    "columns_traced_to_cisadm": 40,
+    "columns_traced_to_cisadm": 41,
     "domain_table": "rpt_billable_charge",
     "driving_table": "CI_B_CHG_LINE",
     "field_groups": [
@@ -6331,6 +6295,7 @@
        "Charge Status Code",
        "Is Cancelled",
        "Charge Template Code",
+       "Distribution Code Description",
        "Distribution Code",
        "Is Memo Only",
        "Charge Period Start",
@@ -6426,6 +6391,13 @@
       "on": "bst.field_name='BILL_STAT_FLG' and bst.field_value = bl.bill_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = f.distribution_code",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -6439,6 +6411,7 @@
      "CI_B_CHG_LINE",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_REV_CL_L",
@@ -6448,9 +6421,7 @@
      "CI_SVC_TYPE_L"
     ],
     "trusted_measures": [
-     "Line Sequence",
      "Charge Amount",
-     "Calc Header Seq",
      "Billed Calculation Amount"
     ]
    },
@@ -6474,6 +6445,10 @@
     {
      "id": "Billable Charge ID",
      "label": "Billable Charge ID"
+    },
+    {
+     "id": "Line Sequence",
+     "label": "Line Sequence"
     },
     {
      "id": "Charge Description",
@@ -6504,6 +6479,10 @@
      "label": "Charge Template Code"
     },
     {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
+    },
+    {
      "id": "Distribution Code",
      "label": "Distribution Code"
     },
@@ -6514,6 +6493,10 @@
     {
      "id": "Bill Segment ID",
      "label": "Bill Segment ID"
+    },
+    {
+     "id": "Calc Header Seq",
+     "label": "Calc Header Seq"
     },
     {
      "id": "Is Billed",
@@ -6650,7 +6633,7 @@
      "group": "billing",
      "id": "Line Sequence",
      "label": "Line Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -6718,6 +6701,14 @@
      "type": "text"
     },
     {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "billing",
      "id": "Distribution Code",
@@ -6762,7 +6753,7 @@
      "group": "billing",
      "id": "Calc Header Seq",
      "label": "Calc Header Seq",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -7042,28 +7033,8 @@
       "min",
       "max"
      ],
-     "id": "Line Sequence",
-     "label": "Line Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
      "id": "Charge Amount",
      "label": "Charge Amount"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Calc Header Seq",
-     "label": "Calc Header Seq"
     },
     {
      "aggs": [
@@ -7110,9 +7081,7 @@
    "summary": "Charges that do not come from a rate.",
    "table_name": "rpt_billable_charge",
    "trusted_measures": [
-    "Line Sequence",
     "Charge Amount",
-    "Calc Header Seq",
     "Billed Calculation Amount"
    ],
    "usage_guidance": null,
@@ -7138,7 +7107,7 @@
     "table": "agg_billed_charge_daily"
    },
    "data_model": {
-    "columns_traced_to_cisadm": 53,
+    "columns_traced_to_cisadm": 54,
     "domain_table": "rpt_billed_charge",
     "driving_table": "CI_BSEG_CALC_LN",
     "field_groups": [
@@ -7202,6 +7171,7 @@
        "Rate Schedule Code",
        "Rate Schedule",
        "Calc Rule Code",
+       "Distribution Code Description",
        "Distribution Code",
        "Charge Description",
        "Charge Basis",
@@ -7316,6 +7286,13 @@
       "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = f.bseg_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = f.dst_id",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -7331,6 +7308,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_PREM_TYPE_L",
@@ -7344,8 +7322,6 @@
      "CI_UOM_L"
     ],
     "trusted_measures": [
-     "Calc Header Seq",
-     "Calc Line Seq",
      "Billed Amount",
      "Base Amount",
      "Exempt Amount"
@@ -7379,6 +7355,14 @@
     {
      "id": "Bill Segment ID",
      "label": "Bill Segment ID"
+    },
+    {
+     "id": "Calc Header Seq",
+     "label": "Calc Header Seq"
+    },
+    {
+     "id": "Calc Line Seq",
+     "label": "Calc Line Seq"
     },
     {
      "id": "Bill ID",
@@ -7581,6 +7565,10 @@
      "label": "Calc Rule Code"
     },
     {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
+    },
+    {
      "id": "Distribution Code",
      "label": "Distribution Code"
     },
@@ -7635,7 +7623,7 @@
      "group": "billing",
      "id": "Calc Header Seq",
      "label": "Calc Header Seq",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -7643,7 +7631,7 @@
      "group": "billing",
      "id": "Calc Line Seq",
      "label": "Calc Line Seq",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -8087,6 +8075,14 @@
      "type": "text"
     },
     {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "billing",
      "id": "Distribution Code",
@@ -8111,7 +8107,7 @@
      "type": "text"
     },
     {
-     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemise selectively (Newark: most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
+     "description": "What the segment billed: the sum of its calculation HEADERS (CI_BSEG_CALC.CALC_AMT). Not the calc lines: lines are itemisation and some clients itemize selectively (most headers carry no lines), so a line sum undercounts there. See \"Itemized Charge Amount\" for what the lines cover.",
      "group": "billing",
      "id": "Billed Amount",
      "label": "Billed Amount",
@@ -8143,7 +8139,7 @@
      "type": "numeric"
     },
     {
-     "description": "On rpt_bill_segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (60% of ellensburg revenue). On rpt_billed_charge: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
+     "description": "On a bill segment: Consumption Charge Amount / Billed Usage -- the unit price of METERED CONSUMPTION only, because dividing the full billed amount by usage overstates the price by the daily, service-quantity and flat charges (often the larger share of revenue). On a billed charge line: this line's amount over this line's quantity. Null unless the quantity is a single unit of measure.",
      "group": "billing",
      "id": "Average Price Per Unit",
      "label": "Average Price Per Unit",
@@ -8219,26 +8215,6 @@
      ],
      "id": "*",
      "label": "Number of records"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Calc Header Seq",
-     "label": "Calc Header Seq"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Calc Line Seq",
-     "label": "Calc Line Seq"
     },
     {
      "aggs": [
@@ -8326,8 +8302,6 @@
    "summary": "Billed charges at calc-line grain.",
    "table_name": "rpt_billed_charge",
    "trusted_measures": [
-    "Calc Header Seq",
-    "Calc Line Seq",
     "Billed Amount",
     "Base Amount",
     "Exempt Amount"
@@ -8356,7 +8330,7 @@
     "table": "agg_billed_usage_daily"
    },
    "data_model": {
-    "columns_traced_to_cisadm": 30,
+    "columns_traced_to_cisadm": 31,
     "domain_table": "rpt_billed_usage",
     "driving_table": "CI_BSEG_SQ",
     "field_groups": [
@@ -8406,6 +8380,7 @@
        "Service Type Code",
        "Revenue Class",
        "Revenue Class Code",
+       "Distribution Code Description",
        "Distribution Code",
        "Premise ID",
        "Premise Address",
@@ -8498,6 +8473,13 @@
       "on": "sg.field_name='BSEG_STAT_FLG' and sg.field_value = b.bseg_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = sa.distribution_cd",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -8510,6 +8492,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_PREM",
      "CI_PREM_TYPE_L",
@@ -8704,6 +8687,10 @@
     {
      "id": "Revenue Class Code",
      "label": "Revenue Class Code"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -9108,6 +9095,14 @@
      "type": "text"
     },
     {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "billing",
      "id": "Distribution Code",
@@ -9342,6 +9337,8 @@
        "Case Duration Minutes",
        "Case Duration Hours",
        "Log Entry Count",
+       "Hours In Current Status",
+       "Status Change Count",
        "Account ID",
        "Main Customer Name",
        "Customer Class",
@@ -9434,7 +9431,9 @@
     "trusted_measures": [
      "Case Duration Minutes",
      "Case Duration Hours",
-     "Log Entry Count"
+     "Log Entry Count",
+     "Hours In Current Status",
+     "Status Change Count"
     ]
    },
    "date_fields": [
@@ -9677,6 +9676,22 @@
      "type": "bigint"
     },
     {
+     "description": "Hours the case has spent in its current status, as of the as-of date; 0 once it is parked in a final status. Average it, do not sum it.",
+     "group": "customer_ops",
+     "id": "Hours In Current Status",
+     "label": "Hours In Current Status",
+     "role": "measure",
+     "type": "numeric"
+    },
+    {
+     "description": "Pre-aggregated count, additive at this data set's grain.",
+     "group": "customer_ops",
+     "id": "Status Change Count",
+     "label": "Status Change Count",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
      "group": "customer_ops",
      "id": "Account ID",
@@ -9772,7 +9787,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -9782,7 +9796,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -9799,6 +9812,25 @@
      ],
      "id": "Log Entry Count",
      "label": "Log Entry Count"
+    },
+    {
+     "aggs": [
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Hours In Current Status",
+     "label": "Hours In Current Status"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Status Change Count",
+     "label": "Status Change Count"
     }
    ],
    "poc_enabled": true,
@@ -9837,7 +9869,9 @@
    "trusted_measures": [
     "Case Duration Minutes",
     "Case Duration Hours",
-    "Log Entry Count"
+    "Log Entry Count",
+    "Hours In Current Status",
+    "Status Change Count"
    ],
    "usage_guidance": null,
    "use_case": "Customer cases: type, status, owner, and how long each has been open or took to close.",
@@ -9978,7 +10012,7 @@
      "type": "text"
     },
     {
-     "description": "The resolved characteristic value, whichever storage the characteristic type uses. This is the column to report on.",
+     "description": "The resolved characteristic value, whichever storage the characteristic type uses. This is the column to report on. A price or factor: do not sum it.",
      "group": "common",
      "id": "Value",
      "label": "Value",
@@ -10547,6 +10581,7 @@
        "Credit Review Date",
        "Postpone Credit Review Date",
        "Collection Process Count",
+       "Active Collection Process Count",
        "Pay Plan Count",
        "Active Pay Plan Count",
        "Is On Active Pay Plan",
@@ -10720,6 +10755,7 @@
      "Case Count",
      "Open Case Count",
      "Collection Process Count",
+     "Active Collection Process Count",
      "Pay Plan Count",
      "Active Pay Plan Count",
      "Autopay Maximum Withdrawal Amount"
@@ -11053,7 +11089,7 @@
      "type": "text"
     },
     {
-     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (College Station: 104,826 carry a code, 965 are on budget).",
+     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (at some clients most accounts carry a code and few are on budget).",
      "group": "customer_ops",
      "id": "Is On Budget",
      "label": "Is On Budget",
@@ -11269,7 +11305,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt more than 120 days past due as of the run date.",
      "group": "customer_ops",
      "id": "Arrears 120+ Days",
      "label": "Arrears 120+ Days",
@@ -11465,6 +11501,14 @@
      "group": "customer_ops",
      "id": "Collection Process Count",
      "label": "Collection Process Count",
+     "role": "measure",
+     "type": "bigint"
+    },
+    {
+     "description": "Pre-aggregated count, additive at this data set's grain.",
+     "group": "customer_ops",
+     "id": "Active Collection Process Count",
+     "label": "Active Collection Process Count",
      "role": "measure",
      "type": "bigint"
     },
@@ -11857,6 +11901,16 @@
       "min",
       "max"
      ],
+     "id": "Active Collection Process Count",
+     "label": "Active Collection Process Count"
+    },
+    {
+     "aggs": [
+      "sum",
+      "avg",
+      "min",
+      "max"
+     ],
      "id": "Pay Plan Count",
      "label": "Pay Plan Count"
     },
@@ -12149,6 +12203,7 @@
     "Case Count",
     "Open Case Count",
     "Collection Process Count",
+    "Active Collection Process Count",
     "Pay Plan Count",
     "Active Pay Plan Count",
     "Autopay Maximum Withdrawal Amount"
@@ -13103,7 +13158,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -13316,21 +13370,21 @@
      {
       "alias": "pst",
       "join_type": "left join",
-      "on": "pst.field_name='COLL_STATUS_FLG' and pst.field_value = c.process_status_cd",
+      "on": "pst.field_name = c.status_family and pst.field_value = c.process_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
      },
      {
       "alias": "sds",
       "join_type": "left join",
-      "on": "sds.field_name='COLL_SA_STATUS_FLG' and sds.field_value = c.sa_debt_status_cd",
+      "on": "sds.field_name = c.sa_status_family and sds.field_value = c.sa_debt_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
      },
      {
       "alias": "est",
       "join_type": "left join",
-      "on": "est.field_name='COLL_EVT_STATUS_FLG' and est.field_value = c.event_status_cd",
+      "on": "est.field_name = c.event_status_family and est.field_value = c.event_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
      },
@@ -13357,7 +13411,6 @@
      "CI_SVC_TYPE_L"
     ],
     "trusted_measures": [
-     "Event Sequence",
      "Days Since Process Created",
      "SA Arrears Amount",
      "Process Arrears Amount",
@@ -13407,6 +13460,10 @@
     {
      "id": "Service Agreement ID",
      "label": "Service Agreement ID"
+    },
+    {
+     "id": "Event Sequence",
+     "label": "Event Sequence"
     },
     {
      "id": "Process Template",
@@ -13571,7 +13628,7 @@
      "group": "debt",
      "id": "Event Sequence",
      "label": "Event Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -13607,7 +13664,7 @@
      "type": "timestamp"
     },
     {
-     "description": "",
+     "description": "Days from the process's creation to the as-of date. Repeats on every row of the process; average it, do not sum it.",
      "group": "debt",
      "id": "Days Since Process Created",
      "label": "Days Since Process Created",
@@ -13687,7 +13744,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The service agreement's arrears in this debt process. Repeats on every event row of the process, so it is not additive across rows here; total it from rpt_service_agreement, or over one row per Process ID + Service Agreement ID.",
      "group": "debt",
      "id": "SA Arrears Amount",
      "label": "SA Arrears Amount",
@@ -13695,7 +13752,7 @@
      "type": "numeric(15,2)"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The arrears the whole process was opened for. Repeats on every service agreement and event row of the process -- not additive across rows; count distinct Process ID or average it, and total arrears from rpt_service_agreement.",
      "group": "debt",
      "id": "Process Arrears Amount",
      "label": "Process Arrears Amount",
@@ -13711,7 +13768,7 @@
      "type": "numeric"
     },
     {
-     "description": "Arrears when the debt process was discontinued (C1DC sequence 2). Null while the process is still running. Repeats across the process's rows.",
+     "description": "Arrears when the debt process was discontinued (C1DC sequence 2). Null while the process is still running. Repeats on every service agreement and event row of the process -- not additive across rows.",
      "group": "debt",
      "id": "Arrears at End",
      "label": "Arrears at End",
@@ -13719,7 +13776,7 @@
      "type": "numeric"
     },
     {
-     "description": "",
+     "description": "Arrears at Start less Arrears at End: what the process collected. Null while the process is still running. Repeats on every service agreement and event row of the process -- not additive across rows; average it, or read one row per Process ID.",
      "group": "debt",
      "id": "Arrears Reduction",
      "label": "Arrears Reduction",
@@ -13735,7 +13792,7 @@
      "type": "numeric"
     },
     {
-     "description": "",
+     "description": "Days from the process's start to its discontinuation, to two decimals. Null while the process is still running. Repeats on every row of the process; average it, do not sum it.",
      "group": "debt",
      "id": "Duration (Days)",
      "label": "Duration (Days)",
@@ -13966,17 +14023,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Event Sequence",
-     "label": "Event Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -13986,7 +14032,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -13996,7 +14041,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14006,7 +14050,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14016,7 +14059,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14026,7 +14068,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14044,7 +14085,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -14057,7 +14097,7 @@
    "portal_enabled": true,
    "premade_reports": [
     {
-     "chart_type": "pie",
+     "chart_type": "bar",
      "description": "A process that runs to completion without reducing arrears has cost money and recovered nothing. Percent of arrears collected is the measure that matters.",
      "dimensions": [
       "Process Template"
@@ -14066,7 +14106,7 @@
      "id": "collection_effectiveness",
      "measures": [
       {
-       "agg": "sum",
+       "agg": "avg",
        "field": "Arrears Reduction"
       }
      ],
@@ -14098,7 +14138,6 @@
    "summary": "Collection, severance and write-off processes with their events.",
    "table_name": "rpt_debt_process",
    "trusted_measures": [
-    "Event Sequence",
     "Days Since Process Created",
     "SA Arrears Amount",
     "Process Arrears Amount",
@@ -14980,7 +15019,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The install event's constant applied to the device's readings. A factor: do not sum it.",
      "group": "assets",
      "id": "Installation Constant",
      "label": "Installation Constant",
@@ -15419,7 +15458,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -15429,7 +15467,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -15449,7 +15486,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -16008,7 +16044,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -16054,7 +16089,7 @@
   },
   "rpt_exception": {
    "data_model": {
-    "columns_traced_to_cisadm": 10,
+    "columns_traced_to_cisadm": 16,
     "domain_table": "rpt_exception",
     "driving_table": null,
     "field_groups": [
@@ -16065,6 +16100,7 @@
        "Exception Type Code",
        "Exception Type",
        "Rule Code",
+       "VEE Group",
        "VEE Group Code",
        "VEE Rule",
        "Severity",
@@ -16079,6 +16115,10 @@
        "Device ID",
        "Meter Badge Number",
        "MDM Service Point ID",
+       "MDM Service Point Type",
+       "MDM Service Point Type Code",
+       "MDM Service Point Status",
+       "MDM Service Point Status Code",
        "Service Point ID",
        "Message Number",
        "Review Complete",
@@ -16098,7 +16138,9 @@
        "Main Customer Name",
        "Customer Class",
        "Usage ID",
+       "Usage Group",
        "Usage Group Code",
+       "Measurement Cycle",
        "Measurement Cycle Code"
       ],
       "id": "field_ops",
@@ -16138,16 +16180,23 @@
       "table": "stg_d1_usage"
      },
      {
+      "alias": "bet",
+      "join_type": "left join",
+      "on": "",
+      "role": "model",
+      "table": "stg_lookup_value"
+     },
+     {
       "alias": "uet",
       "join_type": "left join",
-      "on": "uet.excp_type_cd = c.exception_type_cd",
+      "on": "c.exception_domain = 'Usage' and uet.excp_type_cd = c.exception_type_cd",
       "role": "model",
       "table": "stg_usage_excp_type_label"
      },
      {
       "alias": "det",
       "join_type": "left join",
-      "on": "det.excp_type_cd = c.exception_type_cd",
+      "on": "c.exception_domain = 'VEE' and det.excp_type_cd = c.exception_type_cd",
       "role": "model",
       "table": "stg_excp_type_label"
      },
@@ -16206,6 +16255,34 @@
       "on": "spdev.d1_sp_id = c.d1_sp_id",
       "role": "model",
       "table": "int_sp_device"
+     },
+     {
+      "alias": "msp",
+      "join_type": "left join",
+      "on": "msp.d1_sp_id = coalesce(c.d1_sp_id, inst.d1_sp_id)",
+      "role": "model",
+      "table": "int_mdm_service_point"
+     },
+     {
+      "alias": "vg",
+      "join_type": "left join",
+      "on": "vg.vee_grp_cd = c.vee_grp_cd",
+      "role": "model",
+      "table": "stg_d1_vee_group_label"
+     },
+     {
+      "alias": "ug",
+      "join_type": "left join",
+      "on": "ug.usg_grp_cd = u.usg_grp_cd",
+      "role": "model",
+      "table": "stg_d1_usage_group_label"
+     },
+     {
+      "alias": "mcy",
+      "join_type": "left join",
+      "on": "mcy.msrmt_cyc_cd = u.msrmt_cyc_cd",
+      "role": "model",
+      "table": "stg_d1_msrmt_cyc_label"
      }
     ],
     "population_filter": null,
@@ -16218,12 +16295,16 @@
      "CI_SA_TYPE",
      "CI_SA_TYPE_L",
      "CI_SVC_TYPE_L",
+     "D1_MSRMT_CYC_L",
+     "D1_SP",
+     "D1_SP_TYPE_L",
      "D1_USAGE",
+     "D1_USG_GRP_L",
+     "D1_VEE_GRP_L",
      "D1_VEE_RULE_L"
     ],
     "trusted_measures": [
-     "Days Open",
-     "Message Number"
+     "Days Open"
     ]
    },
    "date_fields": [
@@ -16254,6 +16335,10 @@
     {
      "id": "Rule Code",
      "label": "Rule Code"
+    },
+    {
+     "id": "VEE Group",
+     "label": "VEE Group"
     },
     {
      "id": "VEE Group Code",
@@ -16308,8 +16393,28 @@
      "label": "MDM Service Point ID"
     },
     {
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type"
+    },
+    {
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code"
+    },
+    {
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status"
+    },
+    {
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code"
+    },
+    {
      "id": "Service Point ID",
      "label": "Service Point ID"
+    },
+    {
+     "id": "Message Number",
+     "label": "Message Number"
     },
     {
      "id": "Review Complete",
@@ -16376,8 +16481,16 @@
      "label": "Usage ID"
     },
     {
+     "id": "Usage Group",
+     "label": "Usage Group"
+    },
+    {
      "id": "Usage Group Code",
      "label": "Usage Group Code"
+    },
+    {
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle"
     },
     {
      "id": "Measurement Cycle Code",
@@ -16415,7 +16528,7 @@
      "id": "Exception Type",
      "label": "Exception Type",
      "role": "dimension",
-     "type": "text"
+     "type": "character varying"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -16426,7 +16539,15 @@
      "type": "character varying"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"VEE Group Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "VEE Group",
+     "label": "VEE Group",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"VEE Group\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "VEE Group Code",
      "label": "VEE Group Code",
@@ -16482,7 +16603,7 @@
      "type": "boolean"
     },
     {
-     "description": "",
+     "description": "Days since the item was created, as of the as-of date, while it is still open; null once it closes. An age: average it, do not sum it.",
      "group": "field_ops",
      "id": "Days Open",
      "label": "Days Open",
@@ -16538,6 +16659,38 @@
      "type": "character varying"
     },
     {
+     "description": "English description of \"MDM Service Point Type Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Type\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Status Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Status\" for the description: report on the description, filter on the code.",
+     "group": "field_ops",
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
      "group": "field_ops",
      "id": "Service Point ID",
@@ -16546,11 +16699,11 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The C2M message number of the exception's text, within its message category. An identifier, not a measure.",
      "group": "field_ops",
      "id": "Message Number",
      "label": "Message Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric"
     },
     {
@@ -16690,7 +16843,15 @@
      "type": "character varying"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Usage Group Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Usage Group",
+     "label": "Usage Group",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Usage Group\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Usage Group Code",
      "label": "Usage Group Code",
@@ -16698,7 +16859,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measurement Cycle Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code",
@@ -16721,23 +16890,12 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
      ],
      "id": "Days Open",
      "label": "Days Open"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Message Number",
-     "label": "Message Number"
     }
    ],
    "poc_enabled": true,
@@ -16804,8 +16962,7 @@
    "summary": "Every exception, from all three C2M exception engines, in one data set.",
    "table_name": "rpt_exception",
    "trusted_measures": [
-    "Days Open",
-    "Message Number"
+    "Days Open"
    ],
    "usage_guidance": null,
    "use_case": "Every exception raised by billing, usage and meter-data validation in one place, to work the queue or spot patterns.",
@@ -16814,7 +16971,7 @@
   },
   "rpt_field_activity": {
    "data_model": {
-    "columns_traced_to_cisadm": 14,
+    "columns_traced_to_cisadm": 15,
     "domain_table": "rpt_field_activity",
     "driving_table": "D1_ACTIVITY",
     "field_groups": [
@@ -16846,6 +17003,9 @@
        "Measurement Reference Date/Time",
        "Created Date/Time",
        "Status Updated Date/Time",
+       "Days Open",
+       "Closed Date/Time",
+       "Days To Close",
        "Number of Retries",
        "Appointment Required",
        "Appointment Window Start",
@@ -16856,6 +17016,7 @@
        "Activity Comments",
        "Work By Crew",
        "Route Code",
+       "Measurement Cycle",
        "Measurement Cycle Code",
        "Current To Do ID",
        "Priority",
@@ -16946,6 +17107,13 @@
       "on": "",
       "role": "model",
       "table": "stg_ext_lookup_value_label"
+     },
+     {
+      "alias": "mcy",
+      "join_type": "left join",
+      "on": "mcy.msrmt_cyc_cd = f.measurement_cycle_cd",
+      "role": "model",
+      "table": "stg_d1_msrmt_cyc_label"
      }
     ],
     "population_filter": null,
@@ -16957,9 +17125,13 @@
      "D1_ACTIVITY",
      "D1_ACTIVITY_TYPE",
      "D1_ACTIVITY_TYPE_L",
-     "D1_DVC_CFG"
+     "D1_DVC_CFG",
+     "D1_MSRMT_CYC_L"
     ],
-    "trusted_measures": []
+    "trusted_measures": [
+     "Days Open",
+     "Days To Close"
+    ]
    },
    "date_fields": [
     {
@@ -16993,6 +17165,10 @@
     {
      "id": "Status Updated Date/Time",
      "label": "Status Updated Date/Time"
+    },
+    {
+     "id": "Closed Date/Time",
+     "label": "Closed Date/Time"
     },
     {
      "id": "Appointment Window Start",
@@ -17109,6 +17285,10 @@
     {
      "id": "Route Code",
      "label": "Route Code"
+    },
+    {
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle"
     },
     {
      "id": "Measurement Cycle Code",
@@ -17397,6 +17577,30 @@
      "type": "timestamp"
     },
     {
+     "description": "Days since the item was created, as of the as-of date, while it is still open; null once it closes. An age: average it, do not sum it.",
+     "group": "field_ops",
+     "id": "Days Open",
+     "label": "Days Open",
+     "role": "measure",
+     "type": "integer"
+    },
+    {
+     "description": "Timestamp. Oracle DATE carries a time component, so this is not a date.",
+     "group": "field_ops",
+     "id": "Closed Date/Time",
+     "label": "Closed Date/Time",
+     "role": "date",
+     "type": "timestamp"
+    },
+    {
+     "description": "Days from creation to the final status, once the item has closed; null while it is open. Average it, do not sum it.",
+     "group": "field_ops",
+     "id": "Days To Close",
+     "label": "Days To Close",
+     "role": "measure",
+     "type": "integer"
+    },
+    {
      "description": "",
      "group": "field_ops",
      "id": "Number of Retries",
@@ -17477,7 +17681,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measurement Cycle Code\". Group and report on this; filter on the code.",
+     "group": "field_ops",
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle\" for the description: report on the description, filter on the code.",
      "group": "field_ops",
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code",
@@ -17641,6 +17853,24 @@
      ],
      "id": "*",
      "label": "Number of records"
+    },
+    {
+     "aggs": [
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Days Open",
+     "label": "Days Open"
+    },
+    {
+     "aggs": [
+      "avg",
+      "min",
+      "max"
+     ],
+     "id": "Days To Close",
+     "label": "Days To Close"
     }
    ],
    "poc_enabled": true,
@@ -17677,7 +17907,10 @@
    "skip_sample_rows": false,
    "summary": "MDM field activity.",
    "table_name": "rpt_field_activity",
-   "trusted_measures": [],
+   "trusted_measures": [
+    "Days Open",
+    "Days To Close"
+   ],
    "usage_guidance": null,
    "use_case": "Field work: the type, status, dates and outcome of every field activity.",
    "workstream": "field_ops",
@@ -18476,7 +18709,7 @@
      "type": "text"
     },
     {
-     "description": "The adjustment's amount (CI_ADJ.ADJ_AMT), on its AD transaction AND, with the SAME sign, on the AX transaction that cancels it -- so a plain sum counts every cancelled adjustment twice. Sum it with Is Adjustment = true and Adjustment Status Code = '50' (standing adjustments; 60 is cancelled). For the ledger net of charge and cancel, sum Current Amount instead. Ellensburg 2026-09-30: $15,572,430.42 unfiltered, $15,096,751.09 standing.",
+     "description": "The adjustment's amount (CI_ADJ.ADJ_AMT), on its AD transaction AND, with the SAME sign, on the AX transaction that cancels it -- so a plain sum counts every cancelled adjustment twice. Sum it with Is Adjustment = true and Adjustment Status Code = '50' (standing adjustments; 60 is cancelled). For the ledger net of charge and cancel, sum Current Amount instead.",
      "group": "finance",
      "id": "Adjustment Amount",
      "label": "Adjustment Amount",
@@ -19059,7 +19292,7 @@
     "table": "agg_gl_daily"
    },
    "data_model": {
-    "columns_traced_to_cisadm": 31,
+    "columns_traced_to_cisadm": 32,
     "domain_table": "rpt_gl",
     "driving_table": null,
     "field_groups": [
@@ -19072,6 +19305,7 @@
        "Is Debit",
        "Statistic Amount",
        "Is Total Amount Line",
+       "Distribution Code Description",
        "Distribution Code",
        "FT Type",
        "FT Type Code",
@@ -19152,6 +19386,13 @@
       "on": "gd.field_name='GL_DISTRIB_STATUS' and gd.field_value = f.gl_distrib_status",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = g.dst_id",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -19162,6 +19403,7 @@
      "CI_BILL_CYC_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_FT",
      "CI_FT_PROC",
      "CI_LOOKUP_VAL_L",
@@ -19172,12 +19414,10 @@
      "CI_SVC_TYPE_L"
     ],
     "trusted_measures": [
-     "GL Sequence Number",
      "GL Amount",
      "Statistic Amount",
      "FT Current Amount",
-     "FT Total Amount (Payoff)",
-     "GL Extract Run Number"
+     "FT Total Amount (Payoff)"
     ]
    },
    "date_fields": [
@@ -19206,6 +19446,10 @@
      "label": "FT ID"
     },
     {
+     "id": "GL Sequence Number",
+     "label": "GL Sequence Number"
+    },
+    {
      "id": "GL Account",
      "label": "GL Account"
     },
@@ -19216,6 +19460,10 @@
     {
      "id": "Is Total Amount Line",
      "label": "Is Total Amount Line"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -19236,6 +19484,10 @@
     {
      "id": "GL Extract Batch Code",
      "label": "GL Extract Batch Code"
+    },
+    {
+     "id": "GL Extract Run Number",
+     "label": "GL Extract Run Number"
     },
     {
      "id": "Is Extracted to GL",
@@ -19352,7 +19604,7 @@
      "group": "finance",
      "id": "GL Sequence Number",
      "label": "GL Sequence Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -19394,6 +19646,14 @@
      "label": "Is Total Amount Line",
      "role": "dimension",
      "type": "boolean"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "finance",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
     },
     {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
@@ -19476,7 +19736,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Which configured GL extract shipped this transaction (C1-GLFCX, GL Extract for Oracle Financial Cloud, at the reference client). Run numbers are issued PER BATCH CODE, so this column QUALIFIES the Run Number beside it: reconcile a GL file on the pair, never on the run number alone. Most clients configure a single extract and this reads as a constant; demo25 runs two (C1-GLFCX and GLDL), which is why the column is on the data set at all.",
+     "description": "Which configured GL extract shipped this transaction (C1-GLFCX, GL Extract for Oracle Financial Cloud, at the reference client). Run numbers are issued PER BATCH CODE, so this column QUALIFIES the Run Number beside it: reconcile a GL file on the pair, never on the run number alone. Most clients configure a single extract and this reads as a constant; a client running two (for example C1-GLFCX and GLDL) needs it.",
      "group": "finance",
      "id": "GL Extract Batch Code",
      "label": "GL Extract Batch Code",
@@ -19484,11 +19744,11 @@
      "type": "text"
     },
     {
-     "description": "Which run of the GL extract shipped this transaction to the financial system, numbered WITHIN its GL Extract Batch Code -- read the two together, because run 5 of one extract is a different file from run 5 of another. Null until the transaction has been extracted, which is the same population as a null Transferred to GL Date.",
+     "description": "Which run of the GL extract shipped this transaction to the financial system, numbered WITHIN its GL Extract Batch Code -- read the two together, because run 5 of one extract is a different file from run 5 of another. Null until the transaction has been extracted, which is the same population as a null Transferred to GL Date. An identifier, not a measure.",
      "group": "finance",
      "id": "GL Extract Run Number",
      "label": "GL Extract Run Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
@@ -19712,16 +19972,6 @@
       "min",
       "max"
      ],
-     "id": "GL Sequence Number",
-     "label": "GL Sequence Number"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
      "id": "GL Amount",
      "label": "GL Amount"
     },
@@ -19737,7 +19987,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -19747,23 +19996,12 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
      ],
      "id": "FT Total Amount (Payoff)",
      "label": "FT Total Amount (Payoff)"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "GL Extract Run Number",
-     "label": "GL Extract Run Number"
     }
    ],
    "poc_enabled": true,
@@ -19823,12 +20061,10 @@
    "summary": "General ledger distribution.",
    "table_name": "rpt_gl",
    "trusted_measures": [
-    "GL Sequence Number",
     "GL Amount",
     "Statistic Amount",
     "FT Current Amount",
-    "FT Total Amount (Payoff)",
-    "GL Extract Run Number"
+    "FT Total Amount (Payoff)"
    ],
    "usage_guidance": null,
    "use_case": "General ledger postings for each transaction, to reconcile to the ledger by account and distribution code.",
@@ -19837,7 +20073,7 @@
   },
   "rpt_measurement": {
    "data_model": {
-    "columns_traced_to_cisadm": 11,
+    "columns_traced_to_cisadm": 15,
     "domain_table": "rpt_measurement",
     "driving_table": null,
     "field_groups": [
@@ -19853,6 +20089,7 @@
        "Is Estimated Measurement",
        "Is Missing Measurement",
        "Measurement Use Code",
+       "Measuring Component Type",
        "Measuring Component Type Code",
        "Multiplier",
        "Read Sequence",
@@ -19864,6 +20101,10 @@
        "Device Type Code",
        "Service Point ID",
        "MDM Service Point ID",
+       "MDM Service Point Type",
+       "MDM Service Point Type Code",
+       "MDM Service Point Status",
+       "MDM Service Point Status Code",
        "Premise ID",
        "Premise Address",
        "City",
@@ -19877,6 +20118,20 @@
     "grain_description": "One row per measuring component + measurement date/time",
     "grain_preservation": "Grain is asserted by a singular test in the dbt project, so a join that multiplied this population would fail the build.",
     "join_paths": [
+     {
+      "alias": "mc",
+      "join_type": "join",
+      "on": "mc.measr_comp_id = m.measr_comp_id",
+      "role": "model",
+      "table": "stg_d1_measuring_component"
+     },
+     {
+      "alias": "ie",
+      "join_type": "join",
+      "on": "",
+      "role": "model",
+      "table": "stg_d1_install_event"
+     },
      {
       "alias": "mc",
       "join_type": "left join",
@@ -19913,16 +20168,23 @@
       "table": "stg_d1_device_type_label"
      },
      {
-      "alias": "inst",
+      "alias": "inf",
       "join_type": "left join",
-      "on": "inst.device_id = cfg.d1_device_id",
-      "role": "model",
-      "table": "int_sp_device"
+      "on": "inf.measr_comp_id = m.measr_comp_id and inf.msrmt_dttm = m.msrmt_dttm and inf.rn = 1",
+      "role": "step",
+      "table": "in_force"
+     },
+     {
+      "alias": "br",
+      "join_type": "left join",
+      "on": "br.d1_sp_id = inf.d1_sp_id",
+      "role": "step",
+      "table": "sp_bridge"
      },
      {
       "alias": "sp",
       "join_type": "left join",
-      "on": "sp.sp_id = inst.sp_id",
+      "on": "sp.sp_id = br.sp_id",
       "role": "model",
       "table": "stg_service_point"
      },
@@ -19932,6 +20194,20 @@
       "on": "pr.prem_id = sp.prem_id",
       "role": "model",
       "table": "dim_premise"
+     },
+     {
+      "alias": "msp",
+      "join_type": "left join",
+      "on": "msp.d1_sp_id = inf.d1_sp_id",
+      "role": "model",
+      "table": "int_mdm_service_point"
+     },
+     {
+      "alias": "mct",
+      "join_type": "left join",
+      "on": "mct.measr_comp_type_cd = mc.measr_comp_type_cd",
+      "role": "model",
+      "table": "stg_d1_measr_comp_type_label"
      }
     ],
     "population_filter": null,
@@ -19942,13 +20218,15 @@
      "CI_SP",
      "D1_DVC_CFG",
      "D1_DVC_TYPE_L",
-     "D1_MEASR_COMP"
+     "D1_MEASR_COMP",
+     "D1_MEASR_COMP_TYPE_L",
+     "D1_SP",
+     "D1_SP_TYPE_L"
     ],
     "trusted_measures": [
      "Measurement Value",
      "Register Reading",
-     "Multiplier",
-     "Read Sequence"
+     "Multiplier"
     ]
    },
    "date_fields": [
@@ -19993,8 +20271,16 @@
      "label": "Measurement Use Code"
     },
     {
+     "id": "Measuring Component Type",
+     "label": "Measuring Component Type"
+    },
+    {
      "id": "Measuring Component Type Code",
      "label": "Measuring Component Type Code"
+    },
+    {
+     "id": "Read Sequence",
+     "label": "Read Sequence"
     },
     {
      "id": "Device Config ID",
@@ -20023,6 +20309,22 @@
     {
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID"
+    },
+    {
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type"
+    },
+    {
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code"
+    },
+    {
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status"
+    },
+    {
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code"
     },
     {
      "id": "Premise ID",
@@ -20067,7 +20369,7 @@
      "type": "numeric(16,6)"
     },
     {
-     "description": "",
+     "description": "The dial reading the measurement was taken from. A reading, not a quantity: do not sum it.",
      "group": "meter_ops",
      "id": "Register Reading",
      "label": "Register Reading",
@@ -20123,7 +20425,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measuring Component Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Measuring Component Type",
+     "label": "Measuring Component Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measuring Component Type\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Measuring Component Type Code",
      "label": "Measuring Component Type Code",
@@ -20131,7 +20441,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The measuring component's multiplier applied to its readings. A factor: do not sum it.",
      "group": "meter_ops",
      "id": "Multiplier",
      "label": "Multiplier",
@@ -20143,7 +20453,7 @@
      "group": "meter_ops",
      "id": "Read Sequence",
      "label": "Read Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -20211,6 +20521,38 @@
      "type": "text"
     },
     {
+     "description": "English description of \"MDM Service Point Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Status Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Status\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
      "group": "meter_ops",
      "id": "Premise ID",
@@ -20268,7 +20610,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -20278,23 +20619,12 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
      ],
      "id": "Multiplier",
      "label": "Multiplier"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Read Sequence",
-     "label": "Read Sequence"
     }
    ],
    "poc_enabled": true,
@@ -20327,8 +20657,7 @@
    "trusted_measures": [
     "Measurement Value",
     "Register Reading",
-    "Multiplier",
-    "Read Sequence"
+    "Multiplier"
    ],
    "usage_guidance": null,
    "use_case": "Meter readings and interval data by measuring component, with their condition (actual or estimated).",
@@ -20441,7 +20770,6 @@
      "D1_ON_OFF_HIST"
     ],
     "trusted_measures": [
-     "Event Sequence",
      "Hours Since Previous Event"
     ]
    },
@@ -20461,6 +20789,10 @@
     {
      "id": "Install Event ID",
      "label": "Install Event ID"
+    },
+    {
+     "id": "Event Sequence",
+     "label": "Event Sequence"
     },
     {
      "id": "On/Off Event",
@@ -20533,7 +20865,7 @@
      "group": "meter_ops",
      "id": "Event Sequence",
      "label": "Event Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -20688,17 +21020,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Event Sequence",
-     "label": "Event Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -20735,7 +21056,6 @@
    "summary": "Connect and disconnect history.",
    "table_name": "rpt_on_off_history",
    "trusted_measures": [
-    "Event Sequence",
     "Hours Since Previous Event"
    ],
    "usage_guidance": null,
@@ -20745,7 +21065,7 @@
   },
   "rpt_pay_plan": {
    "data_model": {
-    "columns_traced_to_cisadm": 7,
+    "columns_traced_to_cisadm": 8,
     "domain_table": "rpt_pay_plan",
     "driving_table": null,
     "field_groups": [
@@ -20774,6 +21094,7 @@
        "Payments Since Plan Start",
        "Paid Total Since Plan Start",
        "Paid vs Elapsed Schedule Variance",
+       "Pay Method",
        "Pay Method Code",
        "Third Party Payor Code",
        "Third Party",
@@ -20828,6 +21149,13 @@
       "on": "pps.field_name='PP_STAT_FLG' and pps.field_value = f.pp_status_cd",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "pm",
+      "join_type": "left join",
+      "on": "pm.pay_method_cd = f.pay_method_cd",
+      "role": "model",
+      "table": "stg_pay_method_label"
      }
     ],
     "population_filter": null,
@@ -20840,6 +21168,7 @@
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
      "CI_LOOKUP_VAL_L",
+     "CI_PAY_METH_L",
      "CI_PP_TYPE_L"
     ],
     "trusted_measures": [
@@ -20923,6 +21252,10 @@
     {
      "id": "Cancel Reason Code",
      "label": "Cancel Reason Code"
+    },
+    {
+     "id": "Pay Method",
+     "label": "Pay Method"
     },
     {
      "id": "Pay Method Code",
@@ -21155,7 +21488,15 @@
      "type": "numeric"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Pay Method Code\". Group and report on this; filter on the code.",
+     "group": "debt",
+     "id": "Pay Method",
+     "label": "Pay Method",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Pay Method\" for the description: report on the description, filter on the code.",
      "group": "debt",
      "id": "Pay Method Code",
      "label": "Pay Method Code",
@@ -21370,7 +21711,7 @@
     "Paid vs Elapsed Schedule Variance"
    ],
    "usage_guidance": null,
-   "use_case": "Payment arrangements: who is on a plan, what is scheduled, and which plans are kept or broken.",
+   "use_case": "Pay plans: who is on a plan, what is scheduled, and which plans are kept or broken.",
    "workstream": "debt",
    "workstream_label": "Collections & Debt"
   },
@@ -21974,7 +22315,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -21984,7 +22324,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22004,7 +22343,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22211,7 +22549,6 @@
      "Tender Amount",
      "Tender Control Start Balance",
      "Tender Control End Balance",
-     "Batch Number",
      "Deposit End Balance"
     ]
    },
@@ -22311,6 +22648,10 @@
     {
      "id": "Batch Code",
      "label": "Batch Code"
+    },
+    {
+     "id": "Batch Number",
+     "label": "Batch Number"
     },
     {
      "id": "Tender Control User ID",
@@ -22511,7 +22852,7 @@
      "type": "text"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The cash drawer session's starting balance, repeated on every tender of the session -- not additive here; sum Start Balance on rpt_tender_control.",
      "group": "cashiering",
      "id": "Tender Control Start Balance",
      "label": "Tender Control Start Balance",
@@ -22519,7 +22860,7 @@
      "type": "numeric(15,2)"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The cash drawer session's ending balance, repeated on every tender of the session -- not additive here; sum End Balance on rpt_tender_control.",
      "group": "cashiering",
      "id": "Tender Control End Balance",
      "label": "Tender Control End Balance",
@@ -22535,11 +22876,11 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The tender control's batch number as entered in C2M. An identifier, not a measure.",
      "group": "cashiering",
      "id": "Batch Number",
      "label": "Batch Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
@@ -22599,7 +22940,7 @@
      "type": "timestamp"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The deposit control's ending balance, repeated on every drawer session (and tender) of the deposit -- not additive here; read one row per deposit control.",
      "group": "cashiering",
      "id": "Deposit End Balance",
      "label": "Deposit End Balance",
@@ -22672,7 +23013,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22682,7 +23022,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22692,17 +23031,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Batch Number",
-     "label": "Batch Number"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -22748,17 +23076,16 @@
     "Tender Amount",
     "Tender Control Start Balance",
     "Tender Control End Balance",
-    "Batch Number",
     "Deposit End Balance"
    ],
    "usage_guidance": null,
-   "use_case": "How money arrived: cash, cheque, card or electronic transfer, by tender source and date.",
+   "use_case": "How money arrived: cash, check, card or electronic transfer, by tender source and date.",
    "workstream": "cashiering",
    "workstream_label": "Cashiering & Payments"
   },
   "rpt_premise_sp": {
    "data_model": {
-    "columns_traced_to_cisadm": 41,
+    "columns_traced_to_cisadm": 45,
     "domain_table": "rpt_premise_sp",
     "driving_table": "CI_SP",
     "field_groups": [
@@ -22773,6 +23100,7 @@
        "Meter Read Cycle Code",
        "Meter Read Route Code",
        "Meter Read Route Sequence",
+       "Measurement Cycle",
        "Measurement Cycle Code",
        "Measurement Cycle Route Code",
        "Measurement Cycle Route Sequence",
@@ -22808,6 +23136,10 @@
        "SA Count (Premise)",
        "Billed Segment Count (Premise)",
        "MDM Service Point ID",
+       "MDM Service Point Type",
+       "MDM Service Point Type Code",
+       "MDM Service Point Status",
+       "MDM Service Point Status Code",
        "Device ID",
        "Meter Badge Number",
        "Device Type Code",
@@ -22957,6 +23289,20 @@
       "on": "lvsps.field_name='SP_STATUS_FLG' and lvsps.field_value = sp.sp_status_flg",
       "role": "model",
       "table": "stg_lookup_value"
+     },
+     {
+      "alias": "msp",
+      "join_type": "left join",
+      "on": "msp.d1_sp_id = dev.d1_sp_id",
+      "role": "model",
+      "table": "int_mdm_service_point"
+     },
+     {
+      "alias": "mcy",
+      "join_type": "left join",
+      "on": "mcy.msrmt_cyc_cd = d1sp.msrmt_cyc_cd",
+      "role": "model",
+      "table": "stg_d1_msrmt_cyc_label"
      }
     ],
     "population_filter": null,
@@ -22971,11 +23317,11 @@
      "D1_DVC_TYPE_L",
      "D1_MANUFACTURER_L",
      "D1_MODEL_L",
-     "D1_SP"
+     "D1_MSRMT_CYC_L",
+     "D1_SP",
+     "D1_SP_TYPE_L"
     ],
     "trusted_measures": [
-     "Meter Read Route Sequence",
-     "Measurement Cycle Route Sequence",
      "Service Point Count (Premise)",
      "SA Count (Premise)",
      "Billed Segment Count (Premise)",
@@ -23042,12 +23388,24 @@
      "label": "Meter Read Route Code"
     },
     {
+     "id": "Meter Read Route Sequence",
+     "label": "Meter Read Route Sequence"
+    },
+    {
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle"
+    },
+    {
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code"
     },
     {
      "id": "Measurement Cycle Route Code",
      "label": "Measurement Cycle Route Code"
+    },
+    {
+     "id": "Measurement Cycle Route Sequence",
+     "label": "Measurement Cycle Route Sequence"
     },
     {
      "id": "Measurement Cycle Route",
@@ -23164,6 +23522,22 @@
     {
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID"
+    },
+    {
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type"
+    },
+    {
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code"
+    },
+    {
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status"
+    },
+    {
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code"
     },
     {
      "id": "Device ID",
@@ -23292,11 +23666,19 @@
      "group": "meter_ops",
      "id": "Meter Read Route Sequence",
      "label": "Meter Read Route Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(8,0)"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measurement Cycle Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code",
@@ -23316,11 +23698,11 @@
      "group": "meter_ops",
      "id": "Measurement Cycle Route Sequence",
      "label": "Measurement Cycle Route Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(9,0)"
     },
     {
-     "description": "The MDM route the point is read on, as 'cycle / route' (D1_SP.MSRMT_CYC_CD and MSRMT_CYC_RTE_CD): the one to group a reading workload by, because route codes repeat across cycles (College Station: 53 codes on 376 routes, 2026-09-30). Null when the point has no route.",
+     "description": "The MDM route the point is read on, as 'cycle / route' (D1_SP.MSRMT_CYC_CD and MSRMT_CYC_RTE_CD): the one to group a reading workload by, because route codes repeat across cycles (one client reuses 53 codes on 376 routes). Null when the point has no route.",
      "group": "meter_ops",
      "id": "Measurement Cycle Route",
      "label": "Measurement Cycle Route",
@@ -23544,7 +23926,7 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "Service points at this point's premise, repeated on every service point of the premise -- not additive here; count distinct Premise ID or average it.",
      "group": "meter_ops",
      "id": "Service Point Count (Premise)",
      "label": "Service Point Count (Premise)",
@@ -23552,7 +23934,7 @@
      "type": "bigint"
     },
     {
-     "description": "",
+     "description": "Service agreements at this point's premise, repeated on every service point of the premise -- not additive here; count distinct Premise ID or average it.",
      "group": "meter_ops",
      "id": "SA Count (Premise)",
      "label": "SA Count (Premise)",
@@ -23560,7 +23942,7 @@
      "type": "bigint"
     },
     {
-     "description": "",
+     "description": "Billed segments at this point's premise, repeated on every service point of the premise -- not additive here; count distinct Premise ID or average it.",
      "group": "meter_ops",
      "id": "Billed Segment Count (Premise)",
      "label": "Billed Segment Count (Premise)",
@@ -23572,6 +23954,38 @@
      "group": "meter_ops",
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Status Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Status\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code",
      "role": "dimension",
      "type": "text"
     },
@@ -23767,27 +24181,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Meter Read Route Sequence",
-     "label": "Meter Read Route Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Measurement Cycle Route Sequence",
-     "label": "Measurement Cycle Route Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -23797,7 +24190,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -23807,7 +24199,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -23817,7 +24208,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -23932,8 +24322,6 @@
    "summary": "Service point with its premise and installed device.",
    "table_name": "rpt_premise_sp",
    "trusted_measures": [
-    "Meter Read Route Sequence",
-    "Measurement Cycle Route Sequence",
     "Service Point Count (Premise)",
     "SA Count (Premise)",
     "Billed Segment Count (Premise)",
@@ -23948,7 +24336,7 @@
   },
   "rpt_rate_configuration": {
    "data_model": {
-    "columns_traced_to_cisadm": 24,
+    "columns_traced_to_cisadm": 25,
     "domain_table": "rpt_rate_configuration",
     "driving_table": null,
     "field_groups": [
@@ -23980,6 +24368,7 @@
        "Bill Factor Value Type Code",
        "Bill Factor Varies By Char Type",
        "Bill Factor Allows Proration",
+       "Distribution Code Description",
        "Distribution Code",
        "Nested Calculation Group Code",
        "Has Nested Group",
@@ -24035,6 +24424,13 @@
       "on": "bf.bill_factor_cd = r.bill_factor_cd",
       "role": "model",
       "table": "stg_bill_factor"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = r.distribution_cd",
+      "role": "model",
+      "table": "stg_dst_code_label"
      }
     ],
     "population_filter": null,
@@ -24045,12 +24441,11 @@
      "C1_CALC_RULE",
      "C1_CALC_RULE_L",
      "CI_BF",
+     "CI_DST_CODE_L",
      "CI_RS",
      "CI_RS_L"
     ],
     "trusted_measures": [
-     "Role Sequence",
-     "Execution Sequence",
      "Eligibility Criteria Count"
     ]
    },
@@ -24096,12 +24491,20 @@
      "label": "Group Role"
     },
     {
+     "id": "Role Sequence",
+     "label": "Role Sequence"
+    },
+    {
      "id": "Calculation Group Code",
      "label": "Calculation Group Code"
     },
     {
      "id": "Calculation Group",
      "label": "Calculation Group"
+    },
+    {
+     "id": "Execution Sequence",
+     "label": "Execution Sequence"
     },
     {
      "id": "Calculation Rule Code",
@@ -24154,6 +24557,10 @@
     {
      "id": "Bill Factor Allows Proration",
      "label": "Bill Factor Allows Proration"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -24242,7 +24649,7 @@
      "group": "billing",
      "id": "Role Sequence",
      "label": "Role Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric"
     },
     {
@@ -24274,7 +24681,7 @@
      "group": "billing",
      "id": "Execution Sequence",
      "label": "Execution Sequence",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(5,0)"
     },
     {
@@ -24382,6 +24789,14 @@
      "type": "boolean"
     },
     {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "billing",
      "id": "Distribution Code",
@@ -24442,26 +24857,6 @@
       "min",
       "max"
      ],
-     "id": "Role Sequence",
-     "label": "Role Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Execution Sequence",
-     "label": "Execution Sequence"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
      "id": "Eligibility Criteria Count",
      "label": "Eligibility Criteria Count"
     }
@@ -24494,8 +24889,6 @@
    "summary": "How each rate schedule actually calculates.",
    "table_name": "rpt_rate_configuration",
    "trusted_measures": [
-    "Role Sequence",
-    "Execution Sequence",
     "Eligibility Criteria Count"
    ],
    "usage_guidance": null,
@@ -24978,7 +25371,7 @@
      "type": "text"
     },
     {
-     "description": "Flag. Filter on it; do not sum it.",
+     "description": "The bill carries a budget-billed segment: its financial transaction posts the budget as the current amount and the actual charges as the payoff (they differ, and the payoff is not zero). Its variance is the budget-vs-actual difference, so the zero-variance gate excludes it. Read from the bill's own money, not the account's budget plan code, which most accounts carry whether or not they are on budget.",
      "group": "finance",
      "id": "Is Budget Billed",
      "label": "Is Budget Billed",
@@ -25131,7 +25524,7 @@
   },
   "rpt_sa_aged_balance": {
    "data_model": {
-    "columns_traced_to_cisadm": 15,
+    "columns_traced_to_cisadm": 19,
     "domain_table": "rpt_sa_aged_balance",
     "driving_table": null,
     "field_groups": [
@@ -25167,7 +25560,11 @@
        "Customer Class",
        "Customer Class Code",
        "Collection Class",
-       "Bill Cycle"
+       "Bill Cycle",
+       "CIS Division",
+       "Premise ID",
+       "Premise Address",
+       "City"
       ],
       "id": "debt",
       "label": "Collections & Debt"
@@ -25190,6 +25587,13 @@
       "on": "da.acct_id = f.acct_id",
       "role": "model",
       "table": "dim_account"
+     },
+     {
+      "alias": "pr",
+      "join_type": "left join",
+      "on": "pr.prem_id = sa.characteristic_prem_id",
+      "role": "model",
+      "table": "dim_premise"
      }
     ],
     "population_filter": null,
@@ -25201,6 +25605,7 @@
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
      "CI_LOOKUP_VAL_L",
+     "CI_PREM",
      "CI_REV_CL_L",
      "CI_SA",
      "CI_SA_TYPE",
@@ -25314,6 +25719,22 @@
     {
      "id": "Bill Cycle",
      "label": "Bill Cycle"
+    },
+    {
+     "id": "CIS Division",
+     "label": "CIS Division"
+    },
+    {
+     "id": "Premise ID",
+     "label": "Premise ID"
+    },
+    {
+     "id": "Premise Address",
+     "label": "Premise Address"
+    },
+    {
+     "id": "City",
+     "label": "City"
     }
    ],
    "fields": [
@@ -25564,6 +25985,38 @@
      "label": "Bill Cycle",
      "role": "dimension",
      "type": "varchar(60)"
+    },
+    {
+     "description": "",
+     "group": "debt",
+     "id": "CIS Division",
+     "label": "CIS Division",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "debt",
+     "id": "Premise ID",
+     "label": "Premise ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Address component, as held in C2M. Not validated or standardised here.",
+     "group": "debt",
+     "id": "Premise Address",
+     "label": "Premise Address",
+     "role": "dimension",
+     "type": "varchar(254)"
+    },
+    {
+     "description": "Address component, as held in C2M. Not validated or standardised here.",
+     "group": "debt",
+     "id": "City",
+     "label": "City",
+     "role": "dimension",
+     "type": "varchar(90)"
     }
    ],
    "grain": "service agreement + snapshot date",
@@ -25738,7 +26191,7 @@
   },
   "rpt_service_agreement": {
    "data_model": {
-    "columns_traced_to_cisadm": 28,
+    "columns_traced_to_cisadm": 29,
     "domain_table": "rpt_service_agreement",
     "driving_table": "CI_SA",
     "field_groups": [
@@ -25759,6 +26212,7 @@
        "Service Type Code",
        "Revenue Class",
        "Revenue Class Code",
+       "Distribution Code Description",
        "Distribution Code",
        "SA Start Date",
        "SA End Date",
@@ -25772,6 +26226,7 @@
        "Start Reason",
        "Stop Reason",
        "Characteristic Premise ID",
+       "MDM Next Scheduled Read Date",
        "Premise Characteristics",
        "Premise Characteristic Count",
        "Snapshot Date",
@@ -25884,6 +26339,20 @@
       "on": "pch.prem_id = sa.characteristic_prem_id",
       "role": "step",
       "table": "premise_characteristics"
+     },
+     {
+      "alias": "dcl",
+      "join_type": "left join",
+      "on": "dcl.dst_id = sa.distribution_cd",
+      "role": "model",
+      "table": "stg_dst_code_label"
+     },
+     {
+      "alias": "nr",
+      "join_type": "left join",
+      "on": "nr.sa_id = sa.sa_id",
+      "role": "step",
+      "table": "next_read"
      }
     ],
     "population_filter": null,
@@ -25895,6 +26364,7 @@
      "CI_BUD_PLAN_L",
      "CI_COLL_CL_L",
      "CI_CUST_CL_L",
+     "CI_DST_CODE_L",
      "CI_LOOKUP_VAL_L",
      "CI_REV_CL_L",
      "CI_SA",
@@ -25937,6 +26407,10 @@
     {
      "id": "SA Renewal Date",
      "label": "SA Renewal Date"
+    },
+    {
+     "id": "MDM Next Scheduled Read Date",
+     "label": "MDM Next Scheduled Read Date"
     },
     {
      "id": "Snapshot Date",
@@ -26013,6 +26487,10 @@
     {
      "id": "Revenue Class Code",
      "label": "Revenue Class Code"
+    },
+    {
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description"
     },
     {
      "id": "Distribution Code",
@@ -26233,6 +26711,14 @@
      "type": "text"
     },
     {
+     "description": "Descriptive label.",
+     "group": "billing",
+     "id": "Distribution Code Description",
+     "label": "Distribution Code Description",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
      "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
      "group": "billing",
      "id": "Distribution Code",
@@ -26337,6 +26823,14 @@
      "type": "text"
     },
     {
+     "description": "When MDM next expects to read this service agreement's meters: C2M's own C1-NSRD service agreement characteristic (base product, kept by the MDM sync), its current version as of the as-of date. Blank where MDM has not set it.",
+     "group": "billing",
+     "id": "MDM Next Scheduled Read Date",
+     "label": "MDM Next Scheduled Read Date",
+     "role": "date",
+     "type": "date"
+    },
+    {
      "description": "",
      "group": "billing",
      "id": "Premise Characteristics",
@@ -26425,7 +26919,7 @@
      "type": "numeric"
     },
     {
-     "description": "Elapsed days. Average it, do not sum it.",
+     "description": "Unpaid debt more than 120 days past due as of the run date.",
      "group": "billing",
      "id": "Arrears 120+ Days",
      "label": "Arrears 120+ Days",
@@ -26593,7 +27087,7 @@
      "type": "varchar(60)"
     },
     {
-     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (College Station: 104,826 carry a code, 965 are on budget).",
+     "description": "On budget billing by C2M's own rule: a budget-ELIGIBLE SA type (ELIG_BUDGET_SW), Active or Pending Stop, with a current recurring charge above zero; on an account, any of its agreements. Not the Budget Plan code, which also sits on accounts that are not on budget (at some clients most accounts carry a code and few are on budget).",
      "group": "billing",
      "id": "Is On Budget",
      "label": "Is On Budget",
@@ -26634,7 +27128,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -26744,7 +27237,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -26956,7 +27448,6 @@
      "Start Balance",
      "End Balance",
      "Days Unbalanced",
-     "Batch Number",
      "Deposit End Balance"
     ]
    },
@@ -27024,6 +27515,10 @@
     {
      "id": "Batch Code",
      "label": "Batch Code"
+    },
+    {
+     "id": "Batch Number",
+     "label": "Batch Number"
     },
     {
      "id": "Deposit Control ID",
@@ -27180,11 +27675,11 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "The tender control's batch number as entered in C2M. An identifier, not a measure.",
      "group": "cashiering",
      "id": "Batch Number",
      "label": "Batch Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(10,0)"
     },
     {
@@ -27212,7 +27707,7 @@
      "type": "text"
     },
     {
-     "description": "Currency measure, additive at this data set's grain.",
+     "description": "The deposit control's ending balance, repeated on every drawer session (and tender) of the deposit -- not additive here; read one row per deposit control.",
      "group": "cashiering",
      "id": "Deposit End Balance",
      "label": "Deposit End Balance",
@@ -27271,7 +27766,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -27281,17 +27775,6 @@
     },
     {
      "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
-     "id": "Batch Number",
-     "label": "Batch Number"
-    },
-    {
-     "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -27331,7 +27814,6 @@
     "Start Balance",
     "End Balance",
     "Days Unbalanced",
-    "Batch Number",
     "Deposit End Balance"
    ],
    "usage_guidance": null,
@@ -27580,7 +28062,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -27655,7 +28136,7 @@
     "Drill Key Count"
    ],
    "usage_guidance": null,
-   "use_case": "To-do entries: the work C2M assigns to staff, with its owner, age and completion.",
+   "use_case": "To Do entries: the work C2M assigns to staff, with its owner, age and completion.",
    "workstream": "common",
    "workstream_label": "Operations & Shared Services"
   },
@@ -28187,7 +28668,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28197,7 +28677,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28217,7 +28696,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28296,7 +28774,7 @@
   },
   "rpt_usage_txn": {
    "data_model": {
-    "columns_traced_to_cisadm": 26,
+    "columns_traced_to_cisadm": 39,
     "domain_table": "rpt_usage_txn",
     "driving_table": "D1_USAGE_SCALAR_DTL",
     "field_groups": [
@@ -28304,6 +28782,10 @@
       "fields": [
        "Usage ID",
        "MDM Service Point ID",
+       "MDM Service Point Type",
+       "MDM Service Point Type Code",
+       "MDM Service Point Status",
+       "MDM Service Point Status Code",
        "Sequence Number",
        "Quantity",
        "Final Quantity",
@@ -28326,10 +28808,23 @@
        "Is Used on Bill",
        "Usage Source Code",
        "Usage Subscription ID",
+       "Usage Group",
        "Usage Group Code",
+       "Measurement Cycle",
        "Measurement Cycle Code",
        "Measurement Cycle Route Code",
        "Usage Created Date/Time",
+       "Usage Request ID",
+       "Service Agreement ID",
+       "SA Type",
+       "SA Type Code",
+       "Utility Type",
+       "Account ID",
+       "Main Customer Name",
+       "Customer Class",
+       "Customer Class Code",
+       "Bill Segment ID",
+       "Bill ID",
        "Service Point ID",
        "Premise ID",
        "Premise Address",
@@ -28349,6 +28844,34 @@
       "on": "u.d1_usage_id = r.d1_usage_id",
       "role": "model",
       "table": "stg_d1_usage"
+     },
+     {
+      "alias": "cu",
+      "join_type": "left join",
+      "on": "cu.usage_id = u.usg_ext_id",
+      "role": "model",
+      "table": "stg_c1_usage"
+     },
+     {
+      "alias": "sa",
+      "join_type": "left join",
+      "on": "sa.sa_id = cu.sa_id",
+      "role": "model",
+      "table": "dim_service_agreement"
+     },
+     {
+      "alias": "da",
+      "join_type": "left join",
+      "on": "da.acct_id = sa.acct_id",
+      "role": "model",
+      "table": "dim_account"
+     },
+     {
+      "alias": "bs",
+      "join_type": "left join",
+      "on": "bs.bseg_id = cu.bseg_id",
+      "role": "model",
+      "table": "dim_bill_segment"
      },
      {
       "alias": "ust",
@@ -28419,23 +28942,52 @@
       "on": "sqi.sqi_cd = r.sqi_cd",
       "role": "model",
       "table": "stg_sqi_label"
+     },
+     {
+      "alias": "msp",
+      "join_type": "left join",
+      "on": "msp.d1_sp_id = r.d1_sp_id",
+      "role": "model",
+      "table": "int_mdm_service_point"
+     },
+     {
+      "alias": "ug",
+      "join_type": "left join",
+      "on": "ug.usg_grp_cd = u.usg_grp_cd",
+      "role": "model",
+      "table": "stg_d1_usage_group_label"
+     },
+     {
+      "alias": "mcy",
+      "join_type": "left join",
+      "on": "mcy.msrmt_cyc_cd = u.msrmt_cyc_cd",
+      "role": "model",
+      "table": "stg_d1_msrmt_cyc_label"
      }
     ],
     "population_filter": null,
     "refresh_sql": "models/marts/reporting/rpt_usage_txn.sql",
     "snapshot_table": "reporting.rpt_usage_txn",
     "source_tables": [
+     "C1_USAGE",
+     "CI_ACCT",
+     "CI_CUST_CL_L",
      "CI_PREM",
+     "CI_SA",
+     "CI_SA_TYPE_L",
      "CI_SP",
      "CI_SQI_L",
      "CI_TOU_L",
      "CI_UOM_L",
      "D1_DVC_CFG",
+     "D1_MSRMT_CYC_L",
+     "D1_SP",
+     "D1_SP_TYPE_L",
      "D1_USAGE",
-     "D1_USAGE_SCALAR_DTL"
+     "D1_USAGE_SCALAR_DTL",
+     "D1_USG_GRP_L"
     ],
     "trusted_measures": [
-     "Sequence Number",
      "Quantity",
      "Final Quantity",
      "Start Measurement",
@@ -28466,6 +29018,26 @@
     {
      "id": "MDM Service Point ID",
      "label": "MDM Service Point ID"
+    },
+    {
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type"
+    },
+    {
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code"
+    },
+    {
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status"
+    },
+    {
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code"
+    },
+    {
+     "id": "Sequence Number",
+     "label": "Sequence Number"
     },
     {
      "id": "Unit of Measure",
@@ -28528,8 +29100,16 @@
      "label": "Usage Subscription ID"
     },
     {
+     "id": "Usage Group",
+     "label": "Usage Group"
+    },
+    {
      "id": "Usage Group Code",
      "label": "Usage Group Code"
+    },
+    {
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle"
     },
     {
      "id": "Measurement Cycle Code",
@@ -28538,6 +29118,50 @@
     {
      "id": "Measurement Cycle Route Code",
      "label": "Measurement Cycle Route Code"
+    },
+    {
+     "id": "Usage Request ID",
+     "label": "Usage Request ID"
+    },
+    {
+     "id": "Service Agreement ID",
+     "label": "Service Agreement ID"
+    },
+    {
+     "id": "SA Type",
+     "label": "SA Type"
+    },
+    {
+     "id": "SA Type Code",
+     "label": "SA Type Code"
+    },
+    {
+     "id": "Utility Type",
+     "label": "Utility Type"
+    },
+    {
+     "id": "Account ID",
+     "label": "Account ID"
+    },
+    {
+     "id": "Main Customer Name",
+     "label": "Main Customer Name"
+    },
+    {
+     "id": "Customer Class",
+     "label": "Customer Class"
+    },
+    {
+     "id": "Customer Class Code",
+     "label": "Customer Class Code"
+    },
+    {
+     "id": "Bill Segment ID",
+     "label": "Bill Segment ID"
+    },
+    {
+     "id": "Bill ID",
+     "label": "Bill ID"
     },
     {
      "id": "Service Point ID",
@@ -28574,11 +29198,43 @@
      "type": "text"
     },
     {
-     "description": "",
+     "description": "English description of \"MDM Service Point Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type",
+     "label": "MDM Service Point Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Type Code",
+     "label": "MDM Service Point Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"MDM Service Point Status Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status",
+     "label": "MDM Service Point Status",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"MDM Service Point Status\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "MDM Service Point Status Code",
+     "label": "MDM Service Point Status Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Ordering sequence within its parent. Part of the grain, not a measure.",
      "group": "meter_ops",
      "id": "Sequence Number",
      "label": "Sequence Number",
-     "role": "measure",
+     "role": "dimension",
      "type": "numeric(3,0)"
     },
     {
@@ -28598,7 +29254,7 @@
      "type": "numeric"
     },
     {
-     "description": "",
+     "description": "The measurement at the start of the usage period. A reading, not a quantity: do not sum it; Quantity is the additive amount.",
      "group": "meter_ops",
      "id": "Start Measurement",
      "label": "Start Measurement",
@@ -28606,7 +29262,7 @@
      "type": "numeric(16,6)"
     },
     {
-     "description": "",
+     "description": "The measurement at the end of the usage period. A reading, not a quantity: do not sum it; Quantity is the additive amount.",
      "group": "meter_ops",
      "id": "End Measurement",
      "label": "End Measurement",
@@ -28750,7 +29406,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Usage Group Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Usage Group",
+     "label": "Usage Group",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Usage Group\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Usage Group Code",
      "label": "Usage Group Code",
@@ -28758,7 +29422,15 @@
      "type": "text"
     },
     {
-     "description": "Code configured by this utility. Values differ between clients, so a filter on it does not necessarily travel to another client.",
+     "description": "English description of \"Measurement Cycle Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Measurement Cycle",
+     "label": "Measurement Cycle",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Measurement Cycle\" for the description: report on the description, filter on the code.",
      "group": "meter_ops",
      "id": "Measurement Cycle Code",
      "label": "Measurement Cycle Code",
@@ -28780,6 +29452,94 @@
      "label": "Usage Created Date/Time",
      "role": "date",
      "type": "timestamp"
+    },
+    {
+     "description": "The usage request C2M billing raised (C1_USAGE), which this usage transaction answers. It names the service agreement and bill segment the usage is billed on; blank while billing has not asked for it.",
+     "group": "meter_ops",
+     "id": "Usage Request ID",
+     "label": "Usage Request ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "meter_ops",
+     "id": "Service Agreement ID",
+     "label": "Service Agreement ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "English description of \"SA Type Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "SA Type",
+     "label": "SA Type",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"SA Type\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "SA Type Code",
+     "label": "SA Type Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Which utility this service agreement is for, from C2M's own service type (CI_SA_TYPE.SVC_TYPE_CD). Payment arrangements, deposits, fees and write-offs are service type M and group under Other / Non-Utility. Was previously inferred from the SA type's English description, which read correctly at one client and misfiled sewer and stormwater at the others.",
+     "group": "meter_ops",
+     "id": "Utility Type",
+     "label": "Utility Type",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "meter_ops",
+     "id": "Account ID",
+     "label": "Account ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Descriptive label.",
+     "group": "meter_ops",
+     "id": "Main Customer Name",
+     "label": "Main Customer Name",
+     "role": "dimension",
+     "type": "varchar(254)"
+    },
+    {
+     "description": "English description of \"Customer Class Code\". Group and report on this; filter on the code.",
+     "group": "meter_ops",
+     "id": "Customer Class",
+     "label": "Customer Class",
+     "role": "dimension",
+     "type": "varchar(60)"
+    },
+    {
+     "description": "Code configured by this utility; the values differ between clients. Paired with \"Customer Class\" for the description: report on the description, filter on the code.",
+     "group": "meter_ops",
+     "id": "Customer Class Code",
+     "label": "Customer Class Code",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "Natural key from CISADM. Use it to drill back into C2M.",
+     "group": "meter_ops",
+     "id": "Bill Segment ID",
+     "label": "Bill Segment ID",
+     "role": "dimension",
+     "type": "text"
+    },
+    {
+     "description": "The bill this row was processed on. For revenue attribution on cancellations use \"Owning Bill ID\" where the data set offers it.",
+     "group": "meter_ops",
+     "id": "Bill ID",
+     "label": "Bill ID",
+     "role": "dimension",
+     "type": "text"
     },
     {
      "description": "Natural key from CISADM. Use it to drill back into C2M.",
@@ -28834,16 +29594,6 @@
       "min",
       "max"
      ],
-     "id": "Sequence Number",
-     "label": "Sequence Number"
-    },
-    {
-     "aggs": [
-      "sum",
-      "avg",
-      "min",
-      "max"
-     ],
      "id": "Quantity",
      "label": "Quantity"
     },
@@ -28859,7 +29609,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28869,7 +29618,6 @@
     },
     {
      "aggs": [
-      "sum",
       "avg",
       "min",
       "max"
@@ -28906,7 +29654,6 @@
    "summary": "Usage transactions at scalar-detail grain.",
    "table_name": "rpt_usage_txn",
    "trusted_measures": [
-    "Sequence Number",
     "Quantity",
     "Final Quantity",
     "Start Measurement",

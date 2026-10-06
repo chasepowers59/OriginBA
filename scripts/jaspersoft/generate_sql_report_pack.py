@@ -364,7 +364,7 @@ def controls(s: Spec) -> tuple[dict, list]:
 # on the report unit at import time (/DataSource/<tenant>_DS), never inside the JRXML.
 # Chase, 2026-09-24: every static SQL report lives in ONE folder so a client schedules them from one
 # place instead of hunting the module folders (the 2026-09 layout put each under its module).
-FOLDER = "/SmartCity/Report/Standard_Offering/Standardized_Reports"
+FOLDER = "/SmartCity/Report/Origin_BA_2_0/Standardized_Reports"   # moved into the 2.0 release 2026-10-05
 FOLDERS = {name: FOLDER for name in ("billing_by_cycle_period", "payments_by_tender_type_period", "adjustments_by_type_period",
                                      "gl_by_distribution_code_period", "adj_ap_requests_control", "aged_debt_as_of",
                                      "top_usage_customers")}
