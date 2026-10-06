@@ -85,3 +85,34 @@ def test_a_failing_chunk_is_narrowed_to_the_fields_that_fail():
     assert narrowed({"g.f3", "g.f7"}, 10)[0] == ["g.f3", "g.f7"]
     found, calls = narrowed({"g.f29"}, 40)   # the real case: one bad field in a chunk of forty
     assert found == ["g.f29"] and calls < 15   # bisected, not one call per field
+
+
+EXT_XML = """<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.3">
+  <resources>
+    <jdbcQuery id="CHR_PREM_IN_OUT" datasourceId="DS"><fieldList><field id="KEY_ID" type="java.lang.String"/>
+      <field id="CHAR_VALUE" type="java.lang.String"/></fieldList>
+      <query>SELECT X.KEY_ID AS KEY_ID, X.CHAR_VALUE AS CHAR_VALUE FROM (SELECT 1 FROM DUAL WHERE A &lt;= B) X</query></jdbcQuery>
+    <jdbcTable id="RPT_PREMISE_SP_BI" datasourceId="DS" datasourceTableName="RPT_PREMISE_SP_BI" schemaAlias="ORIGINBA_REPORTING"/>
+    <joinedDataSetRef><joinString>join</joinString></joinedDataSetRef>
+    <joinInfo alias="RPT_PREMISE_SP_BI" referenceId="RPT_PREMISE_SP_BI">
+      <join expr="RPT_PREMISE_SP_BI.PREMISE_ID == CHR_PREM_IN_OUT.KEY_ID" left="RPT_PREMISE_SP_BI" right="CHR_PREM_IN_OUT" type="leftOuter" weight="1"/>
+    </joinInfo>
+  </resources>
+  <itemGroups><itemGroup id="GChar" label="Characteristic" resourceId="JoinTree_1"><items>
+    <item id="PS_CHR_PREM_IN_OUT" label="Inside/Outside City Limits" resourceId="JoinTree_1.CHR_PREM_IN_OUT.CHAR_VALUE"/>
+    <item id="PS_PREMISE_ID" label="Premise ID" resourceId="JoinTree_1.RPT_PREMISE_SP_BI.PREMISE_ID"/>
+  </items></itemGroup></itemGroups>
+</schema>"""
+
+
+def test_each_client_characteristic_is_paired_with_its_join_and_sql():
+    (c,) = v.characteristic_checks(EXT_XML)
+    assert c["item"] == "PS_CHR_PREM_IN_OUT" and c["view"] == "RPT_PREMISE_SP_BI" and c["column"] == "PREMISE_ID"
+    assert c["sql"].startswith("SELECT X.KEY_ID") and "A <= B" in c["sql"]   # the XML escape is undone
+
+
+def test_the_expected_count_is_canvas_rows_whose_key_finds_a_value():
+    sql = v.expected_characteristic_sql({"sql": "SELECT 1 AS KEY_ID, 'x' AS CHAR_VALUE FROM DUAL",
+                                         "view": "RPT_PREMISE_SP_BI", "column": "PREMISE_ID"})
+    assert "count(x.CHAR_VALUE)" in sql and "x.KEY_ID = v.PREMISE_ID" in sql and "left join" in sql.lower()
+    assert "ORIGINBA_REPORTING.RPT_PREMISE_SP_BI v" in sql

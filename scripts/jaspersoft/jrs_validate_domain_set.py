@@ -6,7 +6,10 @@ Three checks per domain under <root>/Domains:
   1. the server's fields (Ad Hoc metadata) equal the generated XML: none missing, extra or relabelled, same folders;
   2. a CountAll on the grain key (the contract's first column; CountAll skips blanks, so any other field can
      under-count) equals select count(*) from the canvas's BI view in the client's warehouse;
-  3. every field executes, 40 at a time, one row each; a failing chunk is bisected to the fields that fail.
+  3. every field executes, 40 at a time, one row each; a failing chunk is bisected to the fields that fail;
+  4. every client characteristic joined in (domain_extensions) returns a value on exactly as many rows as
+     the same derived table joined to the BI view in the warehouse, and on at least one: an all-blank
+     characteristic means its join or its code matches nothing.
 
 A dropped link (VPN or server gone) stops the run and names every domain left unchecked, rather than reading a
 timeout as a failing domain.
@@ -54,6 +57,30 @@ def differences(want: dict, got: dict) -> dict[str, list[str]]:
 def grain_item(got: dict[str, tuple[str, str]], grain_column: str) -> str | None:
     """The item for the grain key's BI column (ids are <role prefix>_<BI column>)."""
     return next((k for k in got if k.split("_", 1)[-1] == grain_column), None)
+
+
+def characteristic_checks(xml_text: str) -> list[dict]:
+    """Each characteristic item with the derived table it reads and the view column it joins on."""
+    root = ET.fromstring(xml_text)
+    sql = {q.get("id"): q.find(f"{NS}query").text for q in root.iter(f"{NS}jdbcQuery")}
+    joins = {}
+    for j in root.iter(f"{NS}join"):
+        left, right = (x.strip() for x in j.get("expr").split("=="))
+        if right.split(".")[0] in sql:
+            joins[right.split(".")[0]] = left.split(".")
+    out = []
+    for it in root.iter(f"{NS}item"):
+        parts = it.get("resourceId").split(".")
+        if len(parts) == 3 and parts[1] in joins and parts[2] == "CHAR_VALUE":
+            view, col = joins[parts[1]]
+            out.append({"item": it.get("id"), "label": it.get("label"), "query": parts[1], "sql": sql[parts[1]],
+                        "view": view, "column": col})
+    return out
+
+
+def expected_characteristic_sql(c: dict) -> str:
+    return (f"select count(x.CHAR_VALUE) from ORIGINBA_REPORTING.{c['view']} v "
+            f"left join ({c['sql']}) x on x.KEY_ID = v.{c['column']}")
 
 
 def count_from(data: dict) -> int:
@@ -155,11 +182,27 @@ def main() -> int:
                             "application/execution.multiLevelQuery+json", "application/flatData+json", 300)[1]
         bad = [] if a.skip_fields else [f for chunk in chunks([f"{level_of[k]}.{k}" for k in got])
                                          for f in failing_fields(chunk, run)]
-        ok = not any(diff.values()) and jrs_rows == ora_rows and not bad
+        chars = []
+        for c in characteristic_checks((a.set_dir / r["file"]).read_text(encoding="utf-8")):
+            if c["item"] not in level_of:   # missing on the server: the definition diff already says so
+                continue
+            q = {"select": {"aggregations": [{"id": "n", "fieldRef": f"{level_of[c['item']]}.{c['item']}",
+                                              "aggregateFunction": "CountAll"}]}}
+            data, why = call("/rest_v2/queryExecutions", "POST",
+                             json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": q}).encode(),
+                             "application/execution.multiLevelQuery+json", "application/flatData+json", 600)
+            cur.execute(expected_characteristic_sql(c))
+            want = cur.fetchone()[0]
+            got = count_from(data) if data else None
+            chars.append({"label": c["label"], "jaspersoft": got, "warehouse": want, "ok": got == want and want > 0})
+        bad_chars = [c for c in chars if not c["ok"]]
+        ok = not any(diff.values()) and jrs_rows == ora_rows and not bad and not bad_chars
         print(f"{'ok  ' if ok else 'FAIL'} {name}: {len(got)} fields ({', '.join(f'{k} {len(v)}' for k, v in diff.items())}); "
-              f"rows {jrs_rows} / {ora_rows:,}{'; failing fields ' + ', '.join(bad) if bad else ''}", flush=True)
+              f"rows {jrs_rows} / {ora_rows:,}{'; failing fields ' + ', '.join(bad) if bad else ''}"
+              + "".join(f"; {c['label']} {c['jaspersoft']} / {c['warehouse']:,}{'' if c['ok'] else ' FAIL'}" for c in chars),
+              flush=True)
         return {"domain": name, "ok": ok, "fields": len(got), **diff, "jaspersoft_rows": jrs_rows,
-                "warehouse_rows": ora_rows, "failing_fields": bad}
+                "warehouse_rows": ora_rows, "failing_fields": bad, "characteristics": chars}
 
     try:
         listing, why = call("/rest_v2/resources?folderUri=" + urllib.parse.quote(f"{a.root}/Domains")
