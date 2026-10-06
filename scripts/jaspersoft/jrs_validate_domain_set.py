@@ -193,8 +193,8 @@ def main() -> int:
                              "application/execution.multiLevelQuery+json", "application/flatData+json", 600)
             cur.execute(expected_characteristic_sql(c))
             want = cur.fetchone()[0]
-            got = count_from(data) if data else None
-            chars.append({"label": c["label"], "jaspersoft": got, "warehouse": want, "ok": got == want and want > 0})
+            have = count_from(data) if data else None
+            chars.append({"label": c["label"], "jaspersoft": have, "warehouse": want, "ok": have == want and want > 0})
         bad_chars = [c for c in chars if not c["ok"]]
         ok = not any(diff.values()) and jrs_rows == ora_rows and not bad and not bad_chars
         print(f"{'ok  ' if ok else 'FAIL'} {name}: {len(got)} fields ({', '.join(f'{k} {len(v)}' for k, v in diff.items())}); "
