@@ -6,7 +6,10 @@ Three checks per domain under <root>/Domains:
   1. the server's fields (Ad Hoc metadata) equal the generated XML: none missing, extra or relabelled, same folders;
   2. a CountAll on the grain key (the contract's first column; CountAll skips blanks, so any other field can
      under-count) equals select count(*) from the canvas's BI view in the client's warehouse;
-  3. every field executes, 40 at a time, one row each.
+  3. every field executes, 40 at a time, one row each; a failing chunk is bisected to the fields that fail.
+
+A dropped link (VPN or server gone) stops the run and names every domain left unchecked, rather than reading a
+timeout as a failing domain.
 
     scripts/jaspersoft/jrs.sh jrs_validate_domain_set.py --env test --org Origin_DEV \\
         --set-dir <generated set> --client ellensburg [--root /SmartCity/Report/Origin_BA_2_0] [--skip-fields]
@@ -53,13 +56,41 @@ def grain_item(got: dict[str, tuple[str, str]], grain_column: str) -> str | None
     return next((k for k in got if k.split("_", 1)[-1] == grain_column), None)
 
 
-def count_from(body: str | bytes) -> int:
-    return int(float(json.loads(body)["dataset"]["rows"][0][0]))
+def count_from(data: dict) -> int:
+    return int(float(data["dataset"]["rows"][0][0]))
 
 
 def chunks(fields: list[str]):
     for k in range(0, len(fields), CHUNK):
         yield fields[k:k + CHUNK]
+
+
+class LinkDown(Exception):
+    pass
+
+
+def answer(code: int | None, body: bytes) -> tuple[object, str | None]:
+    """(parsed JSON, None) for a usable answer, else (None, why)."""
+    text = body.decode(errors="ignore")
+    if code is None:
+        return None, f"link down: {text}"
+    if code != 200 or not text.strip():
+        try:
+            why = json.loads(text).get("message") or text[:160]
+        except ValueError:
+            why = text[:160] or "empty response"
+        return None, f"HTTP {code}: {why}"
+    return json.loads(text), None
+
+
+def failing_fields(fields: list[str], run) -> list[str]:
+    """The fields that fail on their own, by bisection: run(fields) is True when they execute together."""
+    if run(fields):
+        return []
+    if len(fields) == 1:
+        return fields
+    half = len(fields) // 2
+    return failing_fields(fields[:half], run) + failing_fields(fields[half:], run)
 
 
 def main() -> int:
@@ -83,22 +114,25 @@ def main() -> int:
     cur = con.cursor()
     one._scope(a.env, a.org)
 
+    def call(path, *args, **kw):
+        data, why = answer(*sw._http(path, *args, **kw)[:2])
+        if why and why.startswith("link down"):
+            raise LinkDown(why)
+        return data, why
+
     rows = ids.parse_manifest((a.set_dir / "README.md").read_text())
     by_name = {ids.resource_name(r["label"]): r for r in rows}
-    code, body, _ = sw._http("/rest_v2/resources?folderUri=" + urllib.parse.quote(f"{a.root}/Domains")
-                             + "&type=semanticLayerDataSource&recursive=true&limit=500")
-    uris = sorted(r["uri"] for r in json.loads(body)["resourceLookup"]) if code == 200 else []
-    on_server = {u.rsplit("/", 1)[-1]: u for u in uris}
-    results, problems = [], 0
-    for name in sorted(set(by_name) | set(on_server)):
+
+    def check(name: str) -> dict:
         r, uri = by_name.get(name), on_server.get(name)
         if not r or not uri:
             print(f"FAIL {name}: {'not on the server' if r else 'on the server, not in the set'}")
-            results.append({"domain": name, "ok": False, "why": "missing" if r else "extra"}); problems += 1
-            continue
+            return {"domain": name, "ok": False, "why": "missing" if r else "extra"}
         want = generated_items((a.set_dir / r["file"]).read_text(encoding="utf-8"))
-        code, body, _ = sw._http(f"/rest_v2/domains{urllib.parse.quote(uri)}/metadata", timeout=180)
-        meta = json.loads(body)
+        meta, why = call(f"/rest_v2/domains{urllib.parse.quote(uri)}/metadata", timeout=180)
+        if why:
+            print(f"FAIL {name}: metadata {why}")
+            return {"domain": name, "ok": False, "why": f"metadata {why}"}
         levels = jrs_promote.domain_levels(meta)
         level_of = {i["id"]: lv["id"] for lv in levels for i in lv.get("items", [])}
         got = {i["id"]: (lv.get("label") or lv["id"], i.get("label")) for lv in levels for i in lv.get("items", [])}
@@ -107,34 +141,51 @@ def main() -> int:
         cols = [c["name"] for c in contracts[canvas]["columns"]]
         key = grain_item(got, safe_columns(cols)[cols[0]])
         q = {"select": {"aggregations": [{"id": "n", "fieldRef": f"{level_of[key]}.{key}", "aggregateFunction": "CountAll"}]}}
-        c, b, _ = sw._http("/rest_v2/queryExecutions", "POST",
-                           json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": q}).encode(),
-                           "application/execution.multiLevelQuery+json", "application/flatData+json", 600)
-        jrs_rows = count_from(b) if c == 200 else None
+        data, why = call("/rest_v2/queryExecutions", "POST",
+                         json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": q}).encode(),
+                         "application/execution.multiLevelQuery+json", "application/flatData+json", 600)
+        jrs_rows = count_from(data) if data else None
         cur.execute(f"select count(*) from ORIGINBA_REPORTING.{view_for(r['file'])}")
         ora_rows = cur.fetchone()[0]
-        bad_chunks = []
-        if not a.skip_fields:
-            fields = [f"{level_of[k]}.{k}" for k in got]
-            for chunk in chunks(fields):
-                payload = json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": {"select": {
-                    "fields": [{"id": f"f{i}", "field": f} for i, f in enumerate(chunk)]}}}).encode()
-                c2, b2, _ = sw._http("/rest_v2/queryExecutions?offset=0&pageSize=1", "POST", payload,
-                                     "application/execution.multiLevelQuery+json", "application/flatData+json", 300)
-                if c2 != 200:
-                    bad_chunks.append(sw._message(b2)[:160])
-        ok = not any(diff.values()) and jrs_rows == ora_rows and not bad_chunks
-        problems += not ok
+
+        def run(fields):
+            payload = json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": {"select": {
+                "fields": [{"id": f"f{i}", "field": f} for i, f in enumerate(fields)]}}}).encode()
+            return not call("/rest_v2/queryExecutions?offset=0&pageSize=1", "POST", payload,
+                            "application/execution.multiLevelQuery+json", "application/flatData+json", 300)[1]
+        bad = [] if a.skip_fields else [f for chunk in chunks([f"{level_of[k]}.{k}" for k in got])
+                                         for f in failing_fields(chunk, run)]
+        ok = not any(diff.values()) and jrs_rows == ora_rows and not bad
         print(f"{'ok  ' if ok else 'FAIL'} {name}: {len(got)} fields ({', '.join(f'{k} {len(v)}' for k, v in diff.items())}); "
-              f"rows {jrs_rows} / {ora_rows:,}{'; failing field chunks ' + str(len(bad_chunks)) if bad_chunks else ''}",
-              flush=True)
-        results.append({"domain": name, "ok": ok, "fields": len(got), **diff, "jaspersoft_rows": jrs_rows,
-                        "warehouse_rows": ora_rows, "failing_field_chunks": bad_chunks})
+              f"rows {jrs_rows} / {ora_rows:,}{'; failing fields ' + ', '.join(bad) if bad else ''}", flush=True)
+        return {"domain": name, "ok": ok, "fields": len(got), **diff, "jaspersoft_rows": jrs_rows,
+                "warehouse_rows": ora_rows, "failing_fields": bad}
+
+    try:
+        listing, why = call("/rest_v2/resources?folderUri=" + urllib.parse.quote(f"{a.root}/Domains")
+                            + "&type=semanticLayerDataSource&recursive=true&limit=500")
+    except LinkDown as e:
+        why = str(e)
+    if why:
+        print(f"STOP before any domain: the domain listing failed ({why})")
+        return 2
+    on_server = {r["uri"].rsplit("/", 1)[-1]: r["uri"] for r in (listing or {}).get("resourceLookup", [])}
+    results, problems, stopped = [], 0, None
+    names = sorted(set(by_name) | set(on_server))
+    for n, name in enumerate(names):
+        try:
+            res = check(name)
+        except LinkDown as e:
+            stopped = f"{e}; not checked: {', '.join(names[n:])}"
+            print(f"STOP {stopped}")
+            break
+        results.append(res)
+        problems += not res["ok"]
     out = REPO / "backups" / "jaspersoft" / "domain_validation" / f"{a.env}_{a.org}_{time.strftime('%Y%m%d-%H%M%S')}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(results, indent=1, default=str))
-    print(f"{len(results)} domains, {problems} problem(s) -> {out.relative_to(REPO)}")
-    return 1 if problems else 0
+    out.write_text(json.dumps({"results": results, "stopped": stopped}, indent=1, default=str))
+    print(f"{len(results)} of {len(names)} domains checked, {problems} problem(s) -> {out.relative_to(REPO)}")
+    return 2 if stopped else (1 if problems else 0)
 
 
 if __name__ == "__main__":

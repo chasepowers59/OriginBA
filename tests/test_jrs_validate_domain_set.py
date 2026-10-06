@@ -48,8 +48,8 @@ def test_the_count_is_taken_on_the_grain_key_because_countall_skips_blanks():
 
 
 def test_the_count_reads_from_the_dataset_rows():
-    body = json.dumps({"truncated": False, "totalCounts": 1, "dataset": {
-        "fields": [{"reference": "n", "type": "long", "kind": "aggregation"}], "counts": 1, "rows": [["436"]]}})
+    body = json.loads(json.dumps({"truncated": False, "totalCounts": 1, "dataset": {
+        "fields": [{"reference": "n", "type": "long", "kind": "aggregation"}], "counts": 1, "rows": [["436"]]}}))
     assert v.count_from(body) == 436
 
 
@@ -61,3 +61,27 @@ def test_fields_execute_in_chunks_of_forty():
 def test_never_writes():
     src = (ROOT / "scripts" / "jaspersoft" / "jrs_validate_domain_set.py").read_text()
     assert '"PUT"' not in src and '"DELETE"' not in src and "/rest_v2/import" not in src
+
+
+def test_a_dropped_link_is_named_not_parsed():
+    # _http returns code None and the exception text when the VPN or the server is gone
+    assert v.answer(None, b"URLError(TimeoutError('timed out'))") == (None, "link down: URLError(TimeoutError('timed out'))")
+
+
+def test_an_empty_or_failed_response_is_a_problem_not_a_crash():
+    assert v.answer(200, b"") == (None, "HTTP 200: empty response")
+    assert v.answer(500, b'{"message": "boom"}')[1] == "HTTP 500: boom"
+    assert v.answer(200, b'{"a": 1}') == ({"a": 1}, None)
+
+
+def test_a_failing_chunk_is_narrowed_to_the_fields_that_fail():
+    def narrowed(bad, n):
+        calls = []
+
+        def run(fields):
+            calls.append(fields)
+            return not bad & set(fields)
+        return v.failing_fields([f"g.f{i}" for i in range(n)], run), len(calls)
+    assert narrowed({"g.f3", "g.f7"}, 10)[0] == ["g.f3", "g.f7"]
+    found, calls = narrowed({"g.f29"}, 40)   # the real case: one bad field in a chunk of forty
+    assert found == ["g.f29"] and calls < 15   # bisected, not one call per field

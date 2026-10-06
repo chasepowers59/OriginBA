@@ -591,7 +591,8 @@ failed server-side with "Export failed." that day; the root form worked).
 --set-dir <set> --client ellensburg` checks every domain three ways, read-only: the server's fields equal the
 generated XML (none missing, extra or relabelled, same folders); CountAll on the GRAIN KEY equals count(*) on the
 canvas's BI view in the warehouse (CountAll skips blanks, so counting any other field under-counts: the Exception
-domain's first field read 9,918 against 2,646,723 rows); every field executes, 40 per query. Phase 2 re-import
+domain's first field read 9,918 against 2,646,723 rows); every field executes, 40 per query, a failing chunk bisected to the fields that fail. Exit 2 means the link
+dropped (VPN or server) and names every domain left unchecked; it is not a domain failure. Phase 2 re-import
 (45 domains, 2,073 fields): 45/45 match and count, 0 failing fields. Note the multiLevelQuery aggregation result is
 `dataset.rows[0][0]`, and an extended domain's data island is a join tree (`JOINTREE_1`), not the view.
 
