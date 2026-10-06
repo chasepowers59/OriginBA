@@ -83,6 +83,13 @@ def expected_characteristic_sql(c: dict) -> str:
             f"left join ({c['sql']}) x on x.KEY_ID = v.{c['column']}")
 
 
+def characteristic_query(char_ref: str, key_ref: str) -> dict:
+    """Count a characteristic beside the canvas grain key: counted alone, Jaspersoft drops the join and
+    counts the derived table at its own grain (one row per premise, not per service point)."""
+    return {"select": {"aggregations": [{"id": "n", "fieldRef": char_ref, "aggregateFunction": "CountAll"},
+                                        {"id": "k", "fieldRef": key_ref, "aggregateFunction": "CountAll"}]}}
+
+
 def count_from(data: dict) -> int:
     return int(float(data["dataset"]["rows"][0][0]))
 
@@ -186,8 +193,7 @@ def main() -> int:
         for c in characteristic_checks((a.set_dir / r["file"]).read_text(encoding="utf-8")):
             if c["item"] not in level_of:   # missing on the server: the definition diff already says so
                 continue
-            q = {"select": {"aggregations": [{"id": "n", "fieldRef": f"{level_of[c['item']]}.{c['item']}",
-                                              "aggregateFunction": "CountAll"}]}}
+            q = characteristic_query(f"{level_of[c['item']]}.{c['item']}", f"{level_of[key]}.{key}")
             data, why = call("/rest_v2/queryExecutions", "POST",
                              json.dumps({"dataSource": {"reference": {"uri": uri}}, "query": q}).encode(),
                              "application/execution.multiLevelQuery+json", "application/flatData+json", 600)

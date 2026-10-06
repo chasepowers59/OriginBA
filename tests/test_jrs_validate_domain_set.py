@@ -116,3 +116,12 @@ def test_the_expected_count_is_canvas_rows_whose_key_finds_a_value():
                                          "view": "RPT_PREMISE_SP_BI", "column": "PREMISE_ID"})
     assert "count(x.CHAR_VALUE)" in sql and "x.KEY_ID = v.PREMISE_ID" in sql and "left join" in sql.lower()
     assert "ORIGINBA_REPORTING.RPT_PREMISE_SP_BI v" in sql
+
+
+def test_a_characteristic_is_counted_beside_the_grain_key_so_the_join_runs():
+    # counted alone, Jaspersoft drops the join and counts the derived table (12,164 premises, not 33,052
+    # service points, Origin_DEV 2026-10-06); any canvas field in the query keeps the join
+    q = v.characteristic_query("Char.PS_CHR_PREM_IN_OUT", "SP.PS_SERVICE_POINT_ID")
+    refs = [a["fieldRef"] for a in q["select"]["aggregations"]]
+    assert refs == ["Char.PS_CHR_PREM_IN_OUT", "SP.PS_SERVICE_POINT_ID"]
+    assert all(a["aggregateFunction"] == "CountAll" for a in q["select"]["aggregations"])

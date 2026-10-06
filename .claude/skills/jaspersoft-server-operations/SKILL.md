@@ -594,7 +594,10 @@ canvas's BI view in the warehouse (CountAll skips blanks, so counting any other 
 domain's first field read 9,918 against 2,646,723 rows); every field executes, 40 per query, a failing chunk bisected to the fields that fail. Exit 2 means the link
 dropped (VPN or server) and names every domain left unchecked; it is not a domain failure. It also proves every client
 characteristic by population: Jaspersoft's non-blank count on the item equals the derived table left-joined
-to the canvas view in the warehouse, and is above zero. Phase 2 re-import
+to the canvas view in the warehouse, and is above zero. Count a characteristic BESIDE the grain key: counted alone,
+Jaspersoft drops the join and counts the derived table at its own grain (City Limits read 12,164 premises,
+not 33,052 service points, 2026-10-06); any canvas field in the query keeps the join. An Ad Hoc view built
+from characteristic fields alone counts the characteristic's entities, not the canvas rows. Phase 2 re-import
 (45 domains, 2,073 fields): 45/45 match and count, 0 failing fields. Note the multiLevelQuery aggregation result is
 `dataset.rows[0][0]`, and an extended domain's data island is a join tree (`JOINTREE_1`), not the view.
 
